@@ -29,21 +29,20 @@ func ManagingSystem(ch1, ch2 chan time.Duration) {
 	for {
 		t := <-ch1
 		ch2 <- t
-		time.Sleep(5 * time.Second)
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 
 func ManagedSystem(ch chan time.Duration) {
 
-	t := time.Millisecond * time.Duration(rand.Intn(10))
+	t := time.Duration(0)
 	for {
-
-		fmt.Print("+")
-		time.Sleep(t)
-
 		select {
 		case t = <-ch:
+			fmt.Println(t.Milliseconds())
 		default:
 		}
+		//fmt.Print("+")
+		time.Sleep(t)
 	}
 }
