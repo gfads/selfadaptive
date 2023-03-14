@@ -1,15 +1,16 @@
 package onoff
 
-import "time"
+import (
+	"selfadaptive/shared"
+	"time"
+)
 
 type OnOff struct{}
 
 func (OnOff) Update(d time.Duration, g time.Duration) time.Duration {
 	if d.Milliseconds() > g.Milliseconds() {
-		//fmt.Println("Acima da Meta")
-		return time.Duration(10 * time.Millisecond)
+		return time.Duration(shared.MinOnoff * time.Millisecond)
 	} else {
-		//fmt.Println("Abaixo da Meta")
-		return time.Duration(600 * time.Millisecond)
+		return time.Duration(shared.MaxOnoff * time.Millisecond)
 	}
 }

@@ -22,8 +22,8 @@ func ManagingSystem(ch chan time.Duration) {
 
 	for {
 		t := <-ch
-		ch <- c.Update(t, 500*time.Millisecond)
-		time.Sleep(100 * time.Millisecond)
+		ch <- c.Update(t, 590*time.Millisecond)
+		time.Sleep(5000 * time.Millisecond)
 	}
 }
 
@@ -35,10 +35,10 @@ func ManagedSystem(ch chan time.Duration) {
 		select {
 		case ch <- t:
 			t = <-ch
-			fmt.Println(t.Milliseconds())
+			//fmt.Println(t.Milliseconds())
 		default:
 		}
-		//fmt.Print("+")
+		fmt.Print("+")
 		time.Sleep(t)
 	}
 }

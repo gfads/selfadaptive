@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"selfadaptive/shared"
 	"time"
 )
 
@@ -29,7 +30,7 @@ func ManagingSystem(ch1, ch2 chan time.Duration) {
 	for {
 		t := <-ch1
 		ch2 <- t
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(shared.MonitorTime * time.Millisecond)
 	}
 }
 
@@ -39,10 +40,10 @@ func ManagedSystem(ch chan time.Duration) {
 	for {
 		select {
 		case t = <-ch:
-			fmt.Println(t.Milliseconds())
+			//fmt.Println(t.Milliseconds())
 		default:
 		}
-		//fmt.Print("+")
+		fmt.Print("+")
 		time.Sleep(t)
 	}
 }

@@ -1,0 +1,28 @@
+package anlser
+
+import (
+	"math/rand"
+	"selfadaptive/shared/channeltypes"
+)
+
+type Analyser struct{}
+
+func NewAnalyser() *Analyser {
+	return &Analyser{}
+}
+
+func (Analyser) Start(fromMonitor chan []func(), toManaged chan channeltypes.TypeChanManaging) {
+
+	info := channeltypes.TypeChanManaging{}
+	for {
+
+		// receive behaviours from mntor
+		allBehaviours := <-fromMonitor
+
+		// configure ans send info to managed system
+		info.Functions = allBehaviours
+		info.N = rand.Intn(len(allBehaviours) - 1)
+
+		toManaged <- info
+	}
+}
