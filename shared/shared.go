@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"plugin"
 	"runtime"
 	"strings"
@@ -13,13 +14,14 @@ import (
 
 const MinOnoff = 10
 const MaxOnoff = 600
-const MonitorTime = 5000
+const MonitorTime = 10 // seconds
 const NumberOfColors = 7
 const ColorReset = "\033[0m"
 
-var DirGo = LocalizegGo() + "/bin"
+const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/v2/env/plugins/source"
+const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/v2/env/plugins/executable"
 
-const DirPluginsV1 = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/v1/env/plugins"
+var DirGo = LocalizegGo() + "/bin"
 
 var ColorBehaviours = []string{"\033[31m", "\033[32m", "\033[33m", "\033[34m", "\033[35m", "\033[36m", "\033[37m"}
 
@@ -124,10 +126,10 @@ func LoadSources(dir string) []string {
 func GenerateExecutable(dir string, sources []string) {
 
 	for i := range sources {
-		plugin := sources[i]
-		name := plugin[strings.LastIndex(plugin, "/")+1:]
+		plgin := sources[i]
+		name := plgin[strings.LastIndex(plgin, "/")+1:]
 		pOut := dir + "/" + name[:strings.LastIndex(name, ".")]
-		pIn := plugin
+		pIn := plgin
 
 		_, err := exec.Command(DirGo+"/go", "build", "-buildmode=plugin", "-o", pOut, pIn).CombinedOutput()
 		if err != nil {
@@ -143,8 +145,8 @@ func LoadFuncs(sourcesDir, executablesDir string) []func() {
 	r := []func(){}
 	for i := 0; i < len(sourcePluginFiles); i++ {
 		p := sourcePluginFiles[i]
-		plugin := LoadPlugin(executablesDir, p[strings.LastIndex(p, "/")+1:strings.LastIndex(p, ".")])
-		f, err := plugin.Lookup("Behaviour")
+		plgin := LoadPlugin(executablesDir, p[strings.LastIndex(p, "/")+1:strings.LastIndex(p, ".")])
+		f, err := plgin.Lookup("Behaviour")
 		if err != nil {
 			ErrorHandler(GetFunction(), "Function not found in plugin!!")
 		}
@@ -152,4 +154,18 @@ func LoadFuncs(sourcesDir, executablesDir string) []func() {
 	}
 	return r
 
+}
+
+func RemoveContents(dir string) error {
+	files, err := filepath.Glob(filepath.Join(dir, "*"))
+	if err != nil {
+		return err
+	}
+	for _, file := range files {
+		err = os.RemoveAll(file)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

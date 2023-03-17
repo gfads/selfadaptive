@@ -1,4 +1,4 @@
-package channeltypes
+package shared
 
 type TypeChanManaging struct {
 	Functions []func()
