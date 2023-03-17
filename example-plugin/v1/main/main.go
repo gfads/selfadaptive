@@ -16,15 +16,19 @@ import (
 
 func main() {
 
+	// configure version of the example
 	shared.Version = "v1"
 
+	// instantiate channels
 	fromManaged := make(chan shared.TypeChanManaging)
 	fromManaging := make(chan []func())
 
+	// instantiate elements
 	managed := mnged.NewManagedElement()
 	managing := mnging.NewManagingSystem()
 	environment := envrnment.NewEnvironment()
 
+	//
 	go environment.Start()
 	go managed.Start(fromManaging, fromManaged)
 	go managing.Start(fromManaging, fromManaged)
