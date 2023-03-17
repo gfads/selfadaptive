@@ -3,7 +3,6 @@ package mnged
 import (
 	"fmt"
 	"selfadaptive/shared"
-	"selfadaptive/shared/channeltypes"
 )
 
 type ManagedElement struct {
@@ -21,7 +20,7 @@ func NewManagedElement() *ManagedElement {
 	return &r
 }
 
-func (m ManagedElement) Start(toManaging chan []func(), fromManaging chan channeltypes.TypeChanManaging) { // Business logic
+func (m ManagedElement) Start(toManaging chan []func(), fromManaging chan shared.TypeChanManaging) { // Business logic
 	for {
 		toManaging <- m.Behaviours // To managing
 		b := <-fromManaging        // From managing

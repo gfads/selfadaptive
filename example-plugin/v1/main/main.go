@@ -1,3 +1,9 @@
+/*********************************************************************************
+Author: Nelson S Rosa
+Description: This program randomly selects a behaviour between 2 plugins and 3
+hard-coded behaviours.
+Date: 04/02/2023
+*********************************************************************************/
 package main
 
 import (
@@ -5,21 +11,21 @@ import (
 	"selfadaptive/example-plugin/v1/env"
 	"selfadaptive/example-plugin/v1/mnged"
 	"selfadaptive/example-plugin/v1/mnging"
-	"selfadaptive/shared/channeltypes"
+	"selfadaptive/shared"
 )
 
 func main() {
 
-	fromManaged := make(chan channeltypes.TypeChanManaging)
+	fromManaged := make(chan shared.TypeChanManaging)
 	fromManaging := make(chan []func())
 
 	managed := mnged.NewManagedElement()
 	managing := mnging.NewManagingSystem()
-	e := env.NewEnvironment()
+	environment := env.NewEnvironment()
 
-	go e.Start()
+	go environment.Start()
 	go managed.Start(fromManaging, fromManaged)
 	go managing.Start(fromManaging, fromManaged)
 
-	fmt.Scanln()
+	_, _ = fmt.Scanln()
 }

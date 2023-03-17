@@ -3,7 +3,7 @@ package mnging
 import (
 	"selfadaptive/example-plugin/v1/mnging/anlser"
 	"selfadaptive/example-plugin/v1/mnging/mntor"
-	"selfadaptive/shared/channeltypes"
+	"selfadaptive/shared"
 )
 
 type ManagingSystem struct{}
@@ -12,7 +12,7 @@ func NewManagingSystem() *ManagingSystem {
 	return &ManagingSystem{}
 }
 
-func (m ManagingSystem) Start(fromManaged chan []func(), toManaged chan channeltypes.TypeChanManaging) {
+func (m ManagingSystem) Start(fromManaged chan []func(), toManaged chan shared.TypeChanManaging) {
 
 	//fromMonitor := make(chan []func())
 	toAnalyser := make(chan []func())
