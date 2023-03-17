@@ -8,7 +8,7 @@ package main
 
 import (
 	"fmt"
-	"selfadaptive/example-plugin/v1/env"
+	"selfadaptive/example-plugin/v1/envrnment"
 	"selfadaptive/example-plugin/v1/mnged"
 	"selfadaptive/example-plugin/v1/mnging"
 	"selfadaptive/shared"
@@ -16,12 +16,14 @@ import (
 
 func main() {
 
+	shared.Version = "v1"
+
 	fromManaged := make(chan shared.TypeChanManaging)
 	fromManaging := make(chan []func())
 
 	managed := mnged.NewManagedElement()
 	managing := mnging.NewManagingSystem()
-	environment := env.NewEnvironment()
+	environment := envrnment.NewEnvironment()
 
 	go environment.Start()
 	go managed.Start(fromManaging, fromManaged)

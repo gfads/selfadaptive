@@ -6,17 +6,17 @@ import (
 
 type Monitor struct{}
 
-const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/v1/envrnment/plugins/source"
-const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/v1/envrnment/plugins/executable"
-
 func NewMonitor() *Monitor {
 	return &Monitor{}
 }
 
 func (Monitor) Start(fromManaged chan []func(), toAnalyser chan []func()) {
+	dirSources := shared.BaseDirPlugins + "/" + shared.Version + "/" + shared.SourcesDir
+	dirExecutables := shared.BaseDirPlugins + "/" + shared.Version + "/" + shared.ExecutablesDir
+
 	for {
 		// receive plugin behaviours
-		pluginBehaviours := shared.LoadFuncs(SourcesDir, ExecutablesDir)
+		pluginBehaviours := shared.LoadFuncs(dirSources, dirExecutables)
 
 		// receive hard coded behaviours
 		hardBehaviours := <-fromManaged

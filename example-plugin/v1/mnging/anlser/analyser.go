@@ -21,7 +21,7 @@ func (Analyser) Start(fromMonitor chan []func(), toManaged chan shared.TypeChanM
 
 		// configure ans send info to managed system
 		info.Functions = allBehaviours
-		info.N = rand.Intn(len(allBehaviours) - 1)
+		info.N = rand.Intn(len(allBehaviours))
 
 		toManaged <- info
 	}

@@ -1,3 +1,9 @@
+/*********************************************************************************
+Author: Nelson S Rosa
+Description: This code implements a simple managed system that prints something
+on the screen. The managed system has three harded-code behaviours.
+Date: 14/02/2023
+*********************************************************************************/
 package mnged
 
 import (

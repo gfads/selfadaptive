@@ -18,9 +18,11 @@ const MonitorTime = 10 // seconds
 const NumberOfColors = 7
 const ColorReset = "\033[0m"
 
-// V2
-const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/v2/envrnment/plugins/source"
-const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/v2/envrnment/plugins/executable"
+// Base Directories
+var BaseDirPlugins = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin"
+var SourcesDir = "envrnment/plugins/source"
+var ExecutablesDir = "envrnment/plugins/executable"
+var Version = ""
 
 var DirGo = LocalizegGo() + "/bin"
 
@@ -85,18 +87,17 @@ func LoadPlugin(dir string, pluginName string) plugin.Plugin {
 		plg, err = plugin.Open(pluginFile)
 
 		if err != nil {
-			if attempts >= 3 { // TODO
+			if attempts >= 3 {
 				fmt.Printf("Shared:: Error on trying open plugin '%v' \n", pluginFile)
 				os.Exit(0)
 			} else {
 				attempts++
-				time.Sleep(10 * time.Millisecond) // TODO
+				time.Sleep(10 * time.Millisecond)
 			}
 		} else {
 			break
 		}
 	}
-
 	return *plg
 }
 

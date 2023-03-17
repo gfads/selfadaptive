@@ -1,4 +1,4 @@
-package env
+package envrnment
 
 type Environment struct{}
 
