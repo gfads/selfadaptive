@@ -6,8 +6,8 @@ import (
 
 type Monitor struct{}
 
-const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/v1/env/plugins/source"
-const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/v1/env/plugins/executable"
+const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/v1/envrnment/plugins/source"
+const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/v1/envrnment/plugins/executable"
 
 func NewMonitor() *Monitor {
 	return &Monitor{}

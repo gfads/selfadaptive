@@ -18,8 +18,8 @@ const MonitorTime = 10 // seconds
 const NumberOfColors = 7
 const ColorReset = "\033[0m"
 
-const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/v2/env/plugins/source"
-const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/v2/env/plugins/executable"
+const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/v2/envrnment/plugins/source"
+const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/v2/envrnment/plugins/executable"
 
 var DirGo = LocalizegGo() + "/bin"
 
