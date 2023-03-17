@@ -18,6 +18,7 @@ const MonitorTime = 10 // seconds
 const NumberOfColors = 7
 const ColorReset = "\033[0m"
 
+// V2
 const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/v2/envrnment/plugins/source"
 const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/v2/envrnment/plugins/executable"
 
