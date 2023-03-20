@@ -1,15 +1,17 @@
 package mnging
 
 import (
-	"selfadaptive/example-plugin/v1/mnging/anlser"
-	"selfadaptive/example-plugin/v1/mnging/mntor"
+	"selfadaptive/example-plugin/mnging/anlser"
+	"selfadaptive/example-plugin/mnging/mntor"
 	"selfadaptive/shared"
 )
 
-type ManagingSystem struct{}
+type ManagingSystem struct {
+	Goal string
+}
 
-func NewManagingSystem() *ManagingSystem {
-	return &ManagingSystem{}
+func NewManagingSystem(g string) *ManagingSystem {
+	return &ManagingSystem{Goal: g}
 }
 
 func (m ManagingSystem) Start(fromManaged chan []func(), toManaged chan shared.TypeChanManaging) {
@@ -18,8 +20,8 @@ func (m ManagingSystem) Start(fromManaged chan []func(), toManaged chan shared.T
 	toAnalyser := make(chan []func())
 
 	analyser := anlser.NewAnalyser()
-	monitor := evolutive.NewMonitor()
+	monitor := monitor.NewMonitor()
 
-	go analyser.Start(toAnalyser, toManaged)
+	go analyser.Start(toAnalyser, toManaged, m.Goal)
 	go monitor.Start(fromManaged, toAnalyser)
 }

@@ -1,4 +1,4 @@
-package evolutive
+package monitor
 
 import (
 	"selfadaptive/shared"
@@ -11,12 +11,9 @@ func NewMonitor() *Monitor {
 }
 
 func (Monitor) Start(fromManaged chan []func(), toAnalyser chan []func()) {
-	dirSources := shared.BaseDirPlugins + "/" + shared.Version + "/" + shared.SourcesDir
-	dirExecutables := shared.BaseDirPlugins + "/" + shared.Version + "/" + shared.ExecutablesDir
-
 	for {
 		// receive plugin behaviours
-		pluginBehaviours := shared.LoadFuncs(dirSources, dirExecutables)
+		pluginBehaviours := shared.LoadFuncs(shared.SourcesDir, shared.ExecutablesDir)
 
 		// receive hard coded behaviours
 		hardBehaviours := <-fromManaged

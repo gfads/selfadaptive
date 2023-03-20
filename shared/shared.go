@@ -19,10 +19,13 @@ const NumberOfColors = 7
 const ColorReset = "\033[0m"
 
 // Base Directories
-var BaseDirPlugins = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin"
-var SourcesDir = "envrnment/plugins/source"
-var ExecutablesDir = "envrnment/plugins/executable"
-var Version = ""
+const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/source"
+const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/executable"
+
+// Goals
+const AnyBehaviour = "Any Behaviour"
+const AlwaysUpdated = "Always Updated"
+const NoAdaptation = "No Adaptation"
 
 var DirGo = LocalizegGo() + "/bin"
 

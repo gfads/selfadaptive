@@ -8,16 +8,18 @@ package main
 
 import (
 	"fmt"
-	"selfadaptive/example-plugin/v1/envrnment"
-	"selfadaptive/example-plugin/v1/mnged"
-	"selfadaptive/example-plugin/v1/mnging"
+	"selfadaptive/example-plugin/envrnment"
+	"selfadaptive/example-plugin/mnged"
+	"selfadaptive/example-plugin/mnging"
 	"selfadaptive/shared"
 )
 
 func main() {
 
-	// configure version of the example
-	shared.Version = "v1"
+	// configure the adaptation goal
+	//goal := shared.AlwaysUpdated
+	//goal := shared.AnyBehaviour
+	goal := shared.NoAdaptation
 
 	// instantiate channels
 	fromManaged := make(chan shared.TypeChanManaging)
@@ -25,7 +27,7 @@ func main() {
 
 	// instantiate elements
 	managed := mnged.NewManagedElement()
-	managing := mnging.NewManagingSystem()
+	managing := mnging.NewManagingSystem(goal)
 	environment := envrnment.NewEnvironment()
 
 	//

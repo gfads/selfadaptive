@@ -19,7 +19,7 @@ func NewManagedElement() *ManagedElement {
 
 	r := ManagedElement{}
 
-	r.Behaviours = append(r.Behaviours, r.behaviour00)
+	r.Behaviours = append(r.Behaviours, r.defaultBehaviour)
 	r.Behaviours = append(r.Behaviours, r.behaviour01)
 	r.Behaviours = append(r.Behaviours, r.behaviour02)
 
@@ -27,6 +27,9 @@ func NewManagedElement() *ManagedElement {
 }
 
 func (m ManagedElement) Start(toManaging chan []func(), fromManaging chan shared.TypeChanManaging) { // Business logic
+
+	m.defaultBehaviour()
+
 	for {
 		toManaging <- m.Behaviours // To managing
 		b := <-fromManaging        // From managing
@@ -36,7 +39,7 @@ func (m ManagedElement) Start(toManaging chan []func(), fromManaging chan shared
 	}
 }
 
-func (m ManagedElement) behaviour00() {
+func (m ManagedElement) defaultBehaviour() {
 	for i := 0; i < 100; i++ {
 		fmt.Print(string(shared.ColorBehaviours[0]), "+")
 	}
