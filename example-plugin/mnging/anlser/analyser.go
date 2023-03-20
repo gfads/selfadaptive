@@ -5,7 +5,7 @@ selecting the following behaviour of the managed system:
 V0: No adaptation
 V1: randomly select the subsequent behaviour.
 V2: always use the behaviour of the last plugin made available.
-Date: 14/02/2023
+Date: 19/03/2023
 *********************************************************************************/
 package anlser
 

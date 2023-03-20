@@ -17,9 +17,9 @@ import (
 func main() {
 
 	// configure the adaptation goal
-	//goal := shared.AlwaysUpdated
+	goal := shared.AlwaysUpdated
 	//goal := shared.AnyBehaviour
-	goal := shared.NoAdaptation
+	//goal := shared.NoAdaptation
 
 	// instantiate channels
 	fromManaged := make(chan shared.TypeChanManaging)

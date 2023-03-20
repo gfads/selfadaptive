@@ -1,4 +1,4 @@
-package monitor
+package mntor
 
 import (
 	"selfadaptive/shared"
@@ -12,10 +12,10 @@ func NewMonitor() *Monitor {
 
 func (Monitor) Start(fromManaged chan []func(), toAnalyser chan []func()) {
 	for {
-		// receive plugin behaviours
-		pluginBehaviours := shared.LoadFuncs(shared.SourcesDir, shared.ExecutablesDir)
+		// sense environment
+		pluginBehaviours := shared.Sense(shared.SourcesDir, shared.ExecutablesDir)
 
-		// receive hard coded behaviours
+		// sense managed system
 		hardBehaviours := <-fromManaged
 
 		// put all behaviours together

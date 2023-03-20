@@ -2,7 +2,9 @@ package mnging
 
 import (
 	"selfadaptive/example-plugin/mnging/anlser"
+	"selfadaptive/example-plugin/mnging/exctor"
 	"selfadaptive/example-plugin/mnging/mntor"
+	"selfadaptive/example-plugin/mnging/plnner"
 	"selfadaptive/shared"
 )
 
@@ -16,12 +18,17 @@ func NewManagingSystem(g string) *ManagingSystem {
 
 func (m ManagingSystem) Start(fromManaged chan []func(), toManaged chan shared.TypeChanManaging) {
 
-	//fromMonitor := make(chan []func())
 	toAnalyser := make(chan []func())
+	toPlanner := make(chan shared.TypeChanManaging)
+	toExecutor := make(chan shared.TypeChanManaging)
 
+	monitor := mntor.NewMonitor()
 	analyser := anlser.NewAnalyser()
-	monitor := monitor.NewMonitor()
+	planner := plnner.NewPlanner()
+	executor := exctor.NewExecutor()
 
-	go analyser.Start(toAnalyser, toManaged, m.Goal)
 	go monitor.Start(fromManaged, toAnalyser)
+	go analyser.Start(toAnalyser, toPlanner, m.Goal)
+	go planner.Start(toPlanner, toExecutor)
+	go executor.Start(toExecutor, toManaged)
 }

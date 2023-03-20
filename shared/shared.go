@@ -143,7 +143,7 @@ func GenerateExecutable(dir string, sources []string) {
 	}
 }
 
-func LoadFuncs(sourcesDir, executablesDir string) []func() {
+func Sense(sourcesDir, executablesDir string) []func() {
 	sourcePluginFiles := LoadSources(sourcesDir)
 	GenerateExecutable(executablesDir, sourcePluginFiles)
 
