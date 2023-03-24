@@ -10,5 +10,5 @@ type Knowledge struct {
 var KnowledgeDatabase = NewKnowledge()
 
 func NewKnowledge() *Knowledge {
-	return &Knowledge{LastBehaviour: 0}
+	return &Knowledge{LastBehaviour: 0, CurrentSecurityLevelOfApplication: 0, CurrentSecurityLevelOfEnvironment: 0}
 }

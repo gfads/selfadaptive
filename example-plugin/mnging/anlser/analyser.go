@@ -10,9 +10,7 @@ Date: 19/03/2023
 package anlser
 
 import (
-	"selfadaptive/example-plugin/mnging/knwldge"
 	"selfadaptive/shared"
-	"strconv"
 )
 
 type Analyser struct{}
@@ -30,22 +28,12 @@ func (Analyser) Run(fromMonitor chan shared.Symptoms, toPlanner chan shared.ToPl
 
 		// analyse of symptoms (* priority to security *)
 		switch symptoms.SecuritySymptom {
-		case shared.HighSecureEnvironment:
+		case shared.SecureEnvironment:
 			info.ChangeRequest = shared.UsePlainText
-		case shared.MediumSecureEnvironment:
-			if knwldge.KnowledgeDatabase.CurrentSecurityLevelOfEnvironment > shared.MediumSecureEnvironment {
-				info.ChangeRequest = shared.ReduceSecurity
-			}
-			if knwldge.KnowledgeDatabase.CurrentSecurityLevelOfEnvironment == shared.MediumSecureEnvironment {
-				info.ChangeRequest = shared.KeepSecurity
-			}
-			if knwldge.KnowledgeDatabase.CurrentSecurityLevelOfEnvironment < shared.MediumSecureEnvironment {
-				info.ChangeRequest = shared.ImproveSecurity
-			}
-		case shared.LowSecureEnvironment:
-			info.ChangeRequest = shared.ImproveSecurity
+		case shared.UnsecureEnvironment:
+			info.ChangeRequest = shared.UseStrongCryptography
 		default:
-			shared.ErrorHandler(shared.GetFunction(), "Unknown environment symptom '"+strconv.Itoa(symptoms.SecuritySymptom)+"' unknown")
+			shared.ErrorHandler(shared.GetFunction(), "Unknown environment symptom '"+symptoms.SecuritySymptom+"' unknown")
 		}
 
 		// configure and send request change to planner

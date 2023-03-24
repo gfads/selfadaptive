@@ -1,6 +1,8 @@
 package envrnment
 
 import (
+	"fmt"
+	"math/rand"
 	"selfadaptive/shared"
 	"time"
 )
@@ -22,9 +24,11 @@ func (e *Environment) Run() {
 	}
 }
 
-func (Environment) Sense() (int, []func()) {
-	r1 := shared.HighSecureEnvironment
+func (Environment) Sense() (string, []func()) {
+	r1 := shared.EnvironmentSecurityLevel[rand.Intn(2)]
 	r2 := shared.LoadPlugins(shared.SourcesDir, shared.ExecutablesDir)
+
+	fmt.Print("Env:: ", r1, " ")
 
 	return r1, r2
 }

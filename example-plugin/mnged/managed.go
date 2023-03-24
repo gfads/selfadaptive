@@ -45,13 +45,13 @@ func (m ManagedElement) defaultBehaviour() { // plain text
 }
 
 func (m ManagedElement) weakCryptography() {
-	fmt.Println("Sent Message: [Weak]", shared.PlainText)
+	fmt.Println("Sent Message: [Weak]", shared.EncryptMessage(shared.PlainText, shared.Keys32[0]))
 }
 
 func (m ManagedElement) mediumCryptography() {
-	fmt.Println("Sent Message: [Medium]", shared.PlainText)
+	fmt.Println("Sent Message: [Medium]", shared.EncryptMessage(shared.PlainText, shared.Keys32[1]))
 }
 
 func (m ManagedElement) strongCryptography() {
-	fmt.Println("Sent Message: [Strong]", shared.PlainText)
+	fmt.Println("Sent Message: [Strong]", shared.EncryptMessage(shared.PlainText, shared.Keys32[2]))
 }

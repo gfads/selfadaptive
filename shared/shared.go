@@ -21,11 +21,11 @@ const NumberOfColors = 7
 const ColorReset = "\033[0m"
 
 // Base Directories
-//const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/source"
-//const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/executable"
+const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/source"
+const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/executable"
 
-const SourcesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\sources"
-const ExecutablesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\executables"
+//const SourcesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\sources"
+//const ExecutablesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\executables"
 
 // Goals
 const NoAdaptation = 0
@@ -35,10 +35,13 @@ const MediumSecure = 3
 const HighSecure = 4
 const AlwaysSecure = 5
 
+// Environments security level
+var EnvironmentSecurityLevel = []string{SecureEnvironment, UnsecureEnvironment}
+
 // Symptom
 type Symptoms struct {
 	PluginSymptom   int
-	SecuritySymptom int
+	SecuritySymptom string
 }
 
 // plugin symptoms
@@ -46,9 +49,8 @@ const NewPluginvAvailable = 0
 const NoNewPluginAvailable = 1
 
 // security symptoms
-const LowSecureEnvironment = 0
-const MediumSecureEnvironment = 1
-const HighSecureEnvironment = 2
+const SecureEnvironment = "SecureEnvironment"
+const UnsecureEnvironment = "UnsecureEnvironment"
 
 // Request types
 const NoChange = "No Update Needed"
@@ -58,10 +60,11 @@ const ImproveSecurity = "Improve Security"
 const ReduceSecurity = "Reduce Security"
 const KeepSecurity = "Keep Security"
 const UsePlainText = "Use Plain Text"
+const UseStrongCryptography = "Use Strong Cryptography"
 
 // security
-const PlainText = "This is the sent message"                                                                                      // This must be of 16 byte length!!
-var Keys32 = []string{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "YXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "ZXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"} // This must be of 32 byte length!!
+const PlainText = "This is the sent message"                                                                                       // This must be of 16 byte length!!
+var Keys32 = []string{"WeakXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "MediumXXXXXXXXXXXXXXXXXXXXXXXXXXX", "HighXXXXXXXXXXXXXXXXXXXXXXXXXXXX"} // This must be of 32 byte length!!
 const LowSecurityLevel = 0
 const MediumSecurityLevel = 1
 const HighSecurityLevel = 2
