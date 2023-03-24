@@ -20,6 +20,9 @@ func NewManagedElement() *ManagedElement {
 	r := ManagedElement{}
 
 	r.Behaviours = append(r.Behaviours, r.defaultBehaviour)
+	r.Behaviours = append(r.Behaviours, r.weakCryptography)
+	r.Behaviours = append(r.Behaviours, r.mediumCryptography)
+	r.Behaviours = append(r.Behaviours, r.strongCryptography)
 
 	return &r
 }
@@ -37,6 +40,18 @@ func (m ManagedElement) Run(toManaging chan []func(), fromManaging chan shared.T
 	}
 }
 
-func (m ManagedElement) defaultBehaviour() {
+func (m ManagedElement) defaultBehaviour() { // plain text
 	fmt.Println("Sent Message:", shared.PlainText)
+}
+
+func (m ManagedElement) weakCryptography() {
+	fmt.Println("Sent Message: [Weak]", shared.PlainText)
+}
+
+func (m ManagedElement) mediumCryptography() {
+	fmt.Println("Sent Message: [Medium]", shared.PlainText)
+}
+
+func (m ManagedElement) strongCryptography() {
+	fmt.Println("Sent Message: [Strong]", shared.PlainText)
 }

@@ -21,9 +21,10 @@ func main() {
 	shared.RemoveContents(shared.SourcesDir)
 
 	// configure the adaptation goal
-	goal := shared.AlwaysUpdated
+	//goal := shared.AlwaysUpdated
 	//goal := shared.AnyBehaviour
 	//goal := shared.NoAdaptation
+	goal := shared.AlwaysSecure
 
 	// instantiate channels
 	fromManaged := make(chan []func())

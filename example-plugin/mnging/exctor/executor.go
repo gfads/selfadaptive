@@ -22,18 +22,22 @@ func (Executor) Run(fromPlanner chan shared.ToPlannerChan, toManaged chan shared
 		info := shared.ToManagedChan{}
 		request := <-fromPlanner
 		switch request.ChangeRequest {
-		case shared.NoChangeRequest:
+		case shared.UsePlainText:
 			info.Behaviours = knwldge.KnowledgeDatabase.AvailableBehaviours
-			info.SelectedBehaviour = request.SelectedBehaviour
-		case shared.LastBehaviourRequest:
+			info.SelectedBehaviour = 0 // TODO
+		case shared.KeepSecurity:
 			info.Behaviours = knwldge.KnowledgeDatabase.AvailableBehaviours
-			info.SelectedBehaviour = request.SelectedBehaviour
-		case shared.AnyBehaviourRequest:
+			info.SelectedBehaviour = knwldge.KnowledgeDatabase.CurrentSecurityLevelOfApplication
+		case shared.ImproveSecurity:
 			info.Behaviours = knwldge.KnowledgeDatabase.AvailableBehaviours
-			info.SelectedBehaviour = request.SelectedBehaviour
+			info.SelectedBehaviour = knwldge.KnowledgeDatabase.CurrentSecurityLevelOfApplication // TODO
+		case shared.ReduceSecurity:
+			info.Behaviours = knwldge.KnowledgeDatabase.AvailableBehaviours
+			info.SelectedBehaviour = knwldge.KnowledgeDatabase.CurrentSecurityLevelOfApplication // TODO
 		}
 
 		knwldge.KnowledgeDatabase.LastBehaviour = info.SelectedBehaviour
+		knwldge.KnowledgeDatabase.CurrentSecurityLevelOfApplication = info.SelectedBehaviour
 		toManaged <- info
 	}
 }

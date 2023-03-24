@@ -21,8 +21,11 @@ const NumberOfColors = 7
 const ColorReset = "\033[0m"
 
 // Base Directories
-const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/source"
-const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/executable"
+//const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/source"
+//const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/executable"
+
+const SourcesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\sources"
+const ExecutablesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\executables"
 
 // Goals
 const NoAdaptation = 0
@@ -30,6 +33,7 @@ const AlwaysUpdated = 1
 const LowSecure = 2
 const MediumSecure = 3
 const HighSecure = 4
+const AlwaysSecure = 5
 
 // Symptom
 type Symptoms struct {

@@ -21,7 +21,7 @@ func NewAnalyser() *Analyser {
 	return &Analyser{}
 }
 
-func (Analyser) Run(fromMonitor chan shared.Symptoms, toPlanner chan shared.ToPlannerChan, goal string) {
+func (Analyser) Run(fromMonitor chan shared.Symptoms, toPlanner chan shared.ToPlannerChan, goal int) {
 	for {
 
 		// receive symptom from monitor

@@ -23,7 +23,7 @@ func (e *Environment) Run() {
 }
 
 func (Environment) Sense() (int, []func()) {
-	r1 := shared.HighSecurityLevel
+	r1 := shared.HighSecureEnvironment
 	r2 := shared.LoadPlugins(shared.SourcesDir, shared.ExecutablesDir)
 
 	return r1, r2
