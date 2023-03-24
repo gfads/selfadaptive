@@ -1,7 +1,10 @@
 package mntor
 
 import (
+	"selfadaptive/example-plugin/envrnment"
+	"selfadaptive/example-plugin/mnging/knwldge"
 	"selfadaptive/shared"
+	"time"
 )
 
 type Monitor struct{}
@@ -10,10 +13,13 @@ func NewMonitor() *Monitor {
 	return &Monitor{}
 }
 
-func (Monitor) Start(fromManaged chan []func(), toAnalyser chan []func()) {
+func (Monitor) Run(fromManaged chan []func(), toAnalyser chan shared.Symptoms) {
 	for {
+		// monitor interval
+		time.Sleep(5 * time.Second)
+
 		// sense environment
-		pluginBehaviours := shared.Sense(shared.SourcesDir, shared.ExecutablesDir)
+		securityLevel, pluginBehaviours := envrnment.NewEnvironment().Sense()
 
 		// sense managed system
 		hardBehaviours := <-fromManaged
@@ -28,7 +34,23 @@ func (Monitor) Start(fromManaged chan []func(), toAnalyser chan []func()) {
 			allBehaviours = append(allBehaviours, pluginBehaviours[i])
 		}
 
+		// generate symptom
+		symptoms := shared.Symptoms{}
+
+		// update available behaviours symptom
+		if len(allBehaviours) > len(knwldge.KnowledgeDatabase.AvailableBehaviours) {
+			symptoms.PluginSymptom = shared.NewPluginvAvailable
+		} else {
+			symptoms.PluginSymptom = shared.NoNewPluginAvailable
+		}
+
+		// update security symptom
+		symptoms.SecuritySymptom = securityLevel
+
+		// update knowledge database
+		knwldge.KnowledgeDatabase.AvailableBehaviours = allBehaviours
+
 		// send all behaviours to analyser
-		toAnalyser <- allBehaviours
+		toAnalyser <- symptoms
 	}
 }

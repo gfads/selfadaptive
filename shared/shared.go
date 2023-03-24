@@ -1,6 +1,8 @@
 package shared
 
 import (
+	"crypto/aes"
+	"encoding/hex"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -23,10 +25,44 @@ const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugi
 const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/executable"
 
 // Goals
-const AnyBehaviour = "Any Behaviour"
-const AlwaysUpdated = "Always Updated"
-const NoAdaptation = "No Adaptation"
+const NoAdaptation = 0
+const AlwaysUpdated = 1
+const LowSecure = 2
+const MediumSecure = 3
+const HighSecure = 4
 
+// Symptom
+type Symptoms struct {
+	PluginSymptom   int
+	SecuritySymptom int
+}
+
+// plugin symptoms
+const NewPluginvAvailable = 0
+const NoNewPluginAvailable = 1
+
+// environment symptoms
+const LowSecureEnvironment = 0
+const MediumSecureEnvironment = 1
+const HighSecureEnvironment = 2
+
+// Request types
+const NoChange = "No Update Needed"
+const UseAnyBehaviour = "Update to Any Behaviour"
+const UseLastBehaviour = "Update to Last Behaviour Found"
+const ImproveSecurity = "Improve Security"
+const ReduceSecurity = "Reduce Security"
+const KeepSecurity = "Keep Security"
+const UsePlainText = "Use Plain Text"
+
+// security
+const PlainText = "This is the sent message"                                                                                      // This must be of 16 byte length!!
+var Keys32 = []string{"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "YXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "ZXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"} // This must be of 32 byte length!!
+const LowSecurityLevel = 0
+const MediumSecurityLevel = 1
+const HighSecurityLevel = 2
+
+// dir configurations
 var DirGo = LocalizegGo() + "/bin"
 
 var ColorBehaviours = []string{"\033[31m", "\033[32m", "\033[33m", "\033[34m", "\033[35m", "\033[36m", "\033[37m"}
@@ -143,7 +179,7 @@ func GenerateExecutable(dir string, sources []string) {
 	}
 }
 
-func Sense(sourcesDir, executablesDir string) []func() {
+func LoadPlugins(sourcesDir, executablesDir string) []func() {
 	sourcePluginFiles := LoadSources(sourcesDir)
 	GenerateExecutable(executablesDir, sourcePluginFiles)
 
@@ -173,4 +209,31 @@ func RemoveContents(dir string) error {
 		}
 	}
 	return nil
+}
+
+func EncryptMessage(key string, message string) string {
+	c, err := aes.NewCipher([]byte(key))
+	//c, err := des.NewCipher([]byte(key))
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	msgByte := make([]byte, len(message))
+	c.Encrypt(msgByte, []byte(message))
+
+	return hex.EncodeToString(msgByte)
+}
+
+func DecryptMessage(key string, message string) string {
+	txt, _ := hex.DecodeString(message)
+	c, err := aes.NewCipher([]byte(key))
+	if err != nil {
+		fmt.Println(err)
+	}
+	msgByte := make([]byte, len(txt))
+	c.Decrypt(msgByte, []byte(txt))
+
+	msg := string(msgByte[:])
+	return msg
 }

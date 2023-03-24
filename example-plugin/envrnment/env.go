@@ -1,14 +1,30 @@
 package envrnment
 
-type Environment struct{}
+import (
+	"selfadaptive/shared"
+	"time"
+)
 
-func NewEnvironment() *Environment {
-	return &Environment{}
+type Environment struct {
+	SecurityLevel int
+	Plugins       []func()
 }
 
-func (Environment) Start() {
-	forever := make(chan int)
+func NewEnvironment() *Environment {
+	e := Environment{SecurityLevel: shared.HighSecurityLevel, Plugins: shared.LoadPlugins(shared.SourcesDir, shared.ExecutablesDir)}
+	return &e
+}
+
+func (e *Environment) Run() {
 	for {
-		<-forever
+		e.SecurityLevel = shared.HighSecurityLevel
+		time.Sleep(10 * time.Hour)
 	}
+}
+
+func (Environment) Sense() (int, []func()) {
+	r1 := shared.HighSecurityLevel
+	r2 := shared.LoadPlugins(shared.SourcesDir, shared.ExecutablesDir)
+
+	return r1, r2
 }

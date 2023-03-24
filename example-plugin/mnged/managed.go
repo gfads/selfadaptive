@@ -20,13 +20,11 @@ func NewManagedElement() *ManagedElement {
 	r := ManagedElement{}
 
 	r.Behaviours = append(r.Behaviours, r.defaultBehaviour)
-	r.Behaviours = append(r.Behaviours, r.behaviour01)
-	r.Behaviours = append(r.Behaviours, r.behaviour02)
 
 	return &r
 }
 
-func (m ManagedElement) Start(toManaging chan []func(), fromManaging chan shared.TypeChanManaging) { // Business logic
+func (m ManagedElement) Run(toManaging chan []func(), fromManaging chan shared.ToManagedChan) { // Business logic
 
 	m.defaultBehaviour()
 
@@ -34,26 +32,11 @@ func (m ManagedElement) Start(toManaging chan []func(), fromManaging chan shared
 		toManaging <- m.Behaviours // To managing
 		b := <-fromManaging        // From managing
 
-		behaviour := b.Functions[b.N] // new behaviour
-		behaviour()                   // change to new behaviour
+		behaviour := b.Behaviours[b.SelectedBehaviour] // new behaviour
+		behaviour()                                    // change to new behaviour
 	}
 }
 
 func (m ManagedElement) defaultBehaviour() {
-	for i := 0; i < 100; i++ {
-		fmt.Print(string(shared.ColorBehaviours[0]), "+")
-	}
-	fmt.Print(shared.ColorReset)
-}
-func (m ManagedElement) behaviour01() {
-	for i := 0; i < 100; i++ {
-		fmt.Print(string(shared.ColorBehaviours[1]), "+")
-	}
-	fmt.Print(shared.ColorReset)
-}
-func (m ManagedElement) behaviour02() {
-	for i := 0; i < 100; i++ {
-		fmt.Print(string(shared.ColorBehaviours[2]), "+")
-	}
-	fmt.Print(shared.ColorReset)
+	fmt.Println("Sent Message:", shared.PlainText)
 }

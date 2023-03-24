@@ -2,16 +2,18 @@
 Author: Nelson S Rosa
 Description: This code implements an analyser that has several strategies for
 selecting the following behaviour of the managed system:
-V0: No adaptation
-V1: randomly select the subsequent behaviour.
-V2: always use the behaviour of the last plugin made available.
+No adaptation: use same behaviour as before
+Any: randomly select the subsequent behaviour.
+Always updated: always use the behaviour of the last plugin made available.
 Date: 19/03/2023
 *********************************************************************************/
 package anlser
 
 import (
 	"math/rand"
+	"selfadaptive/example-plugin/mnging/knwldge"
 	"selfadaptive/shared"
+	"strconv"
 )
 
 type Analyser struct{}
@@ -20,66 +22,72 @@ func NewAnalyser() *Analyser {
 	return &Analyser{}
 }
 
-func (Analyser) Start(fromMonitor chan []func(), toManaged chan shared.TypeChanManaging, goal string) {
-	switch goal {
-	case shared.NoAdaptation:
-		startV0(fromMonitor, toManaged)
-	case shared.AnyBehaviour:
-		startV1(fromMonitor, toManaged)
-	case shared.AlwaysUpdated:
-		startV2(fromMonitor, toManaged)
-	default:
-		shared.ErrorHandler(shared.GetFunction(), "Analyser unknown")
-	}
-}
-
-// No Adaptation
-func startV0(fromMonitor chan []func(), toManaged chan shared.TypeChanManaging) {
-	info := shared.TypeChanManaging{}
+func (Analyser) Run(fromMonitor chan shared.Symptoms, toPlanner chan shared.ToPlannerChan, goal string) {
 	for {
 
-		// receive behaviours from monitor
-		allBehaviours := <-fromMonitor
+		// receive symptom from monitor
+		symptoms := <-fromMonitor
+		info := shared.ToPlannerChan{}
 
-		// configure and send info to managed system
-		info.Functions = allBehaviours
-		info.N = 0
+		// analyse of symptoms (* priority to security *)
+		switch symptoms.SecuritySymptom {
+		case shared.HighSecureEnvironment:
+			info.ChangeRequest = shared.UsePlainText
+		case shared.MediumSecureEnvironment:
+			if knwldge.KnowledgeDatabase.CurrentSecurityLevelOfEnvironment > shared.MediumSecureEnvironment {
+				info.ChangeRequest = shared.ReduceSecurity
+			}
+			if knwldge.KnowledgeDatabase.CurrentSecurityLevelOfEnvironment == shared.MediumSecureEnvironment {
+				info.ChangeRequest = shared.KeepSecurity
+			}
+			if knwldge.KnowledgeDatabase.CurrentSecurityLevelOfEnvironment < shared.MediumSecureEnvironment {
+				info.ChangeRequest = shared.ImproveSecurity
+			}
+		case shared.LowSecureEnvironment:
+			if knwldge.KnowledgeDatabase.CurrentSecurityLevelOfEnvironment > shared.MediumSecureEnvironment {
+				info.ChangeRequest = shared.ReduceSecurity
+			}
+			if knwldge.KnowledgeDatabase.CurrentSecurityLevelOfEnvironment == shared.MediumSecureEnvironment {
+				info.ChangeRequest = shared.KeepSecurity
+			}
+			if knwldge.KnowledgeDatabase.CurrentSecurityLevelOfEnvironment < shared.MediumSecureEnvironment {
+				info.ChangeRequest = shared.ImproveSecurity
+			}
+		}
+		switch symptoms.PluginSymptom {
+		case shared.NoNewBehaviourAvailable:
+			switch goal {
+			case shared.NoAdaptation:
+				info.ChangeRequest = shared.NoChangeRequest
+				info.SelectedBehaviour = knwldge.KnowledgeDatabase.LastBehaviour
+			case shared.AnyBehaviour:
+				info.ChangeRequest = shared.AnyBehaviourRequest
+				info.SelectedBehaviour = rand.Intn(len(knwldge.KnowledgeDatabase.AvailableBehaviours))
+			case shared.AlwaysUpdated:
+				info.ChangeRequest = shared.LastBehaviourRequest
+				info.SelectedBehaviour = knwldge.KnowledgeDatabase.LastBehaviour
+			default:
+				shared.ErrorHandler(shared.GetFunction(), "Goal '"+goal+"' unknown")
+			}
+		case shared.NewBehaviourAvailable:
+			switch goal {
+			case shared.NoAdaptation:
+				info.ChangeRequest = shared.NoChangeRequest
+				info.SelectedBehaviour = knwldge.KnowledgeDatabase.LastBehaviour
+			case shared.AnyBehaviour:
+				info.ChangeRequest = shared.AnyBehaviourRequest
+				info.SelectedBehaviour = rand.Intn(len(knwldge.KnowledgeDatabase.AvailableBehaviours))
+			case shared.AlwaysUpdated:
+				info.ChangeRequest = shared.LastBehaviourRequest
+				info.SelectedBehaviour = len(knwldge.KnowledgeDatabase.AvailableBehaviours) - 1
+			default:
+				shared.ErrorHandler(shared.GetFunction(), "Goal '"+goal+"' unknown")
+			}
+		default:
+			shared.ErrorHandler(shared.GetFunction(), "Symptom '"+strconv.Itoa(symptom)+"'unknown")
+		}
 
-		toManaged <- info
-	}
-}
-
-// Any behaviour
-func startV1(fromMonitor chan []func(), toManaged chan shared.TypeChanManaging) {
-	info := shared.TypeChanManaging{}
-	for {
-
-		// receive behaviours from mntor
-		allBehaviours := <-fromMonitor
-
-		// configure and send info to managed system
-		info.Functions = allBehaviours
-		info.N = rand.Intn(len(allBehaviours))
-
-		toManaged <- info
-	}
-}
-
-// Always updated
-func startV2(fromMonitor chan []func(), toManaged chan shared.TypeChanManaging) {
-
-	info := shared.TypeChanManaging{}
-
-	for {
-
-		// receive behaviours from monitor
-		allBehaviours := <-fromMonitor
-
-		// configure and send info to managed system
-		info.Functions = allBehaviours
-		info.N = len(allBehaviours) - 1
-
-		// send info to managed system
-		toManaged <- info
+		// configure and send request change to planner
+		toPlanner <- info
 	}
 }

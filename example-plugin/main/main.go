@@ -16,14 +16,18 @@ import (
 
 func main() {
 
+	// remove old plugins
+	shared.RemoveContents(shared.ExecutablesDir)
+	shared.RemoveContents(shared.SourcesDir)
+
 	// configure the adaptation goal
 	goal := shared.AlwaysUpdated
 	//goal := shared.AnyBehaviour
 	//goal := shared.NoAdaptation
 
 	// instantiate channels
-	fromManaged := make(chan shared.TypeChanManaging)
-	fromManaging := make(chan []func())
+	fromManaged := make(chan []func())
+	toManaged := make(chan shared.ToManagedChan)
 
 	// instantiate elements
 	managed := mnged.NewManagedElement()
@@ -31,9 +35,9 @@ func main() {
 	environment := envrnment.NewEnvironment()
 
 	//
-	go environment.Start()
-	go managed.Start(fromManaging, fromManaged)
-	go managing.Start(fromManaging, fromManaged)
+	go environment.Run()
+	go managed.Run(fromManaged, toManaged)
+	go managing.Run(fromManaged, toManaged)
 
 	_, _ = fmt.Scanln()
 }
