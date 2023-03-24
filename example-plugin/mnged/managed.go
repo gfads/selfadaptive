@@ -12,24 +12,25 @@ import (
 )
 
 type ManagedElement struct {
-	Behaviours []func()
+	Behaviours map[string]func()
 }
 
 func NewManagedElement() *ManagedElement {
 
-	r := ManagedElement{}
+	temp := make(map[string]func())
+	r := ManagedElement{Behaviours: temp}
 
-	r.Behaviours = append(r.Behaviours, r.defaultBehaviour)
-	r.Behaviours = append(r.Behaviours, r.weakCryptography)
-	r.Behaviours = append(r.Behaviours, r.mediumCryptography)
-	r.Behaviours = append(r.Behaviours, r.strongCryptography)
+	r.Behaviours["DefaultBehaviour"] = r.PlainText
+	r.Behaviours["WeakCryptography"] = r.WeakCryptography
+	r.Behaviours["MediumCryptography"] = r.MediumCryptography
+	r.Behaviours["StrongCryptography"] = r.StrongCryptography
 
 	return &r
 }
 
-func (m ManagedElement) Run(toManaging chan []func(), fromManaging chan shared.ToManagedChan) { // Business logic
+func (m ManagedElement) Run(toManaging chan map[string]func(), fromManaging chan shared.ToManagedChan) { // Business logic
 
-	m.defaultBehaviour()
+	m.PlainText()
 
 	for {
 		toManaging <- m.Behaviours // To managing
@@ -40,18 +41,18 @@ func (m ManagedElement) Run(toManaging chan []func(), fromManaging chan shared.T
 	}
 }
 
-func (m ManagedElement) defaultBehaviour() { // plain text
-	fmt.Printf("[Defaul] -> [Plain Text]'%s'\n", shared.PlainText)
+func (ManagedElement) PlainText() { // plain text
+	fmt.Printf("[PlainText] -> [Plain Text] '%s'\n", shared.PlainText)
 }
 
-func (m ManagedElement) weakCryptography() {
+func (ManagedElement) WeakCryptography() {
 	fmt.Printf("[Weak] '%s'\n", shared.EncryptMessage(shared.PlainText, shared.Keys32[0]))
 }
 
-func (m ManagedElement) mediumCryptography() {
+func (ManagedElement) MediumCryptography() {
 	fmt.Printf("[Medium] '%s'\n", shared.EncryptMessage(shared.PlainText, shared.Keys32[1]))
 }
 
-func (m ManagedElement) strongCryptography() {
+func (ManagedElement) StrongCryptography() {
 	fmt.Printf("[Strong] '%s'\n", shared.EncryptMessage(shared.PlainText, shared.Keys32[2]))
 }

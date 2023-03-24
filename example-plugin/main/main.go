@@ -25,7 +25,7 @@ func main() {
 	//goal := shared.NoWorry
 
 	// instantiate channels
-	fromManaged := make(chan []func())
+	fromManaged := make(chan map[string]func())
 	toManaged := make(chan shared.ToManagedChan)
 
 	// instantiate elements

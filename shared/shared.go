@@ -21,11 +21,11 @@ const NumberOfColors = 7
 const ColorReset = "\033[0m"
 
 // Base Directories
-const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/source"
-const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/executable"
+//const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/source"
+//const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/executable"
 
-//const SourcesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\sources"
-//const ExecutablesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\executables"
+const SourcesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\sources"
+const ExecutablesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\executables"
 
 // Goals
 const AlwaysSecure = "Always Secure"
@@ -54,6 +54,7 @@ const Unsecure = "UnsecureEnvironment"
 // Request types
 const NoChange = "No Update Needed"
 const UsePlainText = "Use Plain Text"
+const UseWeakCryptography = "Use Weak Cryptography"
 const UseMediumCryptography = "Use Medium Cryptography"
 const UseStrongCryptography = "Use Strong Cryptography"
 

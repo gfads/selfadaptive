@@ -27,13 +27,16 @@ func (Executor) Run(fromPlanner chan shared.ToPlannerChan, toManaged chan shared
 			info.SelectedBehaviour = knwldge.KnowledgeDatabase.LastBehaviour
 		case shared.UsePlainText:
 			info.Behaviours = knwldge.KnowledgeDatabase.AvailableBehaviours
-			info.SelectedBehaviour = 0
+			info.SelectedBehaviour = "DefaultBehaviour"
+		case shared.UseWeakCryptography:
+			info.Behaviours = knwldge.KnowledgeDatabase.AvailableBehaviours
+			info.SelectedBehaviour = "WeakCryptography"
 		case shared.UseMediumCryptography:
 			info.Behaviours = knwldge.KnowledgeDatabase.AvailableBehaviours
-			info.SelectedBehaviour = 2
+			info.SelectedBehaviour = "MediumCryptography"
 		case shared.UseStrongCryptography:
 			info.Behaviours = knwldge.KnowledgeDatabase.AvailableBehaviours
-			info.SelectedBehaviour = 3
+			info.SelectedBehaviour = "StrongCryptography"
 			/*case shared.KeepSecurity:
 				info.Behaviours = knwldge.KnowledgeDatabase.AvailableBehaviours
 				info.SelectedBehaviour = knwldge.KnowledgeDatabase.CurrentSecurityLevelOfApplication

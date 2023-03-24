@@ -4,6 +4,7 @@ import (
 	"selfadaptive/example-plugin/envrnment"
 	"selfadaptive/example-plugin/mnging/knwldge"
 	"selfadaptive/shared"
+	"strconv"
 	"time"
 )
 
@@ -13,7 +14,7 @@ func NewMonitor() *Monitor {
 	return &Monitor{}
 }
 
-func (Monitor) Run(fromManaged chan []func(), toAnalyser chan shared.Symptoms) {
+func (Monitor) Run(fromManaged chan map[string]func(), toAnalyser chan shared.Symptoms) {
 	for {
 		// monitor interval
 		time.Sleep(5 * time.Second)
@@ -25,13 +26,13 @@ func (Monitor) Run(fromManaged chan []func(), toAnalyser chan shared.Symptoms) {
 		hardBehaviours := <-fromManaged
 
 		// put all behaviours together
-		var allBehaviours = []func(){}
-		for i := 0; i < len(hardBehaviours); i++ {
-			allBehaviours = append(allBehaviours, hardBehaviours[i])
+		var allBehaviours = map[string]func(){}
+		for i := range hardBehaviours {
+			allBehaviours[i] = hardBehaviours[i]
 		}
 
 		for i := 0; i < len(pluginBehaviours); i++ {
-			allBehaviours = append(allBehaviours, pluginBehaviours[i])
+			allBehaviours["Plugin"+strconv.Itoa(i)] = pluginBehaviours[i]
 		}
 
 		// generate symptom

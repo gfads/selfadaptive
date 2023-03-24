@@ -1,11 +1,11 @@
 package shared
 
 type ToManagedChan struct {
-	Behaviours        []func()
-	SelectedBehaviour int
+	Behaviours        map[string]func()
+	SelectedBehaviour string
 }
 
 type ToPlannerChan struct {
 	ChangeRequest     string
-	SelectedBehaviour int
+	SelectedBehaviour string
 }

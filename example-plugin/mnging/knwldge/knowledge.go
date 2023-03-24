@@ -1,14 +1,14 @@
 package knwldge
 
 type Knowledge struct {
-	AvailableBehaviours               []func()
-	LastBehaviour                     int
-	CurrentSecurityLevelOfEnvironment int
-	CurrentSecurityLevelOfApplication int
+	AvailableBehaviours               map[string]func()
+	LastBehaviour                     string
+	CurrentSecurityLevelOfEnvironment string
+	CurrentSecurityLevelOfApplication string
 }
 
 var KnowledgeDatabase = NewKnowledge()
 
 func NewKnowledge() *Knowledge {
-	return &Knowledge{LastBehaviour: 0, CurrentSecurityLevelOfApplication: 0, CurrentSecurityLevelOfEnvironment: 0}
+	return &Knowledge{LastBehaviour: "DefaultBehaviour", CurrentSecurityLevelOfApplication: "", CurrentSecurityLevelOfEnvironment: ""}
 }

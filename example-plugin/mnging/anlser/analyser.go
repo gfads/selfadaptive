@@ -31,7 +31,7 @@ func (Analyser) Run(fromMonitor chan shared.Symptoms, toPlanner chan shared.ToPl
 		case shared.AlwaysSecure:
 			switch symptoms.SecuritySymptom {
 			case shared.Secure:
-				info.ChangeRequest = shared.UsePlainText
+				info.ChangeRequest = shared.UseWeakCryptography
 			case shared.Suspicious:
 				info.ChangeRequest = shared.UseMediumCryptography
 			case shared.Unsecure:

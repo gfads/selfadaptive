@@ -16,19 +16,19 @@ func NewManagingSystem(g string) *ManagingSystem {
 	return &ManagingSystem{Goal: g}
 }
 
-func (m ManagingSystem) Run(fromManaged chan []func(), toManaged chan shared.ToManagedChan) {
+func (ms ManagingSystem) Run(fromManaged chan map[string]func(), toManaged chan shared.ToManagedChan) {
 
 	toAnalyser := make(chan shared.Symptoms)
 	toPlanner := make(chan shared.ToPlannerChan)
 	toExecutor := make(chan shared.ToPlannerChan)
 
-	monitor := mntor.NewMonitor()
-	analyser := anlser.NewAnalyser()
-	planner := plnner.NewPlanner()
-	executor := exctor.NewExecutor()
+	m := mntor.NewMonitor()
+	a := anlser.NewAnalyser()
+	p := plnner.NewPlanner()
+	e := exctor.NewExecutor()
 
-	go monitor.Run(fromManaged, toAnalyser)
-	go analyser.Run(toAnalyser, toPlanner, m.Goal)
-	go planner.Run(toPlanner, toExecutor)
-	go executor.Run(toExecutor, toManaged)
+	go m.Run(fromManaged, toAnalyser)
+	go a.Run(toAnalyser, toPlanner, ms.Goal)
+	go p.Run(toPlanner, toExecutor)
+	go e.Run(toExecutor, toManaged)
 }
