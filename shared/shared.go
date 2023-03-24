@@ -41,7 +41,7 @@ type Symptoms struct {
 const NewPluginvAvailable = 0
 const NoNewPluginAvailable = 1
 
-// environment symptoms
+// security symptoms
 const LowSecureEnvironment = 0
 const MediumSecureEnvironment = 1
 const HighSecureEnvironment = 2
