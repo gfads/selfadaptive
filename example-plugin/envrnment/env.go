@@ -25,10 +25,11 @@ func (e *Environment) Run() {
 }
 
 func (Environment) Sense() (string, []func()) {
-	r1 := shared.EnvironmentSecurityLevel[rand.Intn(2)]
+	temp := shared.EnvironmentSecurityLevels
+	r1 := temp[rand.Intn(len(temp))]
 	r2 := shared.LoadPlugins(shared.SourcesDir, shared.ExecutablesDir)
 
-	fmt.Print("Env:: ", r1, " ")
+	fmt.Printf("[%s] -> ", r1)
 
 	return r1, r2
 }

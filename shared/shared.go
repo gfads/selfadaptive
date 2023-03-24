@@ -28,15 +28,13 @@ const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-p
 //const ExecutablesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\executables"
 
 // Goals
-const NoAdaptation = 0
-const AlwaysUpdated = 1
-const LowSecure = 2
-const MediumSecure = 3
-const HighSecure = 4
-const AlwaysSecure = 5
+const AlwaysSecure = "Always Secure"
+const AlwaysUpdated = "Always Updated"
+const NoWorry = "Unsecure and Out of Date"
+const BestEffort = "Best Effort"
 
 // Environments security level
-var EnvironmentSecurityLevel = []string{SecureEnvironment, UnsecureEnvironment}
+var EnvironmentSecurityLevels = []string{Secure, Suspicious, Unsecure}
 
 // Symptom
 type Symptoms struct {
@@ -49,22 +47,19 @@ const NewPluginvAvailable = 0
 const NoNewPluginAvailable = 1
 
 // security symptoms
-const SecureEnvironment = "SecureEnvironment"
-const UnsecureEnvironment = "UnsecureEnvironment"
+const Secure = "SecureEnvironment"
+const Suspicious = "SuspiciousEnvironment"
+const Unsecure = "UnsecureEnvironment"
 
 // Request types
 const NoChange = "No Update Needed"
-const UseAnyBehaviour = "Update to Any Behaviour"
-const UseLastBehaviour = "Update to Last Behaviour Found"
-const ImproveSecurity = "Improve Security"
-const ReduceSecurity = "Reduce Security"
-const KeepSecurity = "Keep Security"
 const UsePlainText = "Use Plain Text"
+const UseMediumCryptography = "Use Medium Cryptography"
 const UseStrongCryptography = "Use Strong Cryptography"
 
 // security
-const PlainText = "This is the sent message"                                                                                       // This must be of 16 byte length!!
-var Keys32 = []string{"WeakXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "MediumXXXXXXXXXXXXXXXXXXXXXXXXXXX", "HighXXXXXXXXXXXXXXXXXXXXXXXXXXXX"} // This must be of 32 byte length!!
+const PlainText = "This is the sent message"                                                                                      // This must be of 16 byte length!!
+var Keys32 = []string{"WeakXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "MediumXXXXXXXXXXXXXXXXXXXXXXXXXXX", "StrongXXXXXXXXXXXXXXXXXXXXXXXXX"} // This must be of 32 byte length!!
 const LowSecurityLevel = 0
 const MediumSecurityLevel = 1
 const HighSecurityLevel = 2

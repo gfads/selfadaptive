@@ -41,17 +41,17 @@ func (m ManagedElement) Run(toManaging chan []func(), fromManaging chan shared.T
 }
 
 func (m ManagedElement) defaultBehaviour() { // plain text
-	fmt.Println("Sent Message:", shared.PlainText)
+	fmt.Printf("[Defaul] -> [Plain Text]'%s'\n", shared.PlainText)
 }
 
 func (m ManagedElement) weakCryptography() {
-	fmt.Println("Sent Message: [Weak]", shared.EncryptMessage(shared.PlainText, shared.Keys32[0]))
+	fmt.Printf("[Weak] '%s'\n", shared.EncryptMessage(shared.PlainText, shared.Keys32[0]))
 }
 
 func (m ManagedElement) mediumCryptography() {
-	fmt.Println("Sent Message: [Medium]", shared.EncryptMessage(shared.PlainText, shared.Keys32[1]))
+	fmt.Printf("[Medium] '%s'\n", shared.EncryptMessage(shared.PlainText, shared.Keys32[1]))
 }
 
 func (m ManagedElement) strongCryptography() {
-	fmt.Println("Sent Message: [Strong]", shared.EncryptMessage(shared.PlainText, shared.Keys32[2]))
+	fmt.Printf("[Strong] '%s'\n", shared.EncryptMessage(shared.PlainText, shared.Keys32[2]))
 }

@@ -21,10 +21,8 @@ func main() {
 	shared.RemoveContents(shared.SourcesDir)
 
 	// configure the adaptation goal
-	//goal := shared.AlwaysUpdated
-	//goal := shared.AnyBehaviour
-	//goal := shared.NoAdaptation
 	goal := shared.AlwaysSecure
+	//goal := shared.NoWorry
 
 	// instantiate channels
 	fromManaged := make(chan []func())
@@ -36,6 +34,7 @@ func main() {
 	environment := envrnment.NewEnvironment()
 
 	//
+	fmt.Println("******* GOAL: ", goal, "*******")
 	go environment.Run()
 	go managed.Run(fromManaged, toManaged)
 	go managing.Run(fromManaged, toManaged)

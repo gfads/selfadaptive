@@ -19,24 +19,27 @@ func NewAnalyser() *Analyser {
 	return &Analyser{}
 }
 
-func (Analyser) Run(fromMonitor chan shared.Symptoms, toPlanner chan shared.ToPlannerChan, goal int) {
+func (Analyser) Run(fromMonitor chan shared.Symptoms, toPlanner chan shared.ToPlannerChan, goal string) {
 	for {
-
 		// receive symptom from monitor
 		symptoms := <-fromMonitor
 		info := shared.ToPlannerChan{}
 
-		// analyse of symptoms (* priority to security *)
-		switch symptoms.SecuritySymptom {
-		case shared.SecureEnvironment:
-			info.ChangeRequest = shared.UsePlainText
-		case shared.UnsecureEnvironment:
-			info.ChangeRequest = shared.UseStrongCryptography
-		default:
-			shared.ErrorHandler(shared.GetFunction(), "Unknown environment symptom '"+symptoms.SecuritySymptom+"' unknown")
+		switch goal {
+		case shared.NoWorry:
+			info.ChangeRequest = shared.NoChange
+		case shared.AlwaysSecure:
+			switch symptoms.SecuritySymptom {
+			case shared.Secure:
+				info.ChangeRequest = shared.UsePlainText
+			case shared.Suspicious:
+				info.ChangeRequest = shared.UseMediumCryptography
+			case shared.Unsecure:
+				info.ChangeRequest = shared.UseStrongCryptography
+			default:
+				shared.ErrorHandler(shared.GetFunction(), "Unknown environment symptom '"+symptoms.SecuritySymptom+"' unknown")
+			}
 		}
-
-		// configure and send request change to planner
 		toPlanner <- info
 	}
 }

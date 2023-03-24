@@ -9,10 +9,10 @@ import (
 )
 
 type ManagingSystem struct {
-	Goal int
+	Goal string
 }
 
-func NewManagingSystem(g int) *ManagingSystem {
+func NewManagingSystem(g string) *ManagingSystem {
 	return &ManagingSystem{Goal: g}
 }
 
