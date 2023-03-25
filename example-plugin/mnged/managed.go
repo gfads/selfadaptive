@@ -33,11 +33,11 @@ func (m ManagedElement) Run(toManaging chan map[string]func(), fromManaging chan
 	m.PlainText()
 
 	for {
-		toManaging <- m.Behaviours // To managing
-		b := <-fromManaging        // From managing
+		toManaging <- m.Behaviours
+		b := <-fromManaging
 
-		behaviour := b.Behaviours[b.SelectedBehaviour] // new behaviour
-		behaviour()                                    // change to new behaviour
+		behaviour := b.Behaviours[b.SelectedBehaviour]
+		behaviour()
 	}
 }
 
