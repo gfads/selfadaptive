@@ -33,11 +33,10 @@ func main() {
 	managing := mnging.NewManagingSystem(goal)
 	environment := envrnment.NewEnvironment()
 
-	//
 	fmt.Println("******* GOAL: ", goal, "*******")
 	go environment.Run()
 	go managed.Run(fromManaged, toManaged)
-	go managing.Run(fromManaged, toManaged)
+	go managing.Run(fromManaged, toManaged, environment)
 
 	_, _ = fmt.Scanln()
 }

@@ -21,16 +21,16 @@ const NumberOfColors = 7
 const ColorReset = "\033[0m"
 
 // Base Directories
-//const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/source"
-//const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/executable"
+const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/source"
+const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/executable"
 
-const SourcesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\sources"
-const ExecutablesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\executables"
+//const SourcesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\sources"
+//const ExecutablesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\executables"
 
 // Goals
 const AlwaysSecure = "Always Secure"
+const NoWorry = "Do not take care"
 const AlwaysUpdated = "Always Updated"
-const NoWorry = "Unsecure and Out of Date"
 const BestEffort = "Best Effort"
 
 // Environments security level
@@ -61,9 +61,6 @@ const UseStrongCryptography = "Use Strong Cryptography"
 // security
 const PlainText = "This is the sent message"                                                                                      // This must be of 16 byte length!!
 var Keys32 = []string{"WeakXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "MediumXXXXXXXXXXXXXXXXXXXXXXXXXXX", "StrongXXXXXXXXXXXXXXXXXXXXXXXXX"} // This must be of 32 byte length!!
-const LowSecurityLevel = 0
-const MediumSecurityLevel = 1
-const HighSecurityLevel = 2
 
 // dir configurations
 var DirGo = LocalizegGo() + "/bin"

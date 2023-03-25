@@ -14,13 +14,13 @@ func NewMonitor() *Monitor {
 	return &Monitor{}
 }
 
-func (Monitor) Run(fromManaged chan map[string]func(), toAnalyser chan shared.Symptoms) {
+func (Monitor) Run(fromManaged chan map[string]func(), toAnalyser chan shared.Symptoms, env *envrnment.Environment) {
 	for {
 		// monitor interval
 		time.Sleep(5 * time.Second)
 
 		// sense environment
-		securityLevel, pluginBehaviours := envrnment.NewEnvironment().Sense()
+		securityLevel, pluginBehaviours := env.Sense()
 
 		// sense managed system
 		hardBehaviours := <-fromManaged
@@ -35,7 +35,7 @@ func (Monitor) Run(fromManaged chan map[string]func(), toAnalyser chan shared.Sy
 			allBehaviours["Plugin"+strconv.Itoa(i)] = pluginBehaviours[i]
 		}
 
-		// generate symptom
+		// define symptom
 		symptoms := shared.Symptoms{}
 
 		// update available behaviours symptom
@@ -50,6 +50,7 @@ func (Monitor) Run(fromManaged chan map[string]func(), toAnalyser chan shared.Sy
 
 		// update knowledge database
 		knwldge.KnowledgeDatabase.AvailableBehaviours = allBehaviours
+		knwldge.KnowledgeDatabase.CurrentSecurityLevelOfEnvironment = securityLevel
 
 		// send all behaviours to analyser
 		toAnalyser <- symptoms

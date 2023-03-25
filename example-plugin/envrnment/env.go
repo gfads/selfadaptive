@@ -8,25 +8,30 @@ import (
 )
 
 type Environment struct {
-	SecurityLevel int
+	SecurityLevel string
 	Plugins       []func()
 }
 
 func NewEnvironment() *Environment {
-	e := Environment{SecurityLevel: shared.HighSecurityLevel, Plugins: shared.LoadPlugins(shared.SourcesDir, shared.ExecutablesDir)}
+	e := Environment{SecurityLevel: shared.Secure, Plugins: shared.LoadPlugins(shared.SourcesDir, shared.ExecutablesDir)}
 	return &e
 }
 
 func (e *Environment) Run() {
 	for {
-		e.SecurityLevel = shared.HighSecurityLevel
-		time.Sleep(10 * time.Hour)
+		// generate a new security level randomly
+		time.Sleep(10 * time.Second)
+		rand.Seed(time.Now().UnixNano())
+		sls := shared.EnvironmentSecurityLevels
+		sl := sls[rand.Intn(len(sls))]
+
+		// update security level
+		e.SecurityLevel = sl
 	}
 }
 
-func (Environment) Sense() (string, []func()) {
-	temp := shared.EnvironmentSecurityLevels
-	r1 := temp[rand.Intn(len(temp))]
+func (e Environment) Sense() (string, []func()) {
+	r1 := e.SecurityLevel
 	r2 := shared.LoadPlugins(shared.SourcesDir, shared.ExecutablesDir)
 
 	fmt.Printf("[%s] -> ", r1)

@@ -1,6 +1,7 @@
 package mnging
 
 import (
+	"selfadaptive/example-plugin/envrnment"
 	"selfadaptive/example-plugin/mnging/anlser"
 	"selfadaptive/example-plugin/mnging/exctor"
 	"selfadaptive/example-plugin/mnging/mntor"
@@ -16,7 +17,7 @@ func NewManagingSystem(g string) *ManagingSystem {
 	return &ManagingSystem{Goal: g}
 }
 
-func (ms ManagingSystem) Run(fromManaged chan map[string]func(), toManaged chan shared.ToManagedChan) {
+func (ms ManagingSystem) Run(fromManaged chan map[string]func(), toManaged chan shared.ToManagedChan, env *envrnment.Environment) {
 
 	toAnalyser := make(chan shared.Symptoms)
 	toPlanner := make(chan shared.ToPlannerChan)
@@ -27,7 +28,7 @@ func (ms ManagingSystem) Run(fromManaged chan map[string]func(), toManaged chan 
 	p := plnner.NewPlanner()
 	e := exctor.NewExecutor()
 
-	go m.Run(fromManaged, toAnalyser)
+	go m.Run(fromManaged, toAnalyser, env)
 	go a.Run(toAnalyser, toPlanner, ms.Goal)
 	go p.Run(toPlanner, toExecutor)
 	go e.Run(toExecutor, toManaged)

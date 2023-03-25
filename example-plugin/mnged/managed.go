@@ -42,7 +42,7 @@ func (m ManagedElement) Run(toManaging chan map[string]func(), fromManaging chan
 }
 
 func (ManagedElement) PlainText() { // plain text
-	fmt.Printf("[PlainText] -> [Plain Text] '%s'\n", shared.PlainText)
+	fmt.Printf("[Default] -> [Plain Text] '%s'\n", shared.PlainText)
 }
 
 func (ManagedElement) WeakCryptography() {
