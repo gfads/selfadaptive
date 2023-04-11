@@ -1,0 +1,136 @@
+#docker run -d --hostname my-rabbit --name some-rabbit -p 8080:15672 rabbitmq:3-management
+
+#source ~/.cshrc
+export GO111MODULE=off
+export GOPATH=$GOPATH:/Volumes/GoogleDrive/Meu\ Drive/go/adaptive
+cd /Users/Nelson/Google\ Drive/Meu\ Drive/go/adaptive/src/rabbitmq/journal/consumer
+#clear
+
+#echo "1)Remember to start rabbimq-server with 'brew services start rabbitmq'"
+#echo "OR Stop 'brew services stop rabbitmq"
+#echo "2)Remeber that PC=0 is infinite buffer"
+#echo
+
+echo "Compiling main.go"
+go build main.go
+
+#echo "Server started..."
+
+# experiment Dynamic Input
+#echo Experiment Dynamic Input
+#./main -is-adaptive=true -monitor-interval=10 -prefetch-count=89 -controller-type="PID" -set-point=0 -kp=0.0 -ki=0.0 -kd=0.0
+
+# Training
+#echo Training [Root Locus]
+#./main -is-adaptive=false -monitor-interval=5 -prefetch-count=89 -controller-type="PID" -set-point=0 -kp=0.0 -ki=0.0 -kd=0.0
+
+#./main -is-adaptive=true -monitor-interval=10 -prefetch-count=1 -controller-type="PID" -set-point=1000 -kp=0.0179 -ki=0.0 -kd=0.0
+#./main -is-adaptive=true -monitor-interval=10 -prefetch-count=1 -controller-type="PID" -set-point=1000 -kp=0.166577703 -ki=0.158808685 -kd=0.036932252
+
+# Tuning ACM SAC Ziegler
+#echo Tuning ACM SAC - Ziegler-Nichols
+#./main -is-adaptive=true -monitor-interval=5 -prefetch-count=1 -controller-type="PID" -set-point=0.0 -kp=0.0 -ki=0.0 -kd=0.0
+
+# Validation ACM SAC Ziegler
+#echo [PI Validation - Ziegler-Nichols]
+#./main -is-adaptive=true -monitor-interval=2 -prefetch-count=1 -controller-type="PID" -set-point=200.0 -kp=0.0021354 -ki=0.006406201 -kd=0.0
+
+#P Controller [1-22]
+#./main -is-adaptive=true -monitor-interval=10 -prefetch-count=1 -controller-type="PID" -set-point=400 -kp=0.021147 -ki=0.0 -kd=0.0
+
+
+#********** Root LOCUS - BEGIN *********************
+
+########## P controller ##########
+#echo [P Root Locus]
+#./main -is-adaptive=true -monitor-interval=5 -prefetch-count=1 -controller-type="PID" -set-point=400 -kp=0.027878540 -ki=0.0 -kd=0.0
+
+########## PI controller ##########
+#echo [PI Root Locus]
+./main -is-adaptive=true -monitor-interval=5 -prefetch-count=1 -controller-type="PI" -set-point=1000 -kp=0.0 -ki=0.0 -kd=0.0
+
+########## PID controller ##########
+#echo [PID Root Locus]
+#./main -is-adaptive=true -monitor-interval=5 -prefetch-count=1 -controller-type="PID" -set-point=400 -kp=0.004144896 -ki=0.007118042 -kd=0.002256440
+
+#********** Root LOCUS - END *********************
+
+#********** ZIEGLER-NICHOLS - BEGIN *********************
+#echo [P Ziegler Nichols]
+#./main -is-adaptive=true -monitor-interval=5 -prefetch-count=1 -controller-type="PID" -set-point=400 -kp=0.000772300 -ki=0.0 -kd=0.0
+
+#echo [PI Ziegler-Nichols]
+#./main -is-adaptive=true -monitor-interval=5 -prefetch-count=1 -controller-type="PID" -set-point=400 -kp=0.000695070 -ki=0.002085210 -kd=0.0
+
+#echo [PID Ziegler-Nichols]
+#./main -is-adaptive=true -monitor-interval=5 -prefetch-count=1 -controller-type="PID" -set-point=400 -kp=0.000926760 -ki=0.004633801 -kd=0.000046338
+#********** Root LOCUS - END *********************
+
+#********** COHEN-COON - BEGIN *********************
+#echo [P Cohen Coon]
+#./main -is-adaptive=true -monitor-interval=5 -prefetch-count=1 -controller-type="PID" -set-point=400 -kp=0.001042605 -ki=0.0 -kd=0.0
+
+#echo [PI Cohen Coon]
+#./main -is-adaptive=true -monitor-interval=5 -prefetch-count=1 -controller-type="PID" -set-point=400 -kp=0.001334535 -ki=0.011862531 -kd=0.0
+
+#echo [PID Cohen Coon]
+#./main -is-adaptive=true -monitor-interval=5 -prefetch-count=1 -controller-type="PID" -set-point=400 -kp=0.001230274 -ki=0.006602471 -kd=0.000038252
+
+#********** COHEN-COON - END *********************
+
+#********** AMIGO - BEGIN *********************
+
+#echo [P AMIGO]
+#./main -is-adaptive=true -monitor-interval=5 -prefetch-count=1 -controller-type="PID" -set-point=400 -kp=0.000501995 -ki=0.0 -kd=0.0
+
+#echo [PI AMIGO]
+#./main -is-adaptive=true -monitor-interval=5 -prefetch-count=1 -controller-type="PID" -set-point=400 -kp=0.000193075 -ki=0.000465241 -kd=0.0
+
+#echo [PID AMIGO]
+#./main -is-adaptive=true -monitor-interval=5 -prefetch-count=1 -controller-type="PID" -set-point=400 -kp=0.000501995 -ki=0.004601622 -kd=0.000019308
+
+#********** AMIGO - END *********************
+
+
+#********** AMIGO - BEGIN *********************
+echo [OnOff]
+./main -is-adaptive=true -monitor-interval=5 -prefetch-count=1 -controller-type="OnOff" -set-point=400 -kp=0.0 -ki=0.0 -kd=0.0
+
+#********** AMIGO - END *********************
+
+
+#### PI Controller - Ziegler-Nichols
+#echo [PI Ziegler-Nichols]
+#./main -is-adaptive=true -monitor-interval=10 -prefetch-count=1 -controller-type="PID" -set-point=400 -kp=0.001943173 -ki=0.005829519 -kd=0.0
+
+#### PI Controller - Cohen-Coon
+#echo [PI Cohen-Coon]
+#./main -is-adaptive=true -monitor-interval=10 -prefetch-count=1 -controller-type="PID" -set-point=400 -kp=0.003730892 -ki=0.033163486 -kd=0.0
+
+
+#### PI Controller - Cohen
+#./main -is-adaptive=true -monitor-interval=10 -prefetch-count=1 -controller-type="PID" -set-point=400 -kp=0.059876 -ki=532.2303598 -kd=0.0
+
+#### PI Controller - AMIGO
+#echo [PI AMIGO]
+#./main -is-adaptive=true -monitor-interval=2 -prefetch-count=1 -controller-type="PID" -set-point=400 -kp=0.001374935 -ki=0.000687467 -kd=0.0
+
+###### PD Controller [1-22] ACM SAC
+#./main -is-adaptive=true -monitor-interval=10 -prefetch-count=1 -controller-type="PID" -set-point=400 -kp=0.09 -ki=0.0 -kd=0.09
+
+###### PID [1-22] ACM SAC
+#echo [PI Root Locus]
+#./main -is-adaptive=true -monitor-interval=5 -prefetch-count=1 -controller-type="PID" -set-point=400 -kp=0.030793190 -ki=0.019148677 -kd=0.006070186
+
+###### PID [1-22] Cohen
+#./main -is-adaptive=true -monitor-interval=10 -prefetch-count=1 -controller-type="PID" -set-point=400 -kp=0.014968 -ki=80.32624361 -kd=0.00000046538
+
+###### PID [1-22] AMIGO
+#echo [PI AMIGO]
+#./main -is-adaptive=true -monitor-interval=2 -prefetch-count=1 -controller-type="PID" -set-point=200 -kp=0.022523 -ki=206.4587171 -kd=0.00000086626
+
+###### OnOff
+#./main -is-adaptive=true -monitor-interval=30 -prefetch-count=1 -controller-type="OnOff" -set-point=400 -kp=0.0 -ki=0.0 -kd=0.0
+
+###### OnOffDeadZone
+#./main -is-adaptive=true -monitor-interval=5 -prefetch-count=1 -controller-type="OnOffDeadZone" -set-point=400 -kp=0.0 -ki=0.0 -kd=0.0

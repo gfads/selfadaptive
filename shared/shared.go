@@ -15,6 +15,30 @@ import (
 	"time"
 )
 
+// Astar
+const SV = 2.7           // Shutoff voltage (page 17) = 2.7 V
+const OV = 3.7           // Optimum voltage (page 17) = 3.7 V
+const HYSTERISIS = 0.001 // 10 mV
+
+// Prefetch counter
+const PcDefaultLimitMin = 1
+const PcDefaultLimitMax = 1200 // TODO ASTAR
+
+// Controller types
+const PID = "PID"
+const PI = "PI"
+const ONOFF = "OnOff"
+const DeadZoneOnoff = "OnOffwithDeadZone"
+const HysteresisOnoff = "OnOffwithHysteresis"
+const GainScheduling = "GainScheduling"
+
+const BasicPid = "Basic"
+const SmoothingPid = "SmoothingDerivative"
+const IncrementalFormPid = "IncrementalForm"
+const ErrorSquarePid = "ErrorSquare"
+const NonePid = "None"
+const DeadZonePid = "DeadZonePID"
+
 const MinOnoff = 10
 const MaxOnoff = 600
 const MonitorTime = 10 // seconds
