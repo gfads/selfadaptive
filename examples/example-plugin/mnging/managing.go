@@ -1,11 +1,11 @@
 package mnging
 
 import (
-	"selfadaptive/example-plugin/envrnment"
-	"selfadaptive/example-plugin/mnging/anlser"
-	"selfadaptive/example-plugin/mnging/exctor"
-	"selfadaptive/example-plugin/mnging/mntor"
-	"selfadaptive/example-plugin/mnging/plnner"
+	"selfadaptive/examples/example-plugin/envrnment"
+	"selfadaptive/examples/example-plugin/mnging/anlser"
+	"selfadaptive/examples/example-plugin/mnging/exctor"
+	"selfadaptive/examples/example-plugin/mnging/mntor"
+	"selfadaptive/examples/example-plugin/mnging/plnner"
 	"selfadaptive/shared"
 )
 

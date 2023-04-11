@@ -8,9 +8,9 @@ package main
 
 import (
 	"fmt"
-	"selfadaptive/example-plugin/envrnment"
-	"selfadaptive/example-plugin/mnged"
-	"selfadaptive/example-plugin/mnging"
+	"selfadaptive/examples/example-plugin/envrnment"
+	"selfadaptive/examples/example-plugin/mnged"
+	"selfadaptive/examples/example-plugin/mnging"
 	"selfadaptive/shared"
 )
 

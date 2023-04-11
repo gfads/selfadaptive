@@ -29,7 +29,7 @@ func ManagingSystem(ch1, ch2 chan int) {
 	for {
 		t := <-ch1
 		ch2 <- t
-		time.Sleep(shared.MonitorTime * time.Millisecond)
+		time.Sleep(shared.MonitorTime * time.Second)
 	}
 }
 
@@ -41,7 +41,7 @@ func ManagedSystem(ch chan int) {
 		case i = <-ch:
 		default:
 		}
-		fmt.Print(string(shared.Behaviours[i]), "+")
+		fmt.Print(string(shared.ColorBehaviours[i]), "+")
 		time.Sleep(time.Millisecond * 100)
 	}
 }

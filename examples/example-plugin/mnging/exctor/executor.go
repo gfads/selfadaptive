@@ -7,7 +7,7 @@ Date: 28/02/2023
 package exctor
 
 import (
-	"selfadaptive/example-plugin/mnging/knwldge"
+	"selfadaptive/examples/example-plugin/mnging/knwldge"
 	"selfadaptive/shared"
 )
 

@@ -1,8 +1,8 @@
 package mntor
 
 import (
-	"selfadaptive/example-plugin/envrnment"
-	"selfadaptive/example-plugin/mnging/knwldge"
+	"selfadaptive/examples/example-plugin/envrnment"
+	"selfadaptive/examples/example-plugin/mnging/knwldge"
 	"selfadaptive/shared"
 	"strconv"
 	"time"
