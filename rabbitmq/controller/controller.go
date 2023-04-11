@@ -80,29 +80,3 @@ func NewController(typeName string, pidType string, p ...float64) IController {
 
 	return *new(IController)
 }
-
-/*
-func Update(c IController, r float64, y float64) float64 {
-	return c.Update(r, y)
-}
-
-func Initialise(c IController, controllerType string, p ...float64) {
-	c.Initialise(controllerType, p)
-}
-
-func Reconfigure(c IController) {
-	c.Reconfigure()
-}
-
-func SetKP(c IController, kp float64) {
-	c.SetKP(kp)
-}
-
-func GetKP(c IController) float64 {
-	return c.GetKP()
-}
-
-func SetGains(c IController, kp, ki, kd float64) {
-	c.SetGains(kp, ki, kd)
-}
-*/

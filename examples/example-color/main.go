@@ -15,7 +15,10 @@ func main() {
 	go ManagedSystem(ch2)
 	go ManagingSystem(ch1, ch2)
 
-	fmt.Scanln()
+	_, err := fmt.Scanln()
+	if err != nil {
+		return
+	}
 }
 
 func Environment(ch chan int) {
@@ -41,7 +44,7 @@ func ManagedSystem(ch chan int) {
 		case i = <-ch:
 		default:
 		}
-		fmt.Print(string(shared.ColorBehaviours[i]), "+")
+		fmt.Print(shared.ColorBehaviours[i], "+")
 		time.Sleep(time.Millisecond * 100)
 	}
 }

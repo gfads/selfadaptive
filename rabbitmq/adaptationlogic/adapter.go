@@ -3,7 +3,6 @@ package adaptationlogic
 import (
 	"fmt"
 	"math"
-	"math/rand"
 	"os"
 	"selfadaptive/rabbitmq/controller"
 	"time"
@@ -16,7 +15,7 @@ const WarmupTime = 30 // seconds
 const TrainingAttempts = 10
 const SizeOfSameLevel = 20
 
-var PC_EXPERIMENT_SET = []float64{1000.0, 1250.0, 1500.0, 1750.0, 2000.0, 2250.0, 2500.0, 2750.0, 3000.0}
+var PcExperimentSet = []float64{1000.0, 1250.0, 1500.0, 1750.0, 2000.0, 2250.0, 2500.0, 2750.0, 3000.0}
 
 type AdjustmenstInfo struct {
 	PC   int
@@ -160,7 +159,7 @@ func (al AdaptationLogic) RunOnlineTraining() {
 				// update set point dynamically -- ONLY FOR EXPERIMENTS
 				if countCycles > SizeOfSameLevel {
 					//al.SetPoint = myRandon()
-					al.SetPoint = PC_EXPERIMENT_SET[countExperiments]
+					al.SetPoint = PcExperimentSet[countExperiments]
 					countCycles = 0
 					countExperiments++
 				} else {
@@ -234,7 +233,7 @@ func (al AdaptationLogic) RunOfflineTraining() {
 				// update set point dynamically -- ONLY FOR EXPERIMENTS
 				if countCycles > SizeOfSameLevel {
 					//al.SetPoint = myRandon()
-					al.SetPoint = PC_EXPERIMENT_SET[countExperiments]
+					al.SetPoint = PcExperimentSet[countExperiments]
 					countCycles = 0
 					countExperiments++
 				} else {
@@ -384,15 +383,4 @@ func CalculateNRMSE(info TODOINFO) float64 {
 
 	fmt.Println("NMRSE:: ", nmrse, rmse, maxRate, minRate, len(info.Data))
 	return nmrse
-}
-
-func myRandon() float64 {
-	n := 1
-	for {
-		n = rand.Intn(6)
-		if n != 0 {
-			break
-		}
-	}
-	return float64(n * 1000.0)
 }

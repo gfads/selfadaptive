@@ -57,6 +57,7 @@ func (c *GainPIDController) Initialise(pidType string, p ...float64) {
 
 func (c *GainPIDController) Reconfigure(p ...float64) {
 	// TODO
+	fmt.Println(p)
 }
 
 func (c *GainPIDController) Update(p ...float64) float64 {
