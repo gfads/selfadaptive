@@ -24,6 +24,12 @@ const HYSTERISIS = 0.001 // 10 mV
 const PcDefaultLimitMin = 1
 const PcDefaultLimitMax = 1200 // TODO ASTAR
 
+// Training Types
+
+const NoTraining = "No Training"
+const OffLineTraining = "Offline Training"
+const OnLineTraining = "Online Training"
+
 // Controller types
 const PID = "PID"
 const PI = "PI"

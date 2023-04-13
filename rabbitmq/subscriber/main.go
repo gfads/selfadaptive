@@ -23,20 +23,20 @@ type Subscriber struct {
 func main() {
 
 	// configure/read flags
-	var isAdaptive = *flag.Bool("is-adaptive", false, "is-adaptive is a boolean")
+	var isAdaptive = flag.Bool("is-adaptive", false, "is-adaptive is a boolean")
 	var controllerType = flag.String("controller-type", "OnOff", "controller-type is a string")
-	var monitorInterval = *flag.Int("monitor-interval", 1, "monitor-interval is an int (s)")
+	var monitorInterval = flag.Int("monitor-interval", 1, "monitor-interval is an int (s)")
 	var setPointPtr = flag.Float64("set-point", 3000.0, "set-point is a float (goal rate)")
 	var kpPtr = flag.Float64("kp", 1.0, "Kp is a float")
 	var kiPtr = flag.Float64("ki", 1.0, "Ki is a float")
 	var kdPtr = flag.Float64("kd", 1.0, "Kd is a float")
 	var prefetchCountPtr = flag.Int("prefetch-count", 1, "prefetch-count is an int")
 	var pidTypePtr = flag.String("pid-type", "NONE", "pid-type is a string")
-	var trainingTypePtr = flag.String("training-type", "Online", "training-type is a string")
+	var trainingTypePtr = flag.String("training-type", shared.OnLineTraining, "training-type is a string")
 	flag.Parse()
 
 	// create new consumer
-	var consumer = NewConsumer(isAdaptive, *prefetchCountPtr)
+	var consumer = NewConsumer(*isAdaptive, *prefetchCountPtr)
 
 	// Configure RabbitMQ
 	consumer.ConfigureRabbitMQ(consumer.PC)
@@ -59,15 +59,15 @@ func main() {
 	startTimer := make(chan bool) // start timer
 	stopTimer := make(chan bool)  // stop timer
 
-	fmt.Println("Consumer started [ IsAdaptive=", isAdaptive, "Training=", *trainingTypePtr, "Controller=", controllerType, "PIDType=", *pidTypePtr, "Kp=", *kpPtr, "Ki=", *kiPtr, "Kd=", *kdPtr, "Goal=", *setPointPtr, "Monitor Interval=", monitorInterval, "PC=", *prefetchCountPtr, "]")
+	fmt.Println("Subscriber started [ IsAdaptive=", *isAdaptive, "Training=", *trainingTypePtr, "Controller=", controllerType, "PIDType=", *pidTypePtr, "Kp=", *kpPtr, "Ki=", *kiPtr, "Kd=", *kdPtr, "Goal=", *setPointPtr, "Monitor Interval=", monitorInterval, "PC=", *prefetchCountPtr, "]")
 
-	if isAdaptive {
+	if *isAdaptive {
 		// Create & start adaptation logic
-		adapter := adaptationlogic.NewAdaptationLogic(toAdapter, fromAdapter, *controllerType, *pidTypePtr, *trainingTypePtr, *kpPtr, *kiPtr, *kdPtr, *setPointPtr, time.Duration(monitorInterval), *prefetchCountPtr)
+		adapter := adaptationlogic.NewAdaptationLogic(toAdapter, fromAdapter, *controllerType, *pidTypePtr, *trainingTypePtr, *kpPtr, *kiPtr, *kdPtr, *setPointPtr, time.Duration(*monitorInterval), *prefetchCountPtr)
 		go adapter.Run()
 
 		// Create timer
-		t := mytimer.NewMyTimer(monitorInterval, startTimer, stopTimer)
+		t := mytimer.NewMyTimer(*monitorInterval, startTimer, stopTimer)
 		go t.RunMyTimer()
 
 		// run adaptive consumer
@@ -186,7 +186,6 @@ func (c *Subscriber) ConfigureRabbitMQ(pc int) {
 	if err != nil {
 		shared.ErrorHandler(shared.GetFunction(), "Failed to set QoS")
 	}
-
 	return
 }
 

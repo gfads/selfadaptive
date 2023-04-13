@@ -5,6 +5,7 @@ import (
 	"math"
 	"os"
 	"selfadaptive/rabbitmq/controller"
+	"selfadaptive/shared"
 	"time"
 )
 
@@ -53,15 +54,53 @@ func NewAdaptationLogic(chFromBusiness chan int, chToBusiness chan int, controll
 func (al AdaptationLogic) Run() {
 
 	switch al.TrainingType {
-	case "Offline":
+	case shared.NoTraining:
+		al.RunNoTraining()
+	case shared.OffLineTraining:
 		al.RunOfflineTraining()
-	case "Online":
+	case shared.OnLineTraining:
 		al.RunOnlineTraining()
 	default:
 		fmt.Println("Training type ´", al.TrainingType, "´ is invalid")
 		os.Exit(0)
 	}
 }
+
+func (al AdaptationLogic) RunNoTraining() {
+	// create controller
+	var c controller.IController
+	c = controller.NewController(al.ControllerType, al.PIDType, al.Kp, al.Ki, al.Kd)
+
+	// warm up phase
+	time.Sleep(WarmupTime * time.Second)
+
+	// discard first measurement
+	<-al.FromBusiness // receive no. of messages from business
+	al.ToBusiness <- al.PC
+
+	// loop of adaptation logic
+	for {
+		select {
+		case n := <-al.FromBusiness: // interaction with the business
+
+			// calculate new arrival rate (msg/s)
+			rate := float64(n) / al.MonitorInterval.Seconds()
+
+			// catch pc and its yielded rate
+			fmt.Println(al.PC, ";", rate, ";", al.SetPoint)
+
+			// invoke controller to calculate new pc
+			pc := int(math.Round(c.Update(al.SetPoint, rate)))
+
+			// update pc at adaptation mechanism
+			al.PC = pc
+
+			// send new pc to business
+			al.ToBusiness <- al.PC
+		}
+	}
+}
+
 func (al AdaptationLogic) RunOnlineTraining() {
 	state := 0
 	fromAdjuster := make(chan TODOINFO)
