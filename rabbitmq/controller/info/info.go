@@ -1,11 +1,11 @@
 package info
 
 type InfoController struct {
-	PIDType string
 	//R  float64
-	Kp float64
-	Ki float64
-	Kd float64
+	PIDType string
+	Kp      float64
+	Ki      float64
+	Kd      float64
 
 	LimMin float64
 	LimMax float64

@@ -129,7 +129,8 @@ func (c *Subscriber) ConfigureRabbitMQ(pc int) {
 	err := error(nil)
 
 	// create connection
-	c.Conn, err = amqp.Dial("amqp://guest:guest@10.45.21.246:5672/") // KU Leuven
+	//c.Conn, err = amqp.Dial("amqp://guest:guest@10.45.21.246:5672/") // KU Leuven
+	c.Conn, err = amqp.Dial("amqp://guest:guest@192.168.0.20:5672/") // Home Recife
 	//c.Conn, err = amqp.Dial("amqp://guest:guest@192.168.1.127:5672/") // Leuven
 	//c.Conn, err = amqp.Dial("amqp://guest:guest@192.168.0.110:5672/") // Home
 	//s.Conn, err = amqp.Dial("amqp://guest:guest@172.22.38.75:5672/") // Home
