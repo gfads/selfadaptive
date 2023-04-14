@@ -10,9 +10,10 @@ package info
 type Controller struct {
 	TypeName string // Controller type name
 
-	Kp float64 // kp constant used by PID controllers
-	Ki float64 // ki constant used by PID controllers
-	Kd float64 // kd constant used by PID controllers
+	Direction float64
+	Kp        float64 // kp constant used by PID controllers
+	Ki        float64 // ki constant used by PID controllers
+	Kd        float64 // kd constant used by PID controllers
 
 	Min float64 // Minimum value of the controller output
 	Max float64 // Maximum value of the controller output

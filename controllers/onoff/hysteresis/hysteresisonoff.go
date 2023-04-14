@@ -21,13 +21,14 @@ type Controller struct {
 
 func (c *Controller) Initialise(p ...float64) {
 
-	if len(p) < 3 {
-		fmt.Printf("Error: '%s' controller requires 3 info (min,max,hysteresis band) \n", shared.HysteresisOnoff)
+	if len(p) < 4 {
+		fmt.Printf("Error: '%s' controller requires 4 info (direction,min,max,hysteresis band) \n", shared.HysteresisOnoff)
 		os.Exit(0)
 	}
-	c.Info.Min = p[0]
-	c.Info.Max = p[1]
-	c.Info.HysteresisBand = p[2]
+	c.Info.Direction = p[0]
+	c.Info.Min = p[1]
+	c.Info.Max = p[2]
+	c.Info.HysteresisBand = p[3]
 	c.Info.PreviousOut = 0.0
 }
 

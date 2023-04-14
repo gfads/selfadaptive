@@ -22,19 +22,20 @@ type Controller struct {
 
 func (c *Controller) Initialise(p ...float64) {
 
-	if len(p) < 2 {
-		fmt.Printf("Error: '%s controller requires 2 info (min,max) \n", shared.BasicOnoff)
+	if len(p) < 3 {
+		fmt.Printf("Error: '%s controller requires 3 info (direction,min,max) \n", shared.BasicOnoff)
 		os.Exit(0)
 	}
 
 	c.Info.TypeName = shared.BasicOnoff
-	c.Info.Min = p[0]
-	c.Info.Max = p[1]
+	c.Info.Direction = p[0]
+	c.Info.Min = p[1]
+	c.Info.Max = p[2]
 }
 
 func (c *Controller) Update(p ...float64) float64 {
 
-	direction := -1.0
+	direction := 1.0
 	u := 0.0
 
 	s := p[0] // goal

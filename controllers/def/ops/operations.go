@@ -34,39 +34,39 @@ func NewController(i info.Controller) IController {
 	switch i.TypeName {
 	case shared.BasicOnoff:
 		c := onoffbasic.Controller{}
-		c.Initialise(i.Min, i.Max)
+		c.Initialise(i.Direction, i.Min, i.Max)
 		return &c
 	case shared.DeadZoneOnoff:
 		c := deadzoneonff.Controller{}
-		c.Initialise(i.Min, i.Max, i.DeadZone)
+		c.Initialise(i.Direction, i.Min, i.Max, i.DeadZone)
 		return &c
 	case shared.HysteresisOnoff:
 		c := hysteresisonoff.Controller{}
-		c.Initialise(i.Min, i.Max, i.HysteresisBand)
+		c.Initialise(i.Direction, i.Min, i.Max, i.HysteresisBand)
 		return &c
 	case shared.BasicPid:
 		c := basicpid.Controller{}
-		c.Initialise(i.Min, i.Max, i.Kp, i.Ki, i.Kd)
+		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd)
 		return &c
 	case shared.SmoothingPid:
 		c := smoothingpid.Controller{}
-		c.Initialise(i.Min, i.Max, i.Kp, i.Ki, i.Kd)
+		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd)
 		return &c
 	case shared.IncrementalFormPid:
 		c := incrementalpid.Controller{}
-		c.Initialise(i.Min, i.Max, i.Kp, i.Ki, i.Kd)
+		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd)
 		return &c
 	case shared.DeadZonePid:
 		c := deadzonepid.Controller{}
-		c.Initialise(i.Min, i.Max, i.Kp, i.Ki, i.Kd, i.DeadZone)
+		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd, i.DeadZone)
 		return &c
 	case shared.ErrorSquarePid:
 		c := errorsquarepid.Controller{}
-		c.Initialise(i.Min, i.Max, i.Kp, i.Ki, i.Kd)
+		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd)
 		return &c
 	case shared.GainScheduling:
 		c := gainscheduling.Controller{}
-		c.Initialise(i.Min, i.Max, i.Kp, i.Ki, i.Kd)
+		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd)
 		return &c
 	default:
 		fmt.Println("Error: Controller type ´", i.TypeName, "´ is unknown!")

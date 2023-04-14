@@ -24,9 +24,9 @@ type Subscriber struct {
 func main() {
 
 	// configure/read flags
-	var isAdaptive = flag.Bool("is-adaptive", false, "is-adaptive is a boolean")
-	var controllerType = flag.String("controller-type", "OnOff", "controller-type is a string")
-	var monitorInterval = flag.Int("monitor-interval", 1, "monitor-interval is an int (s)")
+	var isAdaptivePtr = flag.Bool("is-adaptive", false, "is-adaptive is a boolean")
+	var controllerTypePtr = flag.String("controller-type", "OnOff", "controller-type is a string")
+	var monitorIntervalPtr = flag.Int("monitor-interval", 1, "monitor-interval is an int (s)")
 	var setPointPtr = flag.Float64("set-point", 3000.0, "set-point is a float (goal rate)")
 	var kpPtr = flag.Float64("kp", 1.0, "Kp is a float")
 	var kiPtr = flag.Float64("ki", 1.0, "Ki is a float")
@@ -36,10 +36,11 @@ func main() {
 	var maxPtr = flag.Float64("max", 100.0, "max is a float")
 	var deadZonePtr = flag.Float64("dead-zone", 0.0, "dead-zone is a float")
 	var hysteresisBandPtr = flag.Float64("hysteresis-band", 0.0, "hysteresis-band is a float")
+	var directionPtr = flag.Float64("direction", 1.0, "direction is a float")
 	flag.Parse()
 
 	// create new consumer
-	var consumer = NewConsumer(*isAdaptive, *prefetchCountPtr)
+	var consumer = NewConsumer(*isAdaptivePtr, *prefetchCountPtr)
 
 	// Configure RabbitMQ
 	consumer.ConfigureRabbitMQ(consumer.PC)
@@ -63,8 +64,9 @@ func main() {
 	stopTimer := make(chan bool)  // stop timer
 
 	fmt.Println("*************** Subscriber started *************")
-	fmt.Printf("IsAdaptive     = % v\n", *isAdaptive)
-	fmt.Printf("Controller Type= %v\n", *controllerType)
+	fmt.Printf("IsAdaptive     = % v\n", *isAdaptivePtr)
+	fmt.Printf("Controller Type= %v\n", *controllerTypePtr)
+	fmt.Printf("Direction      = %.1f\n", *directionPtr)
 	fmt.Printf("Min            = %.2f\n", *minPtr)
 	fmt.Printf("Max            = %.2f\n", *maxPtr)
 	fmt.Printf("Kp             = %.2f\n", *kpPtr)
@@ -73,19 +75,19 @@ func main() {
 	fmt.Printf("Dead Zone      = %.2f\n", *deadZonePtr)
 	fmt.Printf("Hysteresis Band= %.2f\n", *hysteresisBandPtr)
 	fmt.Printf("Goal           = %.2f\n", *setPointPtr)
-	fmt.Printf("Monitor Time   = %v (s)\n", *monitorInterval)
+	fmt.Printf("Monitor Time   = %v (s)\n", *monitorIntervalPtr)
 	fmt.Printf("Prefetch Count = %v\n", *prefetchCountPtr)
 	fmt.Println("************************************************")
 
-	if *isAdaptive {
+	if *isAdaptivePtr {
 
 		// Create & start adaptation logic
-		c := info.Controller{TypeName: *controllerType, Min: *minPtr, Max: *maxPtr, Kp: *kpPtr, Ki: *kiPtr, Kd: *kdPtr, DeadZone: *deadZonePtr, HysteresisBand: *hysteresisBandPtr}
-		adapter := adaptationlogic.NewAdaptationLogic(toAdapter, fromAdapter, c, *setPointPtr, time.Duration(*monitorInterval), *prefetchCountPtr)
+		c := info.Controller{TypeName: *controllerTypePtr, Direction: *directionPtr, Min: *minPtr, Max: *maxPtr, Kp: *kpPtr, Ki: *kiPtr, Kd: *kdPtr, DeadZone: *deadZonePtr, HysteresisBand: *hysteresisBandPtr}
+		adapter := adaptationlogic.NewAdaptationLogic(toAdapter, fromAdapter, c, *setPointPtr, time.Duration(*monitorIntervalPtr), *prefetchCountPtr)
 		go adapter.Run()
 
 		// Create timer
-		t := mytimer.NewMyTimer(*monitorInterval, startTimer, stopTimer)
+		t := mytimer.NewMyTimer(*monitorIntervalPtr, startTimer, stopTimer)
 		go t.RunMyTimer()
 
 		// run adaptive consumer

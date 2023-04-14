@@ -23,17 +23,18 @@ type Controller struct {
 
 func (c *Controller) Initialise(p ...float64) {
 
-	if len(p) < 5 {
-		fmt.Printf("Error: '%s' controller requires 5 info (min,max,kp,ki,kd) \n", shared.IncrementalFormPid)
+	if len(p) < 6 {
+		fmt.Printf("Error: '%s' controller requires 6 info (direction, min,max,kp,ki,kd) \n", shared.IncrementalFormPid)
 		os.Exit(0)
 	}
 
-	c.Info.Min = p[0]
-	c.Info.Max = p[1]
+	c.Info.Direction = p[0]
+	c.Info.Min = p[1]
+	c.Info.Max = p[2]
 
-	c.Info.Kp = p[2]
-	c.Info.Ki = p[3]
-	c.Info.Kd = p[4]
+	c.Info.Kp = p[3]
+	c.Info.Ki = p[4]
+	c.Info.Kd = p[5]
 
 	c.Info.Integrator = 0.0
 	c.Info.PreviousError = 0.0

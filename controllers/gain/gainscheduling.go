@@ -25,8 +25,8 @@ type Controller struct {
 
 func (c *Controller) Initialise(p ...float64) {
 
-	if len(p) < 5 {
-		fmt.Printf("Error: '%s' controller requires 5 info (min,max,kp,ki,kd) \n", shared.ErrorSquarePid)
+	if len(p) < 6 {
+		fmt.Printf("Error: '%s' controller requires 6 info (min,max,kp,ki,kd) \n", shared.ErrorSquarePid)
 		os.Exit(0)
 	}
 
@@ -47,15 +47,15 @@ func (c *Controller) Initialise(p ...float64) {
 	ki := c.GainTable[0][1]
 	kd := c.GainTable[0][2]
 
-	c.Info.Min = p[0]
-	c.Info.Max = p[1]
+	c.Info.Direction = p[0]
+	c.Info.Min = p[1]
+	c.Info.Max = p[2]
 
 	c.Info.Kp = kp
 	c.Info.Ki = ki
 	c.Info.Kd = kd
 
 	c.Info.Integrator = 0.0
-
 	c.Info.PreviousError = 0.0
 	c.Info.PreviousPreviousError = 0.0
 	c.Info.SumPrevErrors = 0.0

@@ -24,18 +24,19 @@ type Controller struct {
 
 func (c *Controller) Initialise(p ...float64) {
 
-	if len(p) < 6 {
-		fmt.Printf("Error: '%s' controller requires 6 info (min,max,kp,ki,kd,dead zone band) \n", shared.DeadZonePid)
+	if len(p) < 7 {
+		fmt.Printf("Error: '%s' controller requires 7 info (min,max,kp,ki,kd,dead zone band) \n", shared.DeadZonePid)
 		os.Exit(0)
 	}
 
-	c.Info.Min = p[0]
-	c.Info.Max = p[1]
+	c.Info.Direction = p[0]
+	c.Info.Min = p[1]
+	c.Info.Max = p[2]
 
-	c.Info.Kp = p[2]
-	c.Info.Ki = p[3]
-	c.Info.Kd = p[4]
-	c.Info.DeadZone = p[5]
+	c.Info.Kp = p[3]
+	c.Info.Ki = p[4]
+	c.Info.Kd = p[5]
+	c.Info.DeadZone = p[6]
 
 	c.Info.Integrator = 0.0
 	c.Info.PreviousError = 0.0
