@@ -30,23 +30,22 @@ const NoTraining = "No Training"
 const OffLineTraining = "Offline Training"
 const OnLineTraining = "Online Training"
 
-// Controller types
-const PID = "PID"
-const PI = "PI"
-const ONOFF = "OnOff"
+// Controller type names
+const BasicOnoff = "OnOff"
 const DeadZoneOnoff = "OnOffwithDeadZone"
 const HysteresisOnoff = "OnOffwithHysteresis"
+
+const BasicPid = "BasicPID"
+const SmoothingPid = "SmoothingDerivativePID"
+const IncrementalFormPid = "IncrementalFormPID"
+const ErrorSquarePid = "ErrorSquarePID"
+const DeadZonePid = "DeadZonePID"
 const GainScheduling = "GainScheduling"
 
-const BasicPid = "Basic"
-const SmoothingPid = "SmoothingDerivative"
-const IncrementalFormPid = "IncrementalForm"
-const ErrorSquarePid = "ErrorSquare"
-const NonePid = "None"
-const DeadZonePid = "DeadZonePID"
-
+// Controller parameters
 const MinOnoff = 10
 const MaxOnoff = 600
+
 const MonitorTime = 10 // seconds
 const NumberOfColors = 7
 const ColorReset = "\033[0m"

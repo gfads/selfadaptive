@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/streadway/amqp"
 	_ "net/http/pprof"
+	"selfadaptive/controllers/def/info"
 	"selfadaptive/rabbitmq/adaptationlogic"
 	"selfadaptive/rabbitmq/mytimer"
 	"selfadaptive/shared"
@@ -31,8 +32,10 @@ func main() {
 	var kiPtr = flag.Float64("ki", 1.0, "Ki is a float")
 	var kdPtr = flag.Float64("kd", 1.0, "Kd is a float")
 	var prefetchCountPtr = flag.Int("prefetch-count", 1, "prefetch-count is an int")
-	var pidTypePtr = flag.String("pid-type", "NONE", "pid-type is a string")
-	var trainingTypePtr = flag.String("training-type", shared.OnLineTraining, "training-type is a string")
+	var minPtr = flag.Float64("min", 0.0, "min is a float")
+	var maxPtr = flag.Float64("max", 100.0, "max is a float")
+	var deadZonePtr = flag.Float64("dead-zone", 0.0, "dead-zone is a float")
+	var hysteresisBandPtr = flag.Float64("hysteresis-band", 0.0, "hysteresis-band is a float")
 	flag.Parse()
 
 	// create new consumer
@@ -59,11 +62,26 @@ func main() {
 	startTimer := make(chan bool) // start timer
 	stopTimer := make(chan bool)  // stop timer
 
-	fmt.Println("Subscriber started [ IsAdaptive=", *isAdaptive, "Training=", *trainingTypePtr, "Controller=", controllerType, "PIDType=", *pidTypePtr, "Kp=", *kpPtr, "Ki=", *kiPtr, "Kd=", *kdPtr, "Goal=", *setPointPtr, "Monitor Interval=", monitorInterval, "PC=", *prefetchCountPtr, "]")
+	fmt.Println("*************** Subscriber started *************")
+	fmt.Printf("IsAdaptive     = % v\n", *isAdaptive)
+	fmt.Printf("Controller Type= %v\n", *controllerType)
+	fmt.Printf("Min            = %.2f\n", *minPtr)
+	fmt.Printf("Max            = %.2f\n", *maxPtr)
+	fmt.Printf("Kp             = %.2f\n", *kpPtr)
+	fmt.Printf("Ki             = %.2f\n", *kiPtr)
+	fmt.Printf("Kd             = %.2f\n", *kdPtr)
+	fmt.Printf("Dead Zone      = %.2f\n", *deadZonePtr)
+	fmt.Printf("Hysteresis Band= %.2f\n", *hysteresisBandPtr)
+	fmt.Printf("Goal           = %.2f\n", *setPointPtr)
+	fmt.Printf("Monitor Time   = %v (s)\n", *monitorInterval)
+	fmt.Printf("Prefetch Count = %v\n", *prefetchCountPtr)
+	fmt.Println("************************************************")
 
 	if *isAdaptive {
+
 		// Create & start adaptation logic
-		adapter := adaptationlogic.NewAdaptationLogic(toAdapter, fromAdapter, *controllerType, *pidTypePtr, *trainingTypePtr, *kpPtr, *kiPtr, *kdPtr, *setPointPtr, time.Duration(*monitorInterval), *prefetchCountPtr)
+		c := info.Controller{TypeName: *controllerType, Min: *minPtr, Max: *maxPtr, Kp: *kpPtr, Ki: *kiPtr, Kd: *kdPtr, DeadZone: *deadZonePtr, HysteresisBand: *hysteresisBandPtr}
+		adapter := adaptationlogic.NewAdaptationLogic(toAdapter, fromAdapter, c, *setPointPtr, time.Duration(*monitorInterval), *prefetchCountPtr)
 		go adapter.Run()
 
 		// Create timer
