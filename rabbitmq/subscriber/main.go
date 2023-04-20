@@ -37,6 +37,7 @@ func main() {
 	var deadZonePtr = flag.Float64("dead-zone", 0.0, "dead-zone is a float")
 	var hysteresisBandPtr = flag.Float64("hysteresis-band", 0.0, "hysteresis-band is a float")
 	var directionPtr = flag.Float64("direction", 1.0, "direction is a float")
+	var gainTriggerPtr = flag.Float64("gain-trigger", 1.0, "gain trigger is a float")
 	flag.Parse()
 
 	// create new consumer
@@ -77,12 +78,13 @@ func main() {
 	fmt.Printf("Goal           = %.2f\n", *setPointPtr)
 	fmt.Printf("Monitor Time   = %v (s)\n", *monitorIntervalPtr)
 	fmt.Printf("Prefetch Count = %v\n", *prefetchCountPtr)
+	fmt.Printf("Gain Trigger = %.2f\n", *gainTriggerPtr)
 	fmt.Println("************************************************")
 
 	if *isAdaptivePtr {
 
 		// Create & start adaptation logic
-		c := info.Controller{TypeName: *controllerTypePtr, Direction: *directionPtr, Min: *minPtr, Max: *maxPtr, Kp: *kpPtr, Ki: *kiPtr, Kd: *kdPtr, DeadZone: *deadZonePtr, HysteresisBand: *hysteresisBandPtr}
+		c := info.Controller{TypeName: *controllerTypePtr, Direction: *directionPtr, Min: *minPtr, Max: *maxPtr, Kp: *kpPtr, Ki: *kiPtr, Kd: *kdPtr, DeadZone: *deadZonePtr, HysteresisBand: *hysteresisBandPtr, GainTrigger: *gainTriggerPtr}
 		adapter := adaptationlogic.NewAdaptationLogic(toAdapter, fromAdapter, c, *setPointPtr, time.Duration(*monitorIntervalPtr), *prefetchCountPtr)
 		go adapter.Run()
 

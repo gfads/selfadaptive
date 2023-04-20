@@ -25,6 +25,7 @@ func (c *Controller) Initialise(p ...float64) {
 		fmt.Printf("Error: '%s' controller requires 4 info (direction,min,max,dead zone band) \n", shared.DeadZoneOnoff)
 		os.Exit(0)
 	}
+
 	c.Info.Direction = p[0]
 	c.Info.Min = p[1]
 	c.Info.Max = p[2]
@@ -32,15 +33,13 @@ func (c *Controller) Initialise(p ...float64) {
 }
 
 func (c *Controller) Update(p ...float64) float64 {
-
-	direction := -1.0
 	u := 0.0
 
 	s := p[0] // goal
 	y := p[1] // plant output
 
 	// error
-	err := direction * (s - y)
+	err := c.Info.Direction * (s - y)
 
 	// control law
 	if err > -c.Info.DeadZone/2.0 && err < c.Info.DeadZone/2.0 {
@@ -59,6 +58,5 @@ func (c *Controller) Update(p ...float64) float64 {
 	if u > c.Info.Max {
 		u = c.Info.Max
 	}
-
 	return u
 }

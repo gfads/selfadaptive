@@ -26,6 +26,18 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o ./subscriber ./rabbitmq/subscriber/main
 ENV GOROOT=/usr/local/go/bin/
 
 # Run
-CMD ["./subscriber","-is-adaptive=true", "-monitor-interval=5", "-prefetch-count=1", "-controller-type=OnOff", "-set-point=1000", "-kp=-0.0","-ki=0.0", "-kd=0.0"]
+# OnOff
+#CMD ["./subscriber","-is-adaptive=true", "-monitor-interval=5", "-prefetch-count=1", "-controller-type=OnOff", "-max=25", "-min=5", "-set-point=500", "-direction=1"]
+#CMD ["./subscriber","-is-adaptive=true", "-monitor-interval=5", "-prefetch-count=1", "-controller-type=OnOffwithDeadZone", "-max=25", "-min=5", "-set-point=500", "-direction=1", "-dead-zone=100"]
+#CMD ["./subscriber","-is-adaptive=true", "-monitor-interval=5", "-prefetch-count=1", "-controller-type=OnOffwithHysteresis", "-max=25", "-min=5", "-set-point=500", "-direction=1", "-hysteresis-band=100"]
+
+# PID
+#CMD ["./subscriber","-is-adaptive=true", "-monitor-interval=5", "-prefetch-count=1", "-controller-type=BasicPID", "-max=25", "-min=5", "-set-point=500", "-direction=1", "-kp=1.0", "-ki=1.0", "-kd=1.0"]
+#CMD ["./subscriber","-is-adaptive=true", "-monitor-interval=5", "-prefetch-count=1", "-controller-type=SmoothingDerivativePID", "-max=25", "-min=5", "-set-point=500", "-direction=1", "-kp=1.0", "-ki=1.0", "-kd=1.0"]
+#CMD ["./subscriber","-is-adaptive=true", "-monitor-interval=5", "-prefetch-count=1", "-controller-type=IncrementalFormPID", "-max=25", "-min=5", "-set-point=500", "-direction=1", "-kp=1.0", "-ki=1.0", "-kd=1.0"]
+#CMD ["./subscriber","-is-adaptive=true", "-monitor-interval=5", "-prefetch-count=1", "-controller-type=DeadZonePID", "-max=25", "-min=5", "-set-point=500", "-direction=1", "-kp=1.0", "-ki=1.0", "-kd=1.0", "-dead-zone=100.0"]
+#CMD ["./subscriber","-is-adaptive=true", "-monitor-interval=5", "-prefetch-count=1", "-controller-type=ErrorSquarePID", "-max=25", "-min=5", "-set-point=500", "-direction=1", "-kp=1.0", "-ki=1.0", "-kd=1.0"]
+CMD ["./subscriber","-is-adaptive=true", "-monitor-interval=5", "-prefetch-count=1", "-controller-type=GainScheduling", "-max=25", "-min=5", "-set-point=500", "-direction=1", "-kp=1.0", "-ki=1.0", "-kd=1.0", "-gain-trigger=100.0"]
+
 #CMD ["ls","-l"]
 #CMD ["which","go"]

@@ -50,7 +50,7 @@ func (c *Controller) Update(p ...float64) float64 {
 	y := p[1] // plant output
 
 	// errors
-	err := r - y
+	err := c.Info.Direction * (r - y)
 
 	// Proportional
 	proportional := c.Info.Kp * err
