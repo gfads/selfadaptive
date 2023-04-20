@@ -8,17 +8,17 @@ package ops
 
 import (
 	"fmt"
-	"main/controllers/def/info"
-	"main/controllers/gain"
-	"main/controllers/onoff/basic"
-	"main/controllers/onoff/deadzone"
-	"main/controllers/onoff/hysteresis"
-	"main/controllers/pid/basic"
-	"main/controllers/pid/deadzone"
-	"main/controllers/pid/errorsquare"
-	"main/controllers/pid/incremental"
-	"main/controllers/pid/smoothing"
-	"main/shared"
+	"main.go/controllers/def/info"
+	gainscheduling "main.go/controllers/gain"
+	onoffbasic "main.go/controllers/onoff/basic"
+	deadzoneonff "main.go/controllers/onoff/deadzone"
+	hysteresisonoff "main.go/controllers/onoff/hysteresis"
+	basicpid "main.go/controllers/pid/basic"
+	deadzonepid "main.go/controllers/pid/deadzone"
+	errorsquarepid "main.go/controllers/pid/errorsquare"
+	incrementalpid "main.go/controllers/pid/incremental"
+	smoothingpid "main.go/controllers/pid/smoothing"
+	"main.go/shared"
 	"os"
 )
 

@@ -2,8 +2,8 @@ package adaptationlogic
 
 import (
 	"fmt"
-	"main/controllers/def/info"
-	"main/controllers/def/ops"
+	"main.go/controllers/def/info"
+	"main.go/controllers/def/ops"
 	"math"
 	"time"
 )

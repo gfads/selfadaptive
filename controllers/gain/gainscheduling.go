@@ -11,8 +11,8 @@ package gainscheduling
 
 import (
 	"fmt"
-	"main/controllers/def/info"
-	"main/shared"
+	"main.go/controllers/def/info"
+	"main.go/shared"
 	"os"
 )
 
