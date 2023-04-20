@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/streadway/amqp"
-	"main/shared"
+	"main.go/shared"
 	"math/rand"
 	"sync"
 	"time"

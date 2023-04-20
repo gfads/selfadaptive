@@ -86,7 +86,8 @@ func main() {
 		// Create & start adaptation logic
 		c := info.Controller{TypeName: *controllerTypePtr, Direction: *directionPtr, Min: *minPtr, Max: *maxPtr, Kp: *kpPtr, Ki: *kiPtr, Kd: *kdPtr, DeadZone: *deadZonePtr, HysteresisBand: *hysteresisBandPtr, GainTrigger: *gainTriggerPtr}
 		adapter := adaptationlogic.NewAdaptationLogic(toAdapter, fromAdapter, c, *setPointPtr, time.Duration(*monitorIntervalPtr), *prefetchCountPtr)
-		go adapter.Run()
+		//go adapter.Run() // normal execution
+		go adapter.RunTraining() // training execution
 
 		// Create timer
 		t := mytimer.NewMyTimer(*monitorIntervalPtr, startTimer, stopTimer)
