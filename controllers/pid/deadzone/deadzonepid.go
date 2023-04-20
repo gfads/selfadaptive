@@ -10,10 +10,10 @@ package deadzonepid
 
 import (
 	"fmt"
+	"main/controllers/def/info"
+	"main/shared"
 	"math"
 	"os"
-	"selfadaptive/controllers/def/info"
-	"selfadaptive/shared"
 )
 
 const DeltaTime = 1 // see page 103

@@ -10,9 +10,9 @@ package deadzoneonff
 
 import (
 	"fmt"
+	"main/controllers/def/info"
+	"main/shared"
 	"os"
-	"selfadaptive/controllers/def/info"
-	"selfadaptive/shared"
 )
 
 type Controller struct {

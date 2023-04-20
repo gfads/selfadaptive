@@ -2,9 +2,9 @@ package adaptationlogic
 
 import (
 	"fmt"
+	"main/controllers/def/info"
+	"main/controllers/def/ops"
 	"math"
-	"selfadaptive/controllers/def/info"
-	"selfadaptive/controllers/def/ops"
 	"time"
 )
 

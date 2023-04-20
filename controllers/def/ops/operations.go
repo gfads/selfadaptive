@@ -8,18 +8,18 @@ package ops
 
 import (
 	"fmt"
+	"main/controllers/def/info"
+	"main/controllers/gain"
+	"main/controllers/onoff/basic"
+	"main/controllers/onoff/deadzone"
+	"main/controllers/onoff/hysteresis"
+	"main/controllers/pid/basic"
+	"main/controllers/pid/deadzone"
+	"main/controllers/pid/errorsquare"
+	"main/controllers/pid/incremental"
+	"main/controllers/pid/smoothing"
+	"main/shared"
 	"os"
-	"selfadaptive/controllers/def/info"
-	gainscheduling "selfadaptive/controllers/gain"
-	onoffbasic "selfadaptive/controllers/onoff/basic"
-	deadzoneonff "selfadaptive/controllers/onoff/deadzone"
-	hysteresisonoff "selfadaptive/controllers/onoff/hysteresis"
-	basicpid "selfadaptive/controllers/pid/basic"
-	deadzonepid "selfadaptive/controllers/pid/deadzone"
-	errorsquarepid "selfadaptive/controllers/pid/errorsquare"
-	incrementalpid "selfadaptive/controllers/pid/incremental"
-	smoothingpid "selfadaptive/controllers/pid/smoothing"
-	"selfadaptive/shared"
 )
 
 type IController interface {

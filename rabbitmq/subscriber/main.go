@@ -4,11 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"github.com/streadway/amqp"
+	"main/controllers/def/info"
+	"main/rabbitmq/adaptationlogic"
+	"main/rabbitmq/mytimer"
+	"main/shared"
 	_ "net/http/pprof"
-	"selfadaptive/controllers/def/info"
-	"selfadaptive/rabbitmq/adaptationlogic"
-	"selfadaptive/rabbitmq/mytimer"
-	"selfadaptive/shared"
 	"time"
 )
 

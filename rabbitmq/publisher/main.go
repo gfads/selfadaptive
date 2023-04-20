@@ -4,8 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/streadway/amqp"
+	"main/shared"
 	"math/rand"
-	"selfadaptive/shared"
 	"sync"
 	"time"
 )
