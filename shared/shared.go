@@ -25,10 +25,9 @@ const PcDefaultLimitMin = 1
 const PcDefaultLimitMax = 1200 // TODO ASTAR
 
 // Training Types
-
-const NoTraining = "No Training"
-const OffLineTraining = "Offline Training"
-const OnLineTraining = "Online Training"
+const NoTraining = "NoTraining"
+const OffLineTraining = "OfflineTraining"
+const OnLineTraining = "OnlineTraining"
 
 // Controller type names
 const BasicOnoff = "OnOff"

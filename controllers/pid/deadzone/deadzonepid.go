@@ -81,3 +81,9 @@ func (c *Controller) Update(p ...float64) float64 {
 
 	return c.Info.Out
 }
+
+func (c *Controller) SetGains(p ...float64) {
+	c.Info.Kp = p[0]
+	c.Info.Ki = p[1]
+	c.Info.Kd = p[2]
+}

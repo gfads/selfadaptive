@@ -24,6 +24,7 @@ type Subscriber struct {
 func main() {
 
 	// configure/read flags
+	var trainingTypePtr = flag.String("training-type", shared.NoTraining, "training-type is a string")
 	var isAdaptivePtr = flag.Bool("is-adaptive", false, "is-adaptive is a boolean")
 	var controllerTypePtr = flag.String("controller-type", "OnOff", "controller-type is a string")
 	var monitorIntervalPtr = flag.Int("monitor-interval", 1, "monitor-interval is an int (s)")
@@ -65,6 +66,7 @@ func main() {
 	stopTimer := make(chan bool)  // stop timer
 
 	fmt.Println("*************** Subscriber started *************")
+	fmt.Printf("Training type  = % v\n", *trainingTypePtr)
 	fmt.Printf("IsAdaptive     = % v\n", *isAdaptivePtr)
 	fmt.Printf("Controller Type= %v\n", *controllerTypePtr)
 	fmt.Printf("Direction      = %.1f\n", *directionPtr)
@@ -78,16 +80,15 @@ func main() {
 	fmt.Printf("Goal           = %.2f\n", *setPointPtr)
 	fmt.Printf("Monitor Time   = %v (s)\n", *monitorIntervalPtr)
 	fmt.Printf("Prefetch Count = %v\n", *prefetchCountPtr)
-	fmt.Printf("Gain Trigger = %.2f\n", *gainTriggerPtr)
+	fmt.Printf("Gain Trigger   = %.2f\n", *gainTriggerPtr)
 	fmt.Println("************************************************")
 
 	if *isAdaptivePtr {
 
 		// Create & start adaptation logic
 		c := info.Controller{TypeName: *controllerTypePtr, Direction: *directionPtr, Min: *minPtr, Max: *maxPtr, Kp: *kpPtr, Ki: *kiPtr, Kd: *kdPtr, DeadZone: *deadZonePtr, HysteresisBand: *hysteresisBandPtr, GainTrigger: *gainTriggerPtr}
-		adapter := adaptationlogic.NewAdaptationLogic(toAdapter, fromAdapter, c, *setPointPtr, time.Duration(*monitorIntervalPtr), *prefetchCountPtr)
-		//go adapter.Run() // normal execution
-		go adapter.RunTraining() // training execution
+		adapter := adaptationlogic.NewAdaptationLogic(*trainingTypePtr, toAdapter, fromAdapter, c, *setPointPtr, time.Duration(*monitorIntervalPtr), *prefetchCountPtr)
+		go adapter.Run() // normal execution
 
 		// Create timer
 		t := mytimer.NewMyTimer(*monitorIntervalPtr, startTimer, stopTimer)

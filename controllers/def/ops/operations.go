@@ -25,6 +25,7 @@ import (
 type IController interface {
 	Initialise(...float64)     // Initialise the controller
 	Update(...float64) float64 // Update the controller output
+	SetGains(...float64)       // Configure gains of PID controllers
 }
 
 // Create a controller of 'Type' (typeName) and configure its parameters //

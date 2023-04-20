@@ -63,3 +63,6 @@ func (c *Controller) Update(p ...float64) float64 {
 
 	return u
 }
+
+func (c *Controller) SetGains(p ...float64) {
+}
