@@ -10,12 +10,12 @@ import (
 	"time"
 )
 
-const TrainingSampleSize = 30
+const TrainingSampleSize = 60
 const TimeBetweenAdjustments = 1200 // seconds
 const MaximumNrmse = 0.30
 const WarmupTime = 30 // seconds
-const TrainingAttempts = 10
-const SizeOfSameLevel = 20
+const TrainingAttempts = 30
+const SizeOfSameLevel = 40
 
 var IncreasingGoal = []float64{500, 1000.0, 1250.0, 1500.0, 1750.0, 2000.0, 2250.0, 2500.0, 2750.0, 3000.0}
 var RandomGoal = []float64{500, 200.0, 1250.0, 1500.0, 800, 2000.0, 2250.0, 350.0, 480.0, 3000.0}
@@ -105,7 +105,8 @@ func (al AdaptationLogic) RunDynamicGoal() {
 				count = 0
 				currentGoalIdx++
 				if currentGoalIdx >= len(RandomGoal) {
-					os.Exit(0)
+					fmt.Println("********** Copy/paste data of the experiments **********")
+					time.Sleep(10 * time.Hour)
 				}
 			}
 		}
@@ -138,6 +139,66 @@ func (al AdaptationLogic) RunStaticGoal() {
 			// send new pc to business
 			al.ToBusiness <- al.PC
 		}
+	}
+}
+
+func (al AdaptationLogic) RunOfflineTraining() {
+	fromAdjuster := make(chan TrainingInfo)
+	toAdjuster := make(chan TrainingInfo)
+	tAttempts := 0
+	info := TrainingInfo{TypeName: al.TrainingInfo.TypeName}
+
+	// create & execute adjustment mechanism
+	go AdjustmentMechanism(fromAdjuster, toAdjuster, al.SetPoint)
+
+	// warm up phase
+	time.Sleep(WarmupTime * time.Second)
+
+	// discard first measurement
+	<-al.FromBusiness // receive no. of messages from business
+	al.ToBusiness <- al.PC
+
+	// loop of adaptation logic
+	for {
+
+		n := <-al.FromBusiness // receive no. of messages from business
+
+		// calculate new arrival rate (msg/s)
+		rate := float64(n) / al.MonitorInterval.Seconds()
+
+		l := len(info.Data)
+
+		if l >= 1 && rate < info.Data[l-1].Rate {
+			if l > TrainingSampleSize || tAttempts >= TrainingAttempts { // training is over
+				info = CalculateGains(info)
+				al.TrainingInfo.Kp = info.Kp
+				al.TrainingInfo.Ki = info.Ki
+				al.TrainingInfo.Kd = info.Kd
+
+				fmt.Printf("Kp= %.8f Ki=%.8f  Kd=%.8f\n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+
+				if al.TrainingInfo.Kp > 0 && al.TrainingInfo.Ki > 0 {
+					fmt.Println("Bad gains...")
+				}
+				fmt.Println("***** End of Training - Copy/paste Gains *****")
+				time.Sleep(10 * time.Hour)
+
+			} else { // redo the training && keep already collected data
+				//fmt.Println("Training attempts=", tAttempts, len(info.Data), rate, al.PC)
+				tAttempts++
+			}
+		} else { // continue the training
+			fmt.Println(al.PC, ";", rate)
+
+			// store training pc and rate
+			info.Data = append(info.Data, AdjustmenstInfo{PC: al.PC, Rate: rate})
+
+			// increment pc
+			al.PC += 1
+		}
+
+		// send pc to business
+		al.ToBusiness <- al.PC
 	}
 }
 
@@ -233,7 +294,6 @@ func (al AdaptationLogic) RunOnlineTraining() {
 
 				// update set point dynamically -- ONLY FOR EXPERIMENTS
 				if countCycles > SizeOfSameLevel {
-					//al.SetPoint = myRandon()
 					al.SetPoint = RandomGoal[countExperiments]
 					countCycles = 0
 					countExperiments++
@@ -254,78 +314,6 @@ func (al AdaptationLogic) RunOnlineTraining() {
 				info.Data = []AdjustmenstInfo{}
 			default:
 			}
-		}
-	}
-}
-
-func (al AdaptationLogic) RunOfflineTraining() {
-	fromAdjuster := make(chan TrainingInfo)
-	toAdjuster := make(chan TrainingInfo)
-	countCycles := 0
-	countExperiments := 0
-
-	// create & execute adjustment mechanism
-	go AdjustmentMechanism(fromAdjuster, toAdjuster, al.SetPoint)
-
-	// warm up phase
-	time.Sleep(WarmupTime * time.Second)
-
-	// discard first measurement
-	<-al.FromBusiness // receive no. of messages from business
-	al.ToBusiness <- al.PC
-
-	info := TrainingInfo{}
-
-	// loop of adaptation logic
-	for {
-		select {
-		case n := <-al.FromBusiness: // interaction with the business
-
-			// calculate new arrival rate (msg/s)
-			rate := float64(n) / al.MonitorInterval.Seconds()
-
-			// store pc and rate
-			al.TrainingInfo.Data = append(al.TrainingInfo.Data, AdjustmenstInfo{PC: al.PC, Rate: rate})
-
-			// catch pc and its yielded rate
-			fmt.Println(al.PC, ";", rate, ";", al.SetPoint)
-
-			// invoke controller to calculate new pc
-			pc := int(math.Round(al.Controller.Update(al.SetPoint, rate)))
-
-			// update pc at adaptation mechanism
-			al.PC = pc
-
-			// send new pc to business
-			al.ToBusiness <- al.PC
-
-			// update set point dynamically -- ONLY FOR EXPERIMENTS
-			if countCycles > SizeOfSameLevel {
-				// update set point dynamically -- ONLY FOR EXPERIMENTS
-				if countCycles > SizeOfSameLevel {
-					//al.SetPoint = myRandon()
-					al.SetPoint = RandomGoal[countExperiments]
-					countCycles = 0
-					countExperiments++
-				} else {
-					countCycles++
-				}
-			} else {
-				countCycles++
-			}
-
-		case toAdjuster <- info: // interaction with the adjustment mechanism
-			info = <-fromAdjuster
-
-			al.TrainingInfo.Kp = info.Kp
-			al.TrainingInfo.Ki = info.Ki
-			al.TrainingInfo.Kd = info.Kd
-
-			al.Controller.SetGains(al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
-
-			// reset data
-			info.Data = []AdjustmenstInfo{}
-		default:
 		}
 	}
 }
@@ -401,7 +389,6 @@ func CalculateGains(info TrainingInfo) TrainingInfo {
 	ki := 0.0
 	kd := 0.0
 
-	fmt.Println("HERE", info.TypeName)
 	if info.TypeName == "P" { // TODO
 		kp = (1 + a) / b
 	}
@@ -424,13 +411,6 @@ func CalculateGains(info TrainingInfo) TrainingInfo {
 		info.Kd = kd
 	}
 
-	fmt.Printf("Kp= %.8f Ki=%.8f  Kd=%.8f\n", info.Kp, info.Ki, info.Kd)
-
-	// TODO - remove in the future
-	if kp > 0 && ki > 0 {
-		fmt.Println("Bad gains... EXIT")
-		os.Exit(0)
-	}
 	return info
 }
 
