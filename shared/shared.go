@@ -50,8 +50,8 @@ const NumberOfColors = 7
 const ColorReset = "\033[0m"
 
 // Base Directories
-const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/source"
-const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/executable"
+const SourcesDir = "/go/selfadaptive/example-plugin/envrnment/plugins/source"
+const ExecutablesDir = "/go/selfadaptive/example-plugin/envrnment/plugins/executable"
 
 //const SourcesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\sources"
 //const ExecutablesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\executables"

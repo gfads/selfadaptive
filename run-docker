@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Creates docker image 
+# -t => [tag image] (name:tag)
+# . => context of build (current directory dot) 
+docker build -t selfadaptive:latest .
+
+# Executes docker container (The container is an instance of an image)
+# --rm => when stoped the container will be removed (but the container image remains)
+# -it => 'binds' iterative shell to container terminal
+docker run --rm -it selfadaptive:latest sh
+
+
+
+# Go Build Plugin
+# -buildmode=plugin
+
