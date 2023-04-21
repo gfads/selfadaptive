@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"main.go/controllers/def/info"
 	"main.go/shared"
+	"math"
 	"os"
 )
 
@@ -43,21 +44,15 @@ func (c *Controller) Update(p ...float64) float64 {
 	err := c.Info.Direction * (s - y)
 
 	// control law
-	if err > -c.Info.HysteresisBand/2.0 && err < c.Info.HysteresisBand/2.0 {
+	if math.Abs(err) > c.Info.HysteresisBand/2 {
+		if err >= c.Info.HysteresisBand/2.0 {
+			u = c.Info.Max
+		}
+		if err <= -c.Info.HysteresisBand/2.0 {
+			u = c.Info.Min
+		}
+	} else {
 		u = c.Info.PreviousOut
-	}
-	if err >= c.Info.HysteresisBand/2.0 {
-		u = c.Info.Max
-	}
-	if err <= -c.Info.HysteresisBand/2.0 {
-		u = c.Info.Min
-	}
-
-	if u < c.Info.Min {
-		u = c.Info.Min
-	}
-	if u > c.Info.Max {
-		u = c.Info.Max
 	}
 	c.Info.PreviousOut = u
 
