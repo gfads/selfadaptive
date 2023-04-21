@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"main.go/controllers/def/info"
 	"main.go/shared"
+	"math"
 	"os"
 )
 
@@ -41,23 +42,15 @@ func (c *Controller) Update(p ...float64) float64 {
 	// error
 	err := c.Info.Direction * (s - y)
 
-	// control law
-	if err > -c.Info.DeadZone/2.0 && err < c.Info.DeadZone/2.0 {
-		u = 0.0 // no action
-	}
-	if err >= c.Info.DeadZone/2.0 {
-		u = c.Info.Max
-	}
-	if err <= -c.Info.DeadZone/2 {
-		u = c.Info.Min
+	// control law - page 221
+	if math.Abs(err) > c.Info.DeadZone/2 {
+		if err >= 0 {
+			u = c.Info.Max
+		} else {
+			u = c.Info.Min
+		}
 	}
 
-	if u < c.Info.Min {
-		u = c.Info.Min
-	}
-	if u > c.Info.Max {
-		u = c.Info.Max
-	}
 	return u
 }
 
