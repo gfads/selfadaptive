@@ -7,8 +7,8 @@ rem timeout /t 15
 echo Create and Execute Publisher
 copy Dockerfile-publisher Dockerfile
 docker build --tag publisher .
-rem START /B docker run publisher
-START docker run publisher
+START /B docker run publisher
+rem START docker run publisher
 
 echo Create and Execute Subscriber
 copy Dockerfile-subscriber Dockerfile

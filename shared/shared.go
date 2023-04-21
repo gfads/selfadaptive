@@ -24,8 +24,9 @@ const HYSTERISIS = 0.001 // 10 mV
 const PcDefaultLimitMin = 1
 const PcDefaultLimitMax = 1200 // TODO ASTAR
 
-// Training Types
-const NoTraining = "NoTraining"
+// Execution Types
+const StaticGoal = "StaticGoal"
+const DynamicGoal = "DynamicGoal"
 const OffLineTraining = "OfflineTraining"
 const OnLineTraining = "OnlineTraining"
 

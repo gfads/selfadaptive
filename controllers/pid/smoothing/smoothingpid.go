@@ -16,7 +16,7 @@ import (
 )
 
 const DeltaTime = 1 // see page 103
-const Alpha = 0.1   // alpha variates from 0 to 1 (see page 104)
+const Alpha = 0.01  // alpha variates from 0 to 1 (see page 104)
 
 type Controller struct {
 	Info info.Controller

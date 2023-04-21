@@ -6,7 +6,6 @@ import (
 	"main.go/controllers/def/ops"
 	"main.go/shared"
 	"math"
-	"math/rand"
 	"os"
 	"time"
 )
@@ -18,7 +17,8 @@ const WarmupTime = 30 // seconds
 const TrainingAttempts = 10
 const SizeOfSameLevel = 20
 
-var PcExperimentSet = []float64{1000.0, 1250.0, 1500.0, 1750.0, 2000.0, 2250.0, 2500.0, 2750.0, 3000.0}
+var IncreasingGoal = []float64{500, 1000.0, 1250.0, 1500.0, 1750.0, 2000.0, 2250.0, 2500.0, 2750.0, 3000.0}
+var RandomGoal = []float64{500, 200.0, 1250.0, 1500.0, 800, 2000.0, 2250.0, 350.0, 480.0, 3000.0}
 
 type AdjustmenstInfo struct {
 	PC   int
@@ -41,34 +41,78 @@ type AdaptationLogic struct {
 	Controller      ops.IController
 	SetPoint        float64
 	PC              int
-	TrainingType    string
+	ExecutionType   string
 	TrainingInfo    TrainingInfo
 }
 
-func NewAdaptationLogic(trainingType string, chFromBusiness chan int, chToBusiness chan int, info info.Controller, setPoint float64, monitorInterval time.Duration, pc int) AdaptationLogic {
+func NewAdaptationLogic(executionType string, chFromBusiness chan int, chToBusiness chan int, info info.Controller, setPoint float64, monitorInterval time.Duration, pc int) AdaptationLogic {
 
 	c := ops.NewController(info)
 	i := TrainingInfo{Kp: info.Kp, Ki: info.Ki, Kd: info.Kd, Data: []AdjustmenstInfo{}, TypeName: info.TypeName, SetPoint: setPoint}
 
-	return AdaptationLogic{TrainingType: trainingType, TrainingInfo: i, FromBusiness: chFromBusiness, ToBusiness: chToBusiness, Controller: c, SetPoint: setPoint, MonitorInterval: monitorInterval * time.Second, PC: pc}
+	return AdaptationLogic{ExecutionType: executionType, TrainingInfo: i, FromBusiness: chFromBusiness, ToBusiness: chToBusiness, Controller: c, SetPoint: setPoint, MonitorInterval: monitorInterval * time.Second, PC: pc}
 }
 
 func (al AdaptationLogic) Run() {
 
-	switch al.TrainingType {
-	case shared.NoTraining:
-		al.RunNoTraining()
+	switch al.ExecutionType {
+	case shared.StaticGoal:
+		al.RunStaticGoal()
+	case shared.DynamicGoal:
+		al.RunDynamicGoal()
 	case shared.OffLineTraining:
 		al.RunOfflineTraining()
 	case shared.OnLineTraining:
 		al.RunOnlineTraining()
 	default:
-		fmt.Println("Training type ´", al.TrainingType, "´ is invalid")
+		fmt.Println("Execution type ´", al.ExecutionType, "´ is invalid")
 		os.Exit(0)
 	}
 }
 
-func (al AdaptationLogic) RunNoTraining() {
+func (al AdaptationLogic) RunDynamicGoal() {
+
+	// discard first measurement
+	<-al.FromBusiness // receive no. of messages from business
+	al.ToBusiness <- al.PC
+
+	currentGoalIdx := 0
+	count := 0
+
+	// loop of adaptation logic
+	for {
+		select {
+		case n := <-al.FromBusiness: // interaction with the business
+			count++
+
+			// calculate new arrival rate (msg/s)
+			rate := float64(n) / al.MonitorInterval.Seconds()
+
+			// catch pc and its yielded rate
+			fmt.Println(al.PC, ";", rate, ";", RandomGoal[currentGoalIdx])
+
+			// invoke controller to calculate new pc
+			pc := int(math.Round(al.Controller.Update(RandomGoal[currentGoalIdx], rate)))
+
+			// update pc at adaptation mechanism
+			al.PC = pc
+
+			// send new pc to business
+			al.ToBusiness <- al.PC
+
+			// change goal
+			if count >= SizeOfSameLevel {
+				count = 0
+				currentGoalIdx++
+				if currentGoalIdx >= len(RandomGoal) {
+					os.Exit(0)
+				}
+			}
+		}
+	}
+}
+
+func (al AdaptationLogic) RunStaticGoal() {
 
 	// discard first measurement
 	<-al.FromBusiness // receive no. of messages from business
@@ -190,7 +234,7 @@ func (al AdaptationLogic) RunOnlineTraining() {
 				// update set point dynamically -- ONLY FOR EXPERIMENTS
 				if countCycles > SizeOfSameLevel {
 					//al.SetPoint = myRandon()
-					al.SetPoint = PcExperimentSet[countExperiments]
+					al.SetPoint = RandomGoal[countExperiments]
 					countCycles = 0
 					countExperiments++
 				} else {
@@ -260,7 +304,7 @@ func (al AdaptationLogic) RunOfflineTraining() {
 				// update set point dynamically -- ONLY FOR EXPERIMENTS
 				if countCycles > SizeOfSameLevel {
 					//al.SetPoint = myRandon()
-					al.SetPoint = PcExperimentSet[countExperiments]
+					al.SetPoint = RandomGoal[countExperiments]
 					countCycles = 0
 					countExperiments++
 				} else {
@@ -411,15 +455,4 @@ func CalculateNRMSE(info TrainingInfo) float64 {
 
 	fmt.Println("NMRSE:: ", nmrse, rmse, maxRate, minRate, len(info.Data))
 	return nmrse
-}
-
-func myRandon() float64 {
-	n := 1
-	for {
-		n = rand.Intn(6)
-		if n != 0 {
-			break
-		}
-	}
-	return float64(n * 1000.0)
 }
