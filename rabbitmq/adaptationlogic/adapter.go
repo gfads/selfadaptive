@@ -18,7 +18,7 @@ const TrainingAttempts = 30
 const SizeOfSameLevel = 40
 
 var IncreasingGoal = []float64{500, 1000.0, 1250.0, 1500.0, 1750.0, 2000.0, 2250.0, 2500.0, 2750.0, 3000.0}
-var RandomGoal = []float64{500, 200.0, 1250.0, 1500.0, 800, 2000.0, 2250.0, 350.0, 480.0, 3000.0}
+var RandomGoal = []float64{500, 200.0, 1250.0, 1300., 300, 200.0, 225.0, 350.0, 480.0, 1000.0}
 
 type AdjustmenstInfo struct {
 	PC   int
@@ -175,7 +175,7 @@ func (al AdaptationLogic) RunOfflineTraining() {
 				al.TrainingInfo.Ki = info.Ki
 				al.TrainingInfo.Kd = info.Kd
 
-				fmt.Printf("Kp= %.8f Ki=%.8f  Kd=%.8f\n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+				fmt.Printf("-kp=%.8f, -ki=%.8f, -kd=%.8f\n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
 
 				if al.TrainingInfo.Kp > 0 && al.TrainingInfo.Ki > 0 {
 					fmt.Println("Bad gains...")

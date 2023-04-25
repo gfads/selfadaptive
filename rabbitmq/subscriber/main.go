@@ -9,8 +9,27 @@ import (
 	"main.go/rabbitmq/mytimer"
 	"main.go/shared"
 	_ "net/http/pprof"
+	"os"
 	"time"
 )
+
+type ExecutionParameters struct {
+	ExecutionType   *string
+	IsAdaptive      *bool
+	ControllerType  *string
+	MonitorInterval *int
+	SetPoint        *float64
+	Kp              *float64
+	Ki              *float64
+	Kd              *float64
+	PrefetchCount   *int
+	Min             *float64
+	Max             *float64
+	DeadZone        *float64
+	HysteresisBand  *float64
+	Direction       *float64
+	GainTrigger     *float64
+}
 
 type Subscriber struct {
 	IsAdaptive bool
@@ -23,26 +42,26 @@ type Subscriber struct {
 
 func main() {
 
-	// configure/read flags
-	var executionTypePtr = flag.String("execution-type", shared.StaticGoal, "execution-type is a string")
-	var isAdaptivePtr = flag.Bool("is-adaptive", false, "is-adaptive is a boolean")
-	var controllerTypePtr = flag.String("controller-type", "OnOff", "controller-type is a string")
-	var monitorIntervalPtr = flag.Int("monitor-interval", 1, "monitor-interval is an int (s)")
-	var setPointPtr = flag.Float64("set-point", 3000.0, "set-point is a float (goal rate)")
-	var kpPtr = flag.Float64("kp", 1.0, "Kp is a float")
-	var kiPtr = flag.Float64("ki", 1.0, "Ki is a float")
-	var kdPtr = flag.Float64("kd", 1.0, "Kd is a float")
-	var prefetchCountPtr = flag.Int("prefetch-count", 1, "prefetch-count is an int")
-	var minPtr = flag.Float64("min", 0.0, "min is a float")
-	var maxPtr = flag.Float64("max", 100.0, "max is a float")
-	var deadZonePtr = flag.Float64("dead-zone", 0.0, "dead-zone is a float")
-	var hysteresisBandPtr = flag.Float64("hysteresis-band", 0.0, "hysteresis-band is a float")
-	var directionPtr = flag.Float64("direction", 1.0, "direction is a float")
-	var gainTriggerPtr = flag.Float64("gain-trigger", 1.0, "gain trigger is a float")
+	p := ExecutionParameters{}
+	p.ExecutionType = flag.String("execution-type", shared.StaticGoal, "execution-type is a string")
+	p.IsAdaptive = flag.Bool("is-adaptive", false, "is-adaptive is a boolean")
+	p.ControllerType = flag.String("controller-type", "OnOff", "controller-type is a string")
+	p.MonitorInterval = flag.Int("monitor-interval", 1, "monitor-interval is an int (s)")
+	p.SetPoint = flag.Float64("set-point", 3000.0, "set-point is a float (goal rate)")
+	p.Kp = flag.Float64("kp", 1.0, "Kp is a float")
+	p.Ki = flag.Float64("ki", 1.0, "Ki is a float")
+	p.Kd = flag.Float64("kd", 1.0, "Kd is a float")
+	p.PrefetchCount = flag.Int("prefetch-count", 1, "prefetch-count is an int")
+	p.Min = flag.Float64("min", 0.0, "min is a float")
+	p.Max = flag.Float64("max", 100.0, "max is a float")
+	p.DeadZone = flag.Float64("dead-zone", 0.0, "dead-zone is a float")
+	p.HysteresisBand = flag.Float64("hysteresis-band", 0.0, "hysteresis-band is a float")
+	p.Direction = flag.Float64("direction", 1.0, "direction is a float")
+	p.GainTrigger = flag.Float64("gain-trigger", 1.0, "gain trigger is a float")
 	flag.Parse()
 
 	// create new consumer
-	var consumer = NewConsumer(*isAdaptivePtr, *prefetchCountPtr)
+	var consumer = NewConsumer(*p.IsAdaptive, *p.PrefetchCount)
 
 	// Configure RabbitMQ
 	consumer.ConfigureRabbitMQ(consumer.PC)
@@ -65,33 +84,17 @@ func main() {
 	startTimer := make(chan bool) // start timer
 	stopTimer := make(chan bool)  // stop timer
 
-	fmt.Println("*************** Subscriber started *************")
-	fmt.Printf("Execution type  = % v\n", *executionTypePtr)
-	fmt.Printf("IsAdaptive     = % v\n", *isAdaptivePtr)
-	fmt.Printf("Controller Type= %v\n", *controllerTypePtr)
-	fmt.Printf("Direction      = %.1f\n", *directionPtr)
-	fmt.Printf("Min            = %.2f\n", *minPtr)
-	fmt.Printf("Max            = %.2f\n", *maxPtr)
-	fmt.Printf("Kp             = %.6f\n", *kpPtr)
-	fmt.Printf("Ki             = %.6f\n", *kiPtr)
-	fmt.Printf("Kd             = %.6f\n", *kdPtr)
-	fmt.Printf("Dead Zone      = %.2f\n", *deadZonePtr)
-	fmt.Printf("Hysteresis Band= %.2f\n", *hysteresisBandPtr)
-	fmt.Printf("Goal           = %.2f\n", *setPointPtr)
-	fmt.Printf("Monitor Time   = %v (s)\n", *monitorIntervalPtr)
-	fmt.Printf("Prefetch Count = %v\n", *prefetchCountPtr)
-	fmt.Printf("Gain Trigger   = %.2f\n", *gainTriggerPtr)
-	fmt.Println("************************************************")
+	showParameters(p)
 
-	if *isAdaptivePtr {
+	if *p.IsAdaptive {
 
 		// Create & start adaptation logic
-		c := info.Controller{TypeName: *controllerTypePtr, Direction: *directionPtr, Min: *minPtr, Max: *maxPtr, Kp: *kpPtr, Ki: *kiPtr, Kd: *kdPtr, DeadZone: *deadZonePtr, HysteresisBand: *hysteresisBandPtr, GainTrigger: *gainTriggerPtr}
-		adapter := adaptationlogic.NewAdaptationLogic(*executionTypePtr, toAdapter, fromAdapter, c, *setPointPtr, time.Duration(*monitorIntervalPtr), *prefetchCountPtr)
+		c := info.Controller{TypeName: *p.ControllerType, Direction: *p.Direction, Min: *p.Min, Max: *p.Max, Kp: *p.Kp, Ki: *p.Ki, Kd: *p.Kd, DeadZone: *p.DeadZone, HysteresisBand: *p.HysteresisBand, GainTrigger: *p.GainTrigger}
+		adapter := adaptationlogic.NewAdaptationLogic(*p.ExecutionType, toAdapter, fromAdapter, c, *p.SetPoint, time.Duration(*p.MonitorInterval), *p.PrefetchCount)
 		go adapter.Run() // normal execution
 
 		// Create timer
-		t := mytimer.NewMyTimer(*monitorIntervalPtr, startTimer, stopTimer)
+		t := mytimer.NewMyTimer(*p.MonitorInterval, startTimer, stopTimer)
 		go t.RunMyTimer()
 
 		// run adaptive consumer
@@ -100,6 +103,57 @@ func main() {
 		// run non-adaptive consumer
 		consumer.RunNonAdaptive()
 	}
+}
+
+func showParameters(p ExecutionParameters) {
+
+	// validate execution type
+	switch *p.ExecutionType {
+	case shared.StaticGoal:
+	case shared.DynamicGoal:
+	case shared.OffLineTraining:
+	case shared.OnLineTraining:
+	default:
+		fmt.Println("Execution type is invalid")
+		os.Exit(0)
+	}
+
+	switch *p.ControllerType {
+	case shared.BasicOnoff:
+	case shared.DeadZoneOnoff:
+	case shared.HysteresisOnoff:
+	case shared.BasicPid:
+	case shared.SmoothingPid:
+	case shared.IncrementalFormPid:
+	case shared.ErrorSquarePid:
+	case shared.DeadZonePid:
+	case shared.GainScheduling:
+	default:
+		fmt.Println("Controller type is invalid")
+		os.Exit(0)
+	}
+
+	if *p.Direction != 1.0 && *p.Direction != -1.0 {
+		fmt.Println("Direction is invalid")
+		os.Exit(0)
+	}
+
+	fmt.Printf("Execution Type  : %v\n", *p.ExecutionType)
+	fmt.Printf("Is Adaptive?    : %v\n", *p.IsAdaptive)
+	fmt.Printf("Controller Type : %v\n", *p.ControllerType)
+	fmt.Printf("Monitor Interval: %v\n", *p.MonitorInterval)
+	fmt.Printf("Goal            : %.4f\n", *p.SetPoint)
+	fmt.Printf("Kp              : %.8f\n", *p.Kp)
+	fmt.Printf("Ki              : %.8f\n", *p.Ki)
+	fmt.Printf("Kd              : %.8f\n", *p.Kd)
+	fmt.Printf("Prefetch Count  : %v\n", *p.PrefetchCount)
+	fmt.Printf("Min             : %.4f\n", *p.Min)
+	fmt.Printf("Max             : %.4f\n", *p.Max)
+	fmt.Printf("Dead Zone       : %.4f\n", *p.DeadZone)
+	fmt.Printf("Hystereis Bans  : %.4f\n", *p.HysteresisBand)
+	fmt.Printf("Direction       : %.1f\n", *p.Direction)
+	fmt.Printf("Gain Trigger    : %.4f\n", *p.GainTrigger)
+	fmt.Println("************************************************")
 }
 
 func (c Subscriber) RunNonAdaptive() {
