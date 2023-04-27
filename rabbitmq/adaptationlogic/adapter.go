@@ -503,9 +503,21 @@ func CalculateZieglerGains(info TrainingInfo) TrainingInfo {
 	//lambda := K * tau / L
 	//theta := L / (L+tau)
 
+	// P
+	info.Kp = tau / K * L
+
+	// PI
+	ti := L / 0.3
+	info.Kp = 0.9 * tau / K * L
+	info.Ki = info.Kp / ti
+	info.Kd = 0.0
+
+	// PID
+	ti = 2 * L
+	td := 0.5 * L
 	info.Kp = 1.2 * tau / K * L
-	info.Ki = 2 * L
-	info.Kd = 0.5 * L
+	info.Ki = info.Kp / ti
+	info.Kd = info.Kp * td
 
 	return info
 }
