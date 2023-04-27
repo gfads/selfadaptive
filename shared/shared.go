@@ -15,6 +15,9 @@ import (
 	"time"
 )
 
+// Configuration RabbitMQ
+const IpPortRabbitMQ = "172.22.40.187:5672" //Home Recife
+
 // Astar
 const SV = 2.7           // Shutoff voltage (page 17) = 2.7 V
 const OV = 3.7           // Optimum voltage (page 17) = 3.7 V
