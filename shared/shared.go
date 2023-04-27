@@ -31,7 +31,10 @@ const PcDefaultLimitMax = 1200 // TODO ASTAR
 // Execution Types
 const StaticGoal = "StaticGoal"
 const DynamicGoal = "DynamicGoal"
-const OffLineTraining = "OfflineTraining"
+const RootLocusTraining = "RootLocusTraining"
+const ZieglerTraining = "ZieglerTraining"
+const CohenTraining = "CohenTraining"
+const AMIGOTraining = "AMIGOTraining"
 const OnLineTraining = "OnlineTraining"
 
 // Controller type names

@@ -111,7 +111,8 @@ func showParameters(p ExecutionParameters) {
 	switch *p.ExecutionType {
 	case shared.StaticGoal:
 	case shared.DynamicGoal:
-	case shared.OffLineTraining:
+	case shared.RootLocusTraining:
+	case shared.ZieglerTraining:
 	case shared.OnLineTraining:
 	default:
 		fmt.Println("Execution type is invalid")
