@@ -32,11 +32,11 @@ ENV GOROOT=/usr/local/go/bin/
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=OnOffwithHysteresis", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1", "-hysteresis-band=1000"]
 
 # PID
-#CMD ["./subscriber","-is-adaptive=true", "-execution-type=OfflineTraining", "-controller-type=BasicPID", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1","-kp=0.03161012", "-ki=0.03842456", "-kd=0.00893595"]
-#CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=SmoothingDerivativePID", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1", "-kp= 0.03161012", "-ki=0.03842456", "-kd=0.00893595"]
-#CMD ["./subscriber","-is-adaptive=true", "-execution-type=StaticGoal", "-controller-type=IncrementalFormPID", "-monitor-interval=5", "-prefetch-count=1",  "-max=10000", "-min=1", "-set-point=1000", "-direction=1", "-kp=--0.00067246", "-ki=0.01070994", "-kd=0.00249068"]
+CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=BasicPID", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1","-kp=0.01685757", "-ki=0.02962220", "-kd=0.00688888"]
+#CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=SmoothingDerivativePID", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.03161012", "-ki=0.03842456", "-kd=0.00893595"]
+#CMD ["./subscriber","-is-adaptive=true", "-execution-type=StaticGoal", "-controller-type=IncrementalFormPID", "-monitor-interval=5", "-prefetch-count=1",  "-max=10000", "-min=1", "-set-point=1000", "-direction=1", "-kp=-0.00067246", "-ki=0.01070994", "-kd=0.00249068"]
 
-CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=DeadZonePID", "-monitor-interval=5", "-prefetch-count=1", "-max=21", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.03161012", "-ki=0.03842456", "-kd=0.00893595", "-dead-zone=100.0"]
+#CMD ["./subscriber","-is-adaptive=true", "-execution-type=OfflineTraining", "-controller-type=BasicPID", "-monitor-interval=5", "-prefetch-count=1", "-max=40", "-min=1", "-set-point=1000", "-direction=1", "-kp=-0.02003554", "-ki=0.03331361", "-kd=0.00774735"]
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=StaticGoal", "-controller-type=ErrorSquarePID", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1", "-kp=-0.00338306", "-ki=0.01070994", "-kd=0.00249068"]
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=StaticGoal", "-controller-type=GainScheduling", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1", "-kp=1.0", "-ki=1.0", "-kd=1.0", "-gain-trigger=100.0"]
 

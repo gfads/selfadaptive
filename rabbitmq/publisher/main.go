@@ -36,18 +36,18 @@ func main() { // Windows
 
 	// make requests to consumer
 	//totalTime := c.Run()
-	for { // experimental purpose
-		for i := 0; i < *numberOfClients; i++ {
-			// create publisher
-			c := NewClient(*clientIdPtr, *msgSizePtr, *sampleSizePtr, *meanRequestTimePtr, *stdDevMeanRequestTimePtr)
+	//for { // experimental purpose
+	for i := 0; i < *numberOfClients; i++ {
+		// create publisher
+		c := NewClient(*clientIdPtr, *msgSizePtr, *sampleSizePtr, *meanRequestTimePtr, *stdDevMeanRequestTimePtr)
 
-			ws.Add(1)
-			go c.RunWindows(&ws)
-		}
-		fmt.Println("Publishers started [", *numberOfClients, "publishers", *msgSizePtr, "bytes", "MeanRequestTime", *meanRequestTimePtr, "ms", "STDEV=", *stdDevMeanRequestTimePtr, "]")
-		ws.Wait()
-		fmt.Println("All", *numberOfClients, "clients finished...")
+		ws.Add(1)
+		go c.RunWindows(&ws)
 	}
+	fmt.Println("Publishers started [", *numberOfClients, "publishers", *msgSizePtr, "bytes", "MeanRequestTime", *meanRequestTimePtr, "ms", "STDEV=", *stdDevMeanRequestTimePtr, "]")
+	ws.Wait()
+	fmt.Println("All", *numberOfClients, "clients finished...")
+	//}
 }
 
 func (c Client) RunWindows(ws *sync.WaitGroup) time.Duration {
@@ -85,8 +85,8 @@ func (c Client) RunWindows(ws *sync.WaitGroup) time.Duration {
 	// make requests
 	startTime := time.Now()
 
-	//for i := 0; i < c.SampleSize; i++ {
-	for { // TODO experimental purpose
+	for i := 0; i < c.SampleSize; i++ {
+		//for { // TODO experimental purpose
 		corrId := shared.RandomString(32)
 
 		// make resquests randomly distributed -- experimental purpose -- comment
