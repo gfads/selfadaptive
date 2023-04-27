@@ -26,6 +26,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o ./publisher ./rabbitmq/publisher/main.g
 ENV GOROOT=/usr/local/go/bin/
 
 # Run
-CMD ["./publisher","-message-size=256","-sample-size=1000000", "-mean-request-time=25", "-std-dev-mean-request-time=2", "-number-of-clients=30"]
+CMD ["./publisher","-message-size=256","-sample-size=1000000", "-mean-request-time=25", "-std-dev-mean-request-time=2", "-number-of-clients=25"]
 #CMD ["ls","-l"]
 #CMD ["which","go"]
