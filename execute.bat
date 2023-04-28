@@ -14,13 +14,15 @@ echo Create and Execute Publisher
 copy Dockerfile-publisher Dockerfile
 docker build --tag publisher .
 
-set clients=1
-:loop
-  START /B docker run publisher
-  set /a clients=clients-1
-  if %clients%==0 goto exitloop
-  goto loop
-:exitloop
+rem set clients=1
+rem :loop
+rem  START /B docker run publisher
+rem  set /a clients=clients-1
+rem  if %clients%==0 goto exitloop
+rem  goto loop
+rem :exitloop
+
+timeout /t 60
 
 echo Create and Execute Subscriber
 copy Dockerfile-subscriber Dockerfile

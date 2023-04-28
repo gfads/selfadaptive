@@ -139,6 +139,7 @@ func showParameters(p ExecutionParameters) {
 		os.Exit(0)
 	}
 
+	fmt.Println("************************************************")
 	fmt.Printf("Execution Type  : %v\n", *p.ExecutionType)
 	fmt.Printf("Is Adaptive?    : %v\n", *p.IsAdaptive)
 	fmt.Printf("Controller Type : %v\n", *p.ControllerType)
@@ -151,7 +152,7 @@ func showParameters(p ExecutionParameters) {
 	fmt.Printf("Min             : %.4f\n", *p.Min)
 	fmt.Printf("Max             : %.4f\n", *p.Max)
 	fmt.Printf("Dead Zone       : %.4f\n", *p.DeadZone)
-	fmt.Printf("Hystereis Bans  : %.4f\n", *p.HysteresisBand)
+	fmt.Printf("Hystereis Band  : %.4f\n", *p.HysteresisBand)
 	fmt.Printf("Direction       : %.1f\n", *p.Direction)
 	fmt.Printf("Gain Trigger    : %.4f\n", *p.GainTrigger)
 	fmt.Println("************************************************")

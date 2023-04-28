@@ -16,8 +16,8 @@ import (
 )
 
 // Configuration RabbitMQ
-//const IpPortRabbitMQ = "172.22.40.187:5672" //UFPE
-const IpPortRabbitMQ = "192.168.0.20:5672" //Home Recife
+//const IpPortRabbitMQ = "172.22.40.187:5672" // CIN
+const IpPortRabbitMQ = "192.168.0.20:5672" // Home Recife
 
 // Astar
 const SV = 2.7           // Shutoff voltage (page 17) = 2.7 V

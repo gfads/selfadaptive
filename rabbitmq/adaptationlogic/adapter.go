@@ -15,10 +15,10 @@ const TimeBetweenAdjustments = 1200 // seconds
 const MaximumNrmse = 0.30
 const WarmupTime = 30 // seconds
 const TrainingAttempts = 30
-const SizeOfSameLevel = 40
+const SizeOfSameLevel = 10
 
 var IncreasingGoal = []float64{500, 1000.0, 1250.0, 1500.0, 1750.0, 2000.0, 2250.0, 2500.0, 2750.0, 3000.0}
-var RandomGoal = []float64{500, 200.0, 1250.0, 1300., 300, 200.0, 3000.0, 2500.0, 500.0, 1000.0}
+var RandomGoal = []float64{500, 300.0, 1250.0, 1300., 300, 600.0, 1000.0, 800.0, 500.0, 1000.0}
 
 type AdjustmenstInfo struct {
 	PC   int
@@ -64,6 +64,9 @@ func (al AdaptationLogic) Run() {
 		al.RootLocusTraining()
 	case shared.ZieglerTraining:
 		al.ZieglerTraining()
+	case shared.CohenTraining:
+		al.ZieglerTraining() // TODO
+
 	case shared.OnLineTraining:
 		al.RunOnlineTraining()
 	default:
@@ -209,7 +212,7 @@ func (al AdaptationLogic) ZieglerTraining() {
 	//toAdjuster := make(chan TrainingInfo)
 	count := 0
 	info := TrainingInfo{TypeName: al.TrainingInfo.TypeName}
-	PCS := []int{1, 2, 1, 2, 1, 2, 1, 2, 1, 2}
+	PCS := []int{5, 6, 5, 6, 5, 6, 5, 6, 5, 6, 5, 6}
 
 	// create & execute adjustment mechanism
 	//go AdjustmentMechanism(fromAdjuster, toAdjuster, al.SetPoint)
@@ -244,7 +247,14 @@ func (al AdaptationLogic) ZieglerTraining() {
 			al.TrainingInfo.Ki = info.Ki
 			al.TrainingInfo.Kd = info.Kd
 
-			fmt.Printf("-kp=%.8f, -ki=%.8f, -kd=%.8f\n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+			fmt.Printf("Ziegler: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+
+			info = CalculateCohenGains(info)
+			al.TrainingInfo.Kp = info.Kp
+			al.TrainingInfo.Ki = info.Ki
+			al.TrainingInfo.Kd = info.Kd
+
+			fmt.Printf("Cohen: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
 
 			if al.TrainingInfo.Kp > 0 && al.TrainingInfo.Ki > 0 {
 				fmt.Println("Bad gains...")
@@ -478,7 +488,7 @@ func CalculateZieglerGains(info TrainingInfo) TrainingInfo {
 	sumRate1 := 0.0
 	sumRate2 := 0.0
 
-	for i := 0; i < len(info.Data); i++ {
+	for i := 2; i < len(info.Data); i++ { // discard 2 initial measurements, i.e., 5 samples
 		if i%2 == 0 {
 			sumPC1 += info.Data[i].PC
 			sumRate1 += info.Data[i].Rate
@@ -497,14 +507,16 @@ func CalculateZieglerGains(info TrainingInfo) TrainingInfo {
 	//diffPC := meanPC2 - meanPC1
 	diffRate := meanRate2 - meanRate1
 
-	L := 0.1    //  time constant
-	tau := 0.01 // dead time
+	L := 1.0   //  time constant
+	tau := 5.0 // dead time
 	K := diffRate
 	//lambda := K * tau / L
 	//theta := L / (L+tau)
 
 	// P TODO
 	info.Kp = tau / K * L
+	info.Ki = 0.0
+	info.Kd = 0.0
 
 	// PI TODO
 	ti := L / 0.3
@@ -513,11 +525,66 @@ func CalculateZieglerGains(info TrainingInfo) TrainingInfo {
 	info.Kd = 0.0
 
 	// PID
-	ti = 2 * L
+	/*ti = 2 * L
 	td := 0.5 * L
 	info.Kp = 1.2 * tau / K * L
 	info.Ki = info.Kp / ti
 	info.Kd = info.Kp * td
+	*/
+
+	return info
+}
+
+func CalculateCohenGains(info TrainingInfo) TrainingInfo {
+
+	sumPC1 := 0
+	sumPC2 := 0
+	sumRate1 := 0.0
+	sumRate2 := 0.0
+
+	for i := 2; i < len(info.Data); i++ { // discard 2 initial measurements, i.e., 5 samples
+		if i%2 == 0 {
+			sumPC1 += info.Data[i].PC
+			sumRate1 += info.Data[i].Rate
+		} else {
+			sumPC2 += info.Data[i].PC
+			sumRate2 += info.Data[i].Rate
+		}
+	}
+
+	fmt.Println("************")
+	//meanPC1 := float64(sumPC1) / float64(len(info.Data)/2.0) // 2.0 = 2 levels
+	//meanPC2 := float64(sumPC2) / float64(len(info.Data)/2.0)
+	meanRate1 := sumRate1 / float64(len(info.Data)/2.0)
+	meanRate2 := sumRate2 / float64(len(info.Data)/2.0)
+
+	//diffPC := meanPC2 - meanPC1
+	diffRate := meanRate2 - meanRate1
+
+	T := 0.1   //  time constant
+	tau := 0.1 // dead time
+	K := diffRate
+	//lambda := K * tau / L
+	theta := tau / (tau + T)
+
+	// P TODO
+	info.Kp = 1 / K * (1 + (0.35 * theta / (1 - theta))) * T / tau
+	info.Ki = 0.0
+	info.Kd = 0.0
+
+	// PI TODO
+	ti := ((3.3 - 3.0*theta) / (1 + 1.2*theta)) * tau
+	info.Kp = 0.9 / K * (1 + (0.92 * theta / (1 - theta))) * T / tau
+	info.Ki = info.Kp / ti
+	info.Kd = 0.0
+
+	// PID
+	/*ti = ((2.5 - 2.0*theta) / (1 - 0.39*theta)) * tau
+	td := ((0.37 * (1 - theta)) / (1 - 0.81*theta)) * tau
+	info.Kp = 1.35 / K * (1 + (0.18 * theta / (1 - theta))) * T / tau
+	info.Ki = info.Kp / ti
+	info.Kd = info.Kp * td
+	*/
 
 	return info
 }
