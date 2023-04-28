@@ -497,16 +497,16 @@ func CalculateZieglerGains(info TrainingInfo) TrainingInfo {
 	//diffPC := meanPC2 - meanPC1
 	diffRate := meanRate2 - meanRate1
 
-	L := 0.1   //  time constant
-	tau := 0.1 // dead time
+	L := 0.1    //  time constant
+	tau := 0.01 // dead time
 	K := diffRate
 	//lambda := K * tau / L
 	//theta := L / (L+tau)
 
-	// P
+	// P TODO
 	info.Kp = tau / K * L
 
-	// PI
+	// PI TODO
 	ti := L / 0.3
 	info.Kp = 0.9 * tau / K * L
 	info.Ki = info.Kp / ti

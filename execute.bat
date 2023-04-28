@@ -25,6 +25,6 @@ set clients=1
 echo Create and Execute Subscriber
 copy Dockerfile-subscriber Dockerfile
 docker build --tag subscriber .
-START docker run subscriber
+docker run subscriber
 
 rem START docker run publisher
