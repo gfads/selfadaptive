@@ -681,27 +681,20 @@ func CalculateAMIGOGains(info TrainingInfo) TrainingInfo {
 	tau := 0.1 // dead time
 	K := diffRate
 	//lambda := K * tau / L
-	theta := tau / (tau + T)
-
-	// P TODO
-	info.Kp = 1 / K * (1 + (0.35 * theta / (1 - theta))) * T / tau
-	info.Ki = 0.0
-	info.Kd = 0.0
 
 	// PI TODO
-	ti := ((3.3 - 3.0*theta) / (1 + 1.2*theta)) * tau
-	info.Kp = 0.9 / K * (1 + (0.92 * theta / (1 - theta))) * T / tau
+	ti := (0.35 + 13*math.Pow(T, 2)/(math.Pow(T, 2)+12*tau*T+7*math.Pow(tau, 2))) * tau
+	info.Kp = 1 / K * (0.15 + (0.35-tau*T/math.Pow(tau+T, 2))*T/tau)
 	info.Ki = info.Kp / ti
 	info.Kd = 0.0
 
 	// PID
-	/*ti = ((2.5 - 2.0*theta) / (1 - 0.39*theta)) * tau
-	td := ((0.37 * (1 - theta)) / (1 - 0.81*theta)) * tau
-	info.Kp = 1.35 / K * (1 + (0.18 * theta / (1 - theta))) * T / tau
+	/*ti = ((0.4*tau + 0.8*T) / (tau + 0.1*T)) * tau
+	td := (0.5 * T / (0.3*tau + T)) * tau
+	info.Kp = 1 / K * (0.2 + 0.45*T/tau)
 	info.Ki = info.Kp / ti
 	info.Kd = info.Kp * td
 	*/
-
 	return info
 }
 
