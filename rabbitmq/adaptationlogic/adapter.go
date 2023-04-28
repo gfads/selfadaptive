@@ -66,7 +66,6 @@ func (al AdaptationLogic) Run() {
 		al.ZieglerTraining()
 	case shared.CohenTraining:
 		al.ZieglerTraining() // TODO
-
 	case shared.OnLineTraining:
 		al.RunOnlineTraining()
 	default:
@@ -212,7 +211,7 @@ func (al AdaptationLogic) ZieglerTraining() {
 	//toAdjuster := make(chan TrainingInfo)
 	count := 0
 	info := TrainingInfo{TypeName: al.TrainingInfo.TypeName}
-	PCS := []int{5, 6, 5, 6, 5, 6, 5, 6, 5, 6, 5, 6}
+	PCS := []int{2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3}
 
 	// create & execute adjustment mechanism
 	//go AdjustmentMechanism(fromAdjuster, toAdjuster, al.SetPoint)
