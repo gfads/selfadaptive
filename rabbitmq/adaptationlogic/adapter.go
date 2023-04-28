@@ -256,6 +256,68 @@ func (al AdaptationLogic) ZieglerTraining() {
 
 			fmt.Printf("Cohen: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
 
+			info = CalculateAMIGOGains(info)
+			al.TrainingInfo.Kp = info.Kp
+			al.TrainingInfo.Ki = info.Ki
+			al.TrainingInfo.Kd = info.Kd
+
+			fmt.Printf("AMIGO: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+
+			if al.TrainingInfo.Kp > 0 && al.TrainingInfo.Ki > 0 {
+				fmt.Println("Bad gains...")
+			}
+			fmt.Println("***** End of Training - Copy/paste Gains *****")
+			time.Sleep(10 * time.Hour)
+
+		}
+
+		// send pc to business
+		al.ToBusiness <- al.PC
+	}
+}
+
+func (al AdaptationLogic) CohenTraining() {
+	//fromAdjuster := make(chan TrainingInfo)
+	//toAdjuster := make(chan TrainingInfo)
+	count := 0
+	info := TrainingInfo{TypeName: al.TrainingInfo.TypeName}
+	PCS := []int{5, 6, 5, 6, 5, 6, 5, 6, 5, 6, 5, 6}
+
+	// create & execute adjustment mechanism
+	//go AdjustmentMechanism(fromAdjuster, toAdjuster, al.SetPoint)
+
+	// warm up phase
+	time.Sleep(WarmupTime * time.Second)
+
+	// discard first measurement
+	<-al.FromBusiness       // receive no. of messages from business
+	al.ToBusiness <- PCS[0] // Configure PC to execute the Ziegler Steps
+
+	// loop of adaptation logic
+	for {
+
+		n := <-al.FromBusiness // receive no. of messages from business
+
+		// calculate new arrival rate (msg/s)
+		rate := float64(n) / al.MonitorInterval.Seconds()
+
+		fmt.Println(al.PC, ";", rate)
+		i := AdjustmenstInfo{PC: al.PC, Rate: rate}
+		info.Data = append(info.Data, i)
+
+		if count < len(PCS)-1 {
+			count++
+			// configure next PC
+			al.PC = PCS[count]
+
+		} else { // training is over
+			info = CalculateCohenGains(info)
+			al.TrainingInfo.Kp = info.Kp
+			al.TrainingInfo.Ki = info.Ki
+			al.TrainingInfo.Kd = info.Kd
+
+			fmt.Printf("Cohen: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+
 			if al.TrainingInfo.Kp > 0 && al.TrainingInfo.Ki > 0 {
 				fmt.Println("Bad gains...")
 			}
@@ -536,6 +598,60 @@ func CalculateZieglerGains(info TrainingInfo) TrainingInfo {
 }
 
 func CalculateCohenGains(info TrainingInfo) TrainingInfo {
+
+	sumPC1 := 0
+	sumPC2 := 0
+	sumRate1 := 0.0
+	sumRate2 := 0.0
+
+	for i := 2; i < len(info.Data); i++ { // discard 2 initial measurements, i.e., 5 samples
+		if i%2 == 0 {
+			sumPC1 += info.Data[i].PC
+			sumRate1 += info.Data[i].Rate
+		} else {
+			sumPC2 += info.Data[i].PC
+			sumRate2 += info.Data[i].Rate
+		}
+	}
+
+	fmt.Println("************")
+	//meanPC1 := float64(sumPC1) / float64(len(info.Data)/2.0) // 2.0 = 2 levels
+	//meanPC2 := float64(sumPC2) / float64(len(info.Data)/2.0)
+	meanRate1 := sumRate1 / float64(len(info.Data)/2.0)
+	meanRate2 := sumRate2 / float64(len(info.Data)/2.0)
+
+	//diffPC := meanPC2 - meanPC1
+	diffRate := meanRate2 - meanRate1
+
+	T := 0.1   //  time constant
+	tau := 0.1 // dead time
+	K := diffRate
+	//lambda := K * tau / L
+	theta := tau / (tau + T)
+
+	// P TODO
+	info.Kp = 1 / K * (1 + (0.35 * theta / (1 - theta))) * T / tau
+	info.Ki = 0.0
+	info.Kd = 0.0
+
+	// PI TODO
+	ti := ((3.3 - 3.0*theta) / (1 + 1.2*theta)) * tau
+	info.Kp = 0.9 / K * (1 + (0.92 * theta / (1 - theta))) * T / tau
+	info.Ki = info.Kp / ti
+	info.Kd = 0.0
+
+	// PID
+	/*ti = ((2.5 - 2.0*theta) / (1 - 0.39*theta)) * tau
+	td := ((0.37 * (1 - theta)) / (1 - 0.81*theta)) * tau
+	info.Kp = 1.35 / K * (1 + (0.18 * theta / (1 - theta))) * T / tau
+	info.Ki = info.Kp / ti
+	info.Kd = info.Kp * td
+	*/
+
+	return info
+}
+
+func CalculateAMIGOGains(info TrainingInfo) TrainingInfo {
 
 	sumPC1 := 0
 	sumPC2 := 0
