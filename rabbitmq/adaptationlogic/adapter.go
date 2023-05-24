@@ -179,7 +179,7 @@ func (al AdaptationLogic) RootLocusTraining() {
 				al.TrainingInfo.Ki = info.Ki
 				al.TrainingInfo.Kd = info.Kd
 
-				fmt.Printf("-kp=%.8f, -ki=%.8f, -kd=%.8f\n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+				fmt.Printf("\"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
 
 				if al.TrainingInfo.Kp > 0 && al.TrainingInfo.Ki > 0 {
 					fmt.Println("Bad gains...")
@@ -517,20 +517,22 @@ func CalculateRootLocusGains(info TrainingInfo) TrainingInfo {
 	ki := 0.0
 	kd := 0.0
 
-	if info.TypeName == "P" { // TODO
-		kp = (1 + a) / b
-	}
+	// P
+	kp = (1 + a) / b
+	ki = 0.0
+	kd = 0.0
 
-	if info.TypeName == "PI" { // TODO
-		kp = (a - 0.36) / b
-		ki = (a - b*kp) / b
-	}
+	// PI
+	kp = (a - 0.36) / b
+	ki = (a - b*kp) / b
+	kd = 0.0
 
-	if info.TypeName == shared.BasicPid {
+	/*
+		// PID
 		kd = 0.11 / b
 		kp = (-0.063 + a - 2*b*kd) / b
 		ki = (0.3 - b*kp - b*kd + a) / b
-	}
+	*/
 
 	// reconfigure gains
 	if !math.IsNaN(a) && !math.IsNaN(b) {

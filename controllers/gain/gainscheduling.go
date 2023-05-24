@@ -32,16 +32,16 @@ func (c *Controller) Initialise(p ...float64) {
 
 	// hard coded gain scheduling table // TODO
 	c.GainTable[0][0] = 1.0 // kp[0] // P
-	c.GainTable[0][1] = 1.0 // ki[1]
-	c.GainTable[0][2] = 1.0 // kd[2]
+	c.GainTable[0][1] = 0.0 // ki[1]
+	c.GainTable[0][2] = 0.0 // kd[2]
 
 	//c.GainTable[1][0] = -9600 // kp[0] // PID
 	//c.GainTable[1][1] = 0.5   // ki[1]
 	//c.GainTable[1][2] = 0.01  // kd[2]
 
-	c.GainTable[1][0] = 2.0 // kp[0] // PI
+	c.GainTable[1][0] = 1.0 // kp[0] // PI
 	c.GainTable[1][1] = 2.0 // ki[1]
-	c.GainTable[1][2] = 2.0 // kd[2]
+	c.GainTable[1][2] = 0.0 // kd[2]
 
 	kp := c.GainTable[0][0]
 	ki := c.GainTable[0][1]

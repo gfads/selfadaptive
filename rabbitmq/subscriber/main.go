@@ -108,53 +108,69 @@ func main() {
 func showParameters(p ExecutionParameters) {
 
 	// validate execution type
-	switch *p.ExecutionType {
-	case shared.StaticGoal:
-	case shared.DynamicGoal:
-	case shared.RootLocusTraining:
-	case shared.ZieglerTraining:
-	case shared.OnLineTraining:
-	default:
-		fmt.Println("Execution type is invalid")
-		os.Exit(0)
-	}
-
-	switch *p.ControllerType {
-	case shared.BasicOnoff:
-	case shared.DeadZoneOnoff:
-	case shared.HysteresisOnoff:
-	case shared.BasicPid:
-	case shared.SmoothingPid:
-	case shared.IncrementalFormPid:
-	case shared.ErrorSquarePid:
-	case shared.DeadZonePid:
-	case shared.GainScheduling:
-	default:
-		fmt.Println("Controller type is invalid")
-		os.Exit(0)
-	}
-
-	if *p.Direction != 1.0 && *p.Direction != -1.0 {
-		fmt.Println("Direction is invalid")
-		os.Exit(0)
-	}
-
 	fmt.Println("************************************************")
 	fmt.Printf("Execution Type  : %v\n", *p.ExecutionType)
 	fmt.Printf("Is Adaptive?    : %v\n", *p.IsAdaptive)
 	fmt.Printf("Controller Type : %v\n", *p.ControllerType)
 	fmt.Printf("Monitor Interval: %v\n", *p.MonitorInterval)
 	fmt.Printf("Goal            : %.4f\n", *p.SetPoint)
-	fmt.Printf("Kp              : %.8f\n", *p.Kp)
-	fmt.Printf("Ki              : %.8f\n", *p.Ki)
-	fmt.Printf("Kd              : %.8f\n", *p.Kd)
 	fmt.Printf("Prefetch Count  : %v\n", *p.PrefetchCount)
-	fmt.Printf("Min             : %.4f\n", *p.Min)
-	fmt.Printf("Max             : %.4f\n", *p.Max)
-	fmt.Printf("Dead Zone       : %.4f\n", *p.DeadZone)
-	fmt.Printf("Hystereis Band  : %.4f\n", *p.HysteresisBand)
 	fmt.Printf("Direction       : %.1f\n", *p.Direction)
-	fmt.Printf("Gain Trigger    : %.4f\n", *p.GainTrigger)
+
+	switch *p.ControllerType {
+	case shared.BasicOnoff:
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+	case shared.DeadZoneOnoff:
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+		fmt.Printf("Dead Zone       : %.4f\n", *p.DeadZone)
+	case shared.HysteresisOnoff:
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+		fmt.Printf("Hystereis Band  : %.4f\n", *p.HysteresisBand)
+	case shared.BasicPid:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+	case shared.SmoothingPid:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+	case shared.IncrementalFormPid:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+	case shared.ErrorSquarePid:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+	case shared.DeadZonePid:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+		fmt.Printf("Dead Zone       : %.4f\n", *p.DeadZone)
+	case shared.GainScheduling:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+		fmt.Printf("Gain Trigger    : %.4f\n", *p.GainTrigger)
+	default:
+		fmt.Println("Controller type is invalid")
+		os.Exit(0)
+	}
 	fmt.Println("************************************************")
 }
 
