@@ -65,7 +65,7 @@ func (al AdaptationLogic) Run() {
 	case shared.ZieglerTraining:
 		al.ZieglerTraining()
 	case shared.CohenTraining:
-		al.ZieglerTraining() // TODO
+		//al.ZieglerTraining() // TODO
 	case shared.OnLineTraining:
 		al.RunOnlineTraining()
 	default:
@@ -517,22 +517,20 @@ func CalculateRootLocusGains(info TrainingInfo) TrainingInfo {
 	ki := 0.0
 	kd := 0.0
 
-	// P
-	kp = (1 + a) / b
-	ki = 0.0
-	kd = 0.0
-
-	// PI
-	kp = (a - 0.36) / b
-	ki = (a - b*kp) / b
-	kd = 0.0
-
-	/*
-		// PID
+	switch info.TypeName {
+	case shared.BasicP:
+		kp = (1 + a) / b
+		ki = 0.0
+		kd = 0.0
+	case shared.BasicPi:
+		kp = (a - 0.36) / b
+		ki = (a - b*kp) / b
+		kd = 0.0
+	case shared.BasicPid:
 		kd = 0.11 / b
 		kp = (-0.063 + a - 2*b*kd) / b
 		ki = (0.3 - b*kp - b*kd + a) / b
-	*/
+	}
 
 	// reconfigure gains
 	if !math.IsNaN(a) && !math.IsNaN(b) {
@@ -540,7 +538,6 @@ func CalculateRootLocusGains(info TrainingInfo) TrainingInfo {
 		info.Ki = ki
 		info.Kd = kd
 	}
-
 	return info
 }
 

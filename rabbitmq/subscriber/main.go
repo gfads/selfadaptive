@@ -60,6 +60,12 @@ func main() {
 	p.GainTrigger = flag.Float64("gain-trigger", 1.0, "gain trigger is a float")
 	flag.Parse()
 
+	// validate parameters
+	validateParameters(p) // TODO
+
+	// show parameters
+	showParameters(p)
+
 	// create new consumer
 	var consumer = NewConsumer(*p.IsAdaptive, *p.PrefetchCount)
 
@@ -84,8 +90,6 @@ func main() {
 	startTimer := make(chan bool) // start timer
 	stopTimer := make(chan bool)  // stop timer
 
-	showParameters(p)
-
 	if *p.IsAdaptive {
 
 		// Create & start adaptation logic
@@ -102,6 +106,12 @@ func main() {
 	} else {
 		// run non-adaptive consumer
 		consumer.RunNonAdaptive()
+	}
+}
+
+func validateParameters(p ExecutionParameters) {
+	if p.Direction != 1.0 || p.Direction != -1.0 {
+		shared.ErrorHandler(shared.GetFunction(), "Direction invalid")
 	}
 }
 

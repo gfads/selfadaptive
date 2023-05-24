@@ -45,6 +45,14 @@ func NewController(i info.Controller) IController {
 		c := hysteresisonoff.Controller{}
 		c.Initialise(i.Direction, i.Min, i.Max, i.HysteresisBand)
 		return &c
+	case shared.BasicP:
+		c := basicpid.Controller{}
+		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, 0.0, 0.0)
+		return &c
+	case shared.BasicPi:
+		c := basicpid.Controller{}
+		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, 0.0)
+		return &c
 	case shared.BasicPid:
 		c := basicpid.Controller{}
 		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd)

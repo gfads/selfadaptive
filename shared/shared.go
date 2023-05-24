@@ -42,6 +42,8 @@ const BasicOnoff = "OnOff"
 const DeadZoneOnoff = "OnOffwithDeadZone"
 const HysteresisOnoff = "OnOffwithHysteresis"
 
+const BasicP = "BasicP"
+const BasicPi = "BasicPI"
 const BasicPid = "BasicPID"
 const SmoothingPid = "SmoothingDerivativePID"
 const IncrementalFormPid = "IncrementalFormPID"
