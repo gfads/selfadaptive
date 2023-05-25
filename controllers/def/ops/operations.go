@@ -31,8 +31,11 @@ type IController interface {
 // Create a controller of 'Type' (typeName) and configure its parameters //
 
 func NewController(i info.Controller) IController {
-
 	switch i.TypeName {
+	case shared.AsTAR:
+		c := onoffbasic.Controller{}
+		c.Initialise(i.Min, i.Max, i.OptimumLevel, i.ShutoffLevel)
+		return &c
 	case shared.BasicOnoff:
 		c := onoffbasic.Controller{}
 		c.Initialise(i.Direction, i.Min, i.Max)

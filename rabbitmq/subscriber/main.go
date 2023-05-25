@@ -29,6 +29,8 @@ type ExecutionParameters struct {
 	HysteresisBand  *float64
 	Direction       *float64
 	GainTrigger     *float64
+	OptimumLevel    *float64
+	ShutoffLevel    *float64
 }
 
 type Subscriber struct {
@@ -58,6 +60,8 @@ func main() {
 	p.HysteresisBand = flag.Float64("hysteresis-band", 0.0, "hysteresis-band is a float")
 	p.Direction = flag.Float64("direction", 1.0, "direction is a float")
 	p.GainTrigger = flag.Float64("gain-trigger", 1.0, "gain trigger is a float")
+	p.OptimumLevel = flag.Float64("optimum-level", 1.0, "optimum level is a float")
+	p.ShutoffLevel = flag.Float64("shutoff-level", 1.0, "shutoff level is a float")
 	flag.Parse()
 
 	// validate parameters
@@ -110,7 +114,7 @@ func main() {
 }
 
 func validateParameters(p ExecutionParameters) {
-	if p.Direction != 1.0 || p.Direction != -1.0 {
+	if *p.Direction != 1.0 && *p.Direction != -1.0 {
 		shared.ErrorHandler(shared.GetFunction(), "Direction invalid")
 	}
 }
@@ -128,6 +132,11 @@ func showParameters(p ExecutionParameters) {
 	fmt.Printf("Direction       : %.1f\n", *p.Direction)
 
 	switch *p.ControllerType {
+	case shared.AsTAR:
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+		fmt.Printf("Optimum Level   : %.4f\n", *p.OptimumLevel)
+		fmt.Printf("Shutoff Level   : %.4f\n", *p.ShutoffLevel)
 	case shared.BasicOnoff:
 		fmt.Printf("Min             : %.4f\n", *p.Min)
 		fmt.Printf("Max             : %.4f\n", *p.Max)
@@ -139,6 +148,18 @@ func showParameters(p ExecutionParameters) {
 		fmt.Printf("Min             : %.4f\n", *p.Min)
 		fmt.Printf("Max             : %.4f\n", *p.Max)
 		fmt.Printf("Hystereis Band  : %.4f\n", *p.HysteresisBand)
+	case shared.BasicP:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+	case shared.BasicPi:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
 	case shared.BasicPid:
 		fmt.Printf("Kp              : %.8f\n", *p.Kp)
 		fmt.Printf("Ki              : %.8f\n", *p.Ki)

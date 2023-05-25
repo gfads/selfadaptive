@@ -503,23 +503,25 @@ func CalculateRootLocusGains(info TrainingInfo) TrainingInfo {
 	}
 
 	for i := 0; i < len(info.Data)-1; i++ {
-		s1 += yLine[i] * yLine[i]
+		s1 += math.Pow(yLine[i], 2.0)
 		s2 += uLine[i] * yLine[i]
-		s3 += uLine[i] * uLine[i]
+		s3 += math.Pow(uLine[i], 2.0)
 		s4 += yLine[i] * yLine[i+1]
 		s5 += uLine[i] * yLine[i+1]
 	}
 
-	a := (s3*s4 - s2*s5) / (s1*s3 - s2*s2)
-	b := (s1*s5 - s2*s4) / (s1*s3 - s2*s2)
+	a := (s3*s4 - s2*s5) / (s1*s3 - math.Pow(s2, 2.0))
+	b := (s1*s5 - s2*s4) / (s1*s3 - math.Pow(s2, 2.0))
 
 	kp := 0.0
 	ki := 0.0
 	kd := 0.0
 
+	//fmt.Printf("a=%.8f b=%.8f\n", a, b)
+
 	switch info.TypeName {
 	case shared.BasicP:
-		kp = (1 + a) / b
+		kp = (1 + a) / b // Feedback Control of Computing Systems - page 264
 		ki = 0.0
 		kd = 0.0
 	case shared.BasicPi:

@@ -51,6 +51,8 @@ const ErrorSquarePid = "ErrorSquarePID"
 const DeadZonePid = "DeadZonePID"
 const GainScheduling = "GainScheduling"
 
+const AsTAR = "AsTAR"
+
 // Controller parameters
 const MinOnoff = 10
 const MaxOnoff = 600
