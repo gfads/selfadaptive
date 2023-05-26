@@ -8,6 +8,7 @@ package ops
 
 import (
 	"fmt"
+	algorithm "main.go/controllers/astar"
 	"main.go/controllers/def/info"
 	gainscheduling "main.go/controllers/gain"
 	onoffbasic "main.go/controllers/onoff/basic"
@@ -33,8 +34,8 @@ type IController interface {
 func NewController(i info.Controller) IController {
 	switch i.TypeName {
 	case shared.AsTAR:
-		c := onoffbasic.Controller{}
-		c.Initialise(i.Min, i.Max, i.OptimumLevel, i.ShutoffLevel)
+		c := algorithm.Controller{}
+		c.Initialise(i.Min, i.Max, i.HysteresisBand)
 		return &c
 	case shared.BasicOnoff:
 		c := onoffbasic.Controller{}

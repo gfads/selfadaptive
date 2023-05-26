@@ -25,6 +25,5 @@ type Controller struct {
 	HysteresisBand         float64 // Hysteresis band used by some controllers
 	Out                    float64 // Controller output
 	GainTrigger            float64 // Gain trigger based on two level gains
-	OptimumLevel           float64 // for AsTAR
-	ShutoffLevel           float64 // for AsTAR
+	PreviousRate           float64 // for AsTAR
 }

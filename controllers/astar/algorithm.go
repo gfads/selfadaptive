@@ -13,59 +13,57 @@ type Controller struct {
 
 func (c *Controller) Initialise(p ...float64) {
 
-	if len(p) < 4 {
+	if len(p) < 3 {
 		fmt.Printf("Error: '%s' controller requires 6 info (direction,min,max,kp,ki,kd) \n", shared.AsTAR)
 		os.Exit(0)
 	}
 
 	c.Info.Min = p[0]
 	c.Info.Max = p[1]
-
-	c.Info.OptimumLevel = p[3]
-	c.Info.ShutoffLevel = p[4]
+	c.Info.HysteresisBand = p[2]
 }
 
-func (a Controller) Update(vnew float64, vold float64, rold float64) float64 {
-	rnew := 0.0
-	//getnew := 0.0
+func (c *Controller) Update(p ...float64) float64 {
+	u := 0.0
+	setpoint := p[0]
+	y := p[1] // measured arrival rate
 
-	if vnew < a.Info.ShutoffLevel { // The system is in Shut-off Voltage state, task is stopped
-		rnew = 0.0
-		//fmt.Println("Shut-off voltage state", vnew, vold, rold, rnew)
-	} else if vnew < (a.Info.OptimumLevel - a.Info.HysteresisBand) { // The system is in Low-voltage state, apply AIMD
-		if vnew > vold {
-			rnew = rold + 1
-			//fmt.Println("Low-voltage voltage state (Accelerating)", vnew, vold, rold, rnew)
+	if y < (setpoint - c.Info.HysteresisBand) { // The system is bellow the goal
+		if y > c.Info.PreviousRate {
+			u = c.Info.PreviousOut + 1
+			//fmt.Printf("Below the goal (Accelerating) [%.4f]", c.Info.OptimumLevel-c.Info.HysteresisBand)
 		} else {
-			rnew = rold / 2
-			//fmt.Println("Low-voltage voltage state (Reducing)", vnew, vold, rold, rnew)
+			u = c.Info.PreviousOut * 2
+			//fmt.Printf("Below the goal (Accelerating fast) [%.4f]", c.Info.OptimumLevel-c.Info.HysteresisBand)
 		}
-	} else if vnew > (a.Info.OptimumLevel + a.Info.HysteresisBand) { // The system is in High Voltage state, apply MIAD
-		if vnew < vold {
-			rnew = rold - 1
-			//fmt.Println("High-voltage state", vnew, vold, rold, rnew)
+	} else if y > (setpoint + c.Info.HysteresisBand) { // The system is above the goal
+		if y < c.Info.PreviousRate {
+			u = c.Info.PreviousOut - 1
+			//fmt.Printf("Above the goal (Reducing) [%.4f]", c.Info.OptimumLevel+c.Info.HysteresisBand)
 		} else {
-			rnew = rold * 2
-			//fmt.Println("High-voltage state", vnew, vold, rold, rnew)
+			u = c.Info.PreviousOut / 2
+			//fmt.Printf("Above the goal (Reducing fast) [%.4f]", c.Info.OptimumLevel+c.Info.HysteresisBand)
 		}
-	} else { // The system is at Optimum Voltage state, take no action
-		rnew = rold
-		//fmt.Println("Optimum voltage state", vnew, vold, rold, rnew)
+	} else { // The system is at Optimum state, no action required
+		u = c.Info.PreviousOut
+		//fmt.Printf("Optimum Level ")
 	}
 
 	// final check of rnew
-	if rnew < a.Info.Min {
-		rnew = a.Info.Min
+	if u < c.Info.Min {
+		u = c.Info.Min
 	}
-	if rnew > a.Info.Max {
-		rnew = a.Info.Max
+	if u > c.Info.Max {
+		u = c.Info.Max
 	}
 
-	//if rnew != 0.0 {
-	//	getnew = 1.0 / float64(rnew)
-	//} else {
-	//	getnew = 0.0
-	//}
+	//fmt.Printf("[Rate=%.4f -> %.4f], [PC=%.4f -> %.4f]\n", c.Info.PreviousRate, y, c.Info.PreviousOut, u)
 
-	return rnew
+	c.Info.PreviousOut = u
+	c.Info.PreviousRate = y
+
+	return u
+}
+
+func (c *Controller) SetGains(p ...float64) {
 }
