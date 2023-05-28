@@ -235,6 +235,15 @@ func (c Subscriber) RunAdaptive(startTimer, stopTimer chan bool, toAdapter chan 
 			}
 			fmt.Print(q.Messages, " ; ")
 
+			// inspect queue
+			/*q, err1 := c.Ch.QueueInspect("rpc_queue")
+			if err1 != nil {
+				shared.ErrorHandler(shared.GetFunction(), "Impossible to inspect the queue")
+				os.Exit(0)
+			}
+			fmt.Println("Subscriber:: HERE", q.Messages)
+			*/
+
 			// configure new pc
 			err := c.Ch.Qos(
 				c.PC, // prefetch count
