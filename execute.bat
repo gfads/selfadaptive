@@ -11,10 +11,10 @@ docker rm publisher
 docker stop subscriber
 docker rm subscriber
 
-rem echo ****** Create and Execute Publisher (Local publisher) ******
-rem copy Dockerfile-publisher Dockerfile
-rem docker build --tag publisher .
-rem START /B docker run publisher *** unrem if publisher executes in this host
+echo ****** Create and Execute Publisher (Local publisher) ******
+copy Dockerfile-publisher Dockerfile
+docker build --tag publisher .
+START /B docker run publisher *** unrem if publisher executes in this host
 
 rem set clients=1
 rem :loop
@@ -27,6 +27,6 @@ rem :exitloop
 timeout /t 10
 
 echo ****** Create and Execute Subscriber ******
-copy Dockerfile-subscriber Dockerfile
-docker build --tag subscriber .
-docker run subscriber
+rem copy Dockerfile-subscriber Dockerfile
+rem docker build --tag subscriber .
+rem docker run subscriber

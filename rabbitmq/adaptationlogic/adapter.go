@@ -15,10 +15,10 @@ const TimeBetweenAdjustments = 1200 // seconds
 const MaximumNrmse = 0.30
 const WarmupTime = 30 // seconds
 const TrainingAttempts = 30
-const SizeOfSameLevel = 10
+const SizeOfSameLevel = 60
 
 var IncreasingGoal = []float64{500, 1000.0, 1250.0, 1500.0, 1750.0, 2000.0, 2250.0, 2500.0, 2750.0, 3000.0}
-var RandomGoal = []float64{500, 300.0, 1250.0, 1300., 300, 600.0, 1000.0, 800.0, 500.0, 1000.0}
+var RandomGoal = []float64{500.0, 900.0, 1250.0, 1300.0, 300.0, 800.0, 1000.0, 400.0, 500.0, 1000.0, 2000.0, 1500.0, 500.0, 1100.0, 1500.0, 500.0, 3000.0}
 
 type AdjustmenstInfo struct {
 	PC   int
@@ -146,6 +146,54 @@ func (al AdaptationLogic) RunStaticGoal() {
 	}
 }
 
+func (al AdaptationLogic) RootLocusTrainingNewNotWorkingProperly() {
+	fromAdjuster := make(chan TrainingInfo)
+	toAdjuster := make(chan TrainingInfo)
+	info := TrainingInfo{TypeName: al.TrainingInfo.TypeName}
+
+	// create & execute adjustment mechanism
+	go AdjustmentMechanism(fromAdjuster, toAdjuster, al.SetPoint)
+
+	// warm up phase
+	time.Sleep(WarmupTime * time.Second)
+
+	// discard first measurement
+	<-al.FromBusiness // receive no. of messages from business
+	al.ToBusiness <- al.PC
+
+	// loop of adaptation logic
+	idx := 0
+	for {
+
+		n := <-al.FromBusiness // receive no. of messages from business
+
+		// calculate new arrival rate (msg/s)
+		rate := float64(n) / al.MonitorInterval.Seconds()
+		info.Data = append(info.Data, AdjustmenstInfo{PC: al.PC, Rate: rate})
+
+		if idx > 0 {
+			info = CalculateRootLocusGains(info)
+			if info.Kp > 0 && info.Ki > 0 { // end of training
+				fmt.Printf("\"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+				fmt.Println("***** End of Training - Copy/paste Gains *****")
+				time.Sleep(10 * time.Hour)
+				break
+			} else {
+				al.TrainingInfo.Kp = info.Kp
+				al.TrainingInfo.Ki = info.Ki
+				al.TrainingInfo.Kd = info.Kd
+				fmt.Printf("\"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+			}
+		}
+		// next pc training
+		idx++
+		al.PC += 1
+
+		// send pc to business
+		al.ToBusiness <- al.PC
+	}
+}
+
 func (al AdaptationLogic) RootLocusTraining() {
 	fromAdjuster := make(chan TrainingInfo)
 	toAdjuster := make(chan TrainingInfo)
@@ -172,7 +220,7 @@ func (al AdaptationLogic) RootLocusTraining() {
 
 		l := len(info.Data)
 
-		if l >= 1 && rate < info.Data[l-1].Rate {
+		if l >= 1 && rate < (1.10*info.Data[l-1].Rate) { // TODO remove 1.10
 			if l > TrainingSampleSize || tAttempts >= TrainingAttempts { // training is over
 				info = CalculateRootLocusGains(info)
 				al.TrainingInfo.Kp = info.Kp

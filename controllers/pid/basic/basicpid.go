@@ -72,7 +72,7 @@ func (c *Controller) Update(p ...float64) float64 {
 	}
 
 	c.Info.PreviousError = err
-	c.Info.SumPrevErrors = c.Info.SumPrevErrors + err
+	c.Info.SumPrevErrors += err
 
 	return c.Info.Out
 }

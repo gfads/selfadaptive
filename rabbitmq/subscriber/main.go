@@ -227,6 +227,14 @@ func (c Subscriber) RunAdaptive(startTimer, stopTimer chan bool, toAdapter chan 
 			// receive new pc from adaptation logic
 			c.PC = <-fromAdapter
 
+			// inspect queue
+			q, err1 := c.Ch.QueueInspect("rpc_queue")
+			if err1 != nil {
+				shared.ErrorHandler(shared.GetFunction(), "Impossible to inspect the queue size")
+				os.Exit(0)
+			}
+			fmt.Print(q.Messages, " ; ")
+
 			// configure new pc
 			err := c.Ch.Qos(
 				c.PC, // prefetch count
