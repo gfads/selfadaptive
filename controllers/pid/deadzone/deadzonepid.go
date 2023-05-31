@@ -68,6 +68,8 @@ func (c *Controller) Update(p ...float64) float64 {
 
 		// pid output
 		c.Info.Out = proportional + integrator + differentiator
+	} else {
+		c.Info.Out = c.Info.PreviousOut
 	}
 
 	if c.Info.Out > c.Info.Max {
@@ -76,6 +78,7 @@ func (c *Controller) Update(p ...float64) float64 {
 		c.Info.Out = c.Info.Min
 	}
 
+	c.Info.PreviousOut = c.Info.Out
 	c.Info.PreviousError = err
 	c.Info.SumPrevErrors = c.Info.SumPrevErrors + err
 

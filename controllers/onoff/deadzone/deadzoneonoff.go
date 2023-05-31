@@ -50,7 +50,7 @@ func (c *Controller) Update(p ...float64) float64 {
 			u = c.Info.Min
 		}
 	} else { // inside dead zone
-		//u = c.Info.PreviousOut TODO ????
+		u = c.Info.PreviousOut // TODO ???? No action?
 	}
 	return u
 }

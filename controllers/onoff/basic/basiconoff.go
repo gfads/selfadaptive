@@ -43,9 +43,9 @@ func (c *Controller) Update(p ...float64) float64 {
 	err := c.Info.Direction * (s - y)
 
 	// control law
-	if err >= 0 {
+	if err >= 0 { // lower than the goal
 		u = c.Info.Max
-	} else {
+	} else { // higher than the goal
 		u = c.Info.Min
 	}
 	return u
