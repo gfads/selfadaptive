@@ -43,13 +43,14 @@ func (c *Controller) Update(p ...float64) float64 {
 	err := c.Info.Direction * (s - y)
 
 	// control law - page 221
-	if math.Abs(err) > c.Info.DeadZone/2 {
-		if err >= c.Info.DeadZone/2.0 {
+	if math.Abs(err) > c.Info.DeadZone { // outside dead zone
+		if err >= 0 {
 			u = c.Info.Max
-		}
-		if err <= -c.Info.DeadZone/2.0 {
+		} else {
 			u = c.Info.Min
 		}
+	} else { // inside dead zone
+		//u = c.Info.PreviousOut TODO ????
 	}
 	return u
 }

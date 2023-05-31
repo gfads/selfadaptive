@@ -55,7 +55,7 @@ func (c *Controller) Update(p ...float64) float64 {
 	// errors
 	err := c.Info.Direction * (r - y)
 
-	if math.Abs(err) > c.Info.DeadZone/2 {
+	if math.Abs(err) > c.Info.DeadZone {
 		// Proportional
 		proportional := c.Info.Kp * err
 
