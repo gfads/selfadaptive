@@ -52,14 +52,14 @@ func (c *Controller) Update(p ...float64) float64 {
 	err := c.Info.Direction * (r - y)
 
 	// Integrator // page 106
-	c.Info.Integrator += DeltaTime * err
-	integrator := c.Info.Integrator * c.Info.Ki
+	//c.Info.Integrator += DeltaTime * err
+	//integrator := c.Info.Integrator * c.Info.Ki
 
 	// Delta of the new PC
 	deltaU := c.Info.Kp*(err-c.Info.PreviousError) + c.Info.Ki*err*DeltaTime + c.Info.Kd*(err-2*c.Info.PreviousError+c.Info.PreviousPreviousError)/DeltaTime
 
 	// pid output
-	c.Info.Out = integrator + deltaU // see page 106 why add an integrator
+	c.Info.Out = c.Info.Out + deltaU // see page 106 why add an integrator TODO to check
 
 	if c.Info.Out > c.Info.Max {
 		c.Info.Out = c.Info.Max

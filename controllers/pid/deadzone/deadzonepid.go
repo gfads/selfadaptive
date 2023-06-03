@@ -55,7 +55,7 @@ func (c *Controller) Update(p ...float64) float64 {
 	// errors
 	err := c.Info.Direction * (r - y)
 
-	if math.Abs(err) > c.Info.DeadZone {
+	if math.Abs(err) > c.Info.DeadZone { // outside deadzone
 		// Proportional
 		proportional := c.Info.Kp * err
 
@@ -68,8 +68,8 @@ func (c *Controller) Update(p ...float64) float64 {
 
 		// pid output
 		c.Info.Out = proportional + integrator + differentiator
-	} else {
-		c.Info.Out = c.Info.PreviousOut
+	} else { // inside deadzone
+		c.Info.Out = c.Info.PreviousOut // No action(?) TODO
 	}
 
 	if c.Info.Out > c.Info.Max {
