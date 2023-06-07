@@ -93,7 +93,7 @@ func main() {
 	if *p.IsAdaptive {
 
 		// Create & start adaptation logic
-		c := info.Controller{TypeName: *p.ControllerType, Direction: *p.Direction, Min: *p.Min, Max: *p.Max, Kp: *p.Kp, Ki: *p.Ki, Kd: *p.Kd, DeadZone: *p.DeadZone, HysteresisBand: *p.HysteresisBand, GainTrigger: *p.GainTrigger}
+		c := info.Controller{TypeName: *p.ControllerType, Direction: *p.Direction, PC: float64(*p.PrefetchCount), Min: *p.Min, Max: *p.Max, Kp: *p.Kp, Ki: *p.Ki, Kd: *p.Kd, DeadZone: *p.DeadZone, HysteresisBand: *p.HysteresisBand, GainTrigger: *p.GainTrigger}
 		adapter := adaptationlogic.NewAdaptationLogic(*p.ExecutionType, toAdapter, fromAdapter, c, *p.SetPoint, time.Duration(*p.MonitorInterval), *p.PrefetchCount)
 		go adapter.Run() // normal execution
 
@@ -193,8 +193,12 @@ func showParameters(p ExecutionParameters) {
 		fmt.Printf("Min             : %.4f\n", *p.Min)
 		fmt.Printf("Max             : %.4f\n", *p.Max)
 		fmt.Printf("Gain Trigger    : %.4f\n", *p.GainTrigger)
+	case shared.HPA:
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+		fmt.Printf("PC           : %v\n", *p.PrefetchCount)
 	default:
-		fmt.Println("Controller type is invalid")
+		fmt.Println(shared.GetFunction(), "Controller type", *p.ControllerType, " is invalid")
 		os.Exit(0)
 	}
 	fmt.Println("************************************************")

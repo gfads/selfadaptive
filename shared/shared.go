@@ -52,6 +52,7 @@ const DeadZonePid = "DeadZonePID"
 const GainScheduling = "GainScheduling"
 
 const AsTAR = "AsTAR"
+const HPA = "HPA"
 
 // Controller parameters
 const MinOnoff = 10

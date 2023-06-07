@@ -11,6 +11,7 @@ import (
 	algorithm "main.go/controllers/astar"
 	"main.go/controllers/def/info"
 	gainscheduling "main.go/controllers/gain"
+	"main.go/controllers/hpa"
 	onoffbasic "main.go/controllers/onoff/basic"
 	deadzoneonff "main.go/controllers/onoff/deadzone"
 	hysteresisonoff "main.go/controllers/onoff/hysteresis"
@@ -33,6 +34,10 @@ type IController interface {
 
 func NewController(i info.Controller) IController {
 	switch i.TypeName {
+	case shared.HPA:
+		c := hpa.Controller{}
+		c.Initialise(i.Direction, i.Min, i.Max, i.PC)
+		return &c
 	case shared.AsTAR:
 		c := algorithm.Controller{}
 		c.Initialise(i.Min, i.Max, i.HysteresisBand)
@@ -82,7 +87,7 @@ func NewController(i info.Controller) IController {
 		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd)
 		return &c
 	default:
-		fmt.Println("Error: Controller type ´", i.TypeName, "´ is unknown!")
+		fmt.Println(shared.GetFunction(), "Error: Controller type ´", i.TypeName, "´ is unknown!")
 		os.Exit(0)
 	}
 
