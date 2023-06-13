@@ -41,19 +41,23 @@ ENV GOROOT=/usr/local/go/bin/
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=ZieglerTraining", "-controller-type=BasicPID", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=0", "-direction=1","-kp=0.0", "-ki=0.0", "-kd=0.0"]
 
 # Execution - PID (Deadzone)
-CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=DeadZonePID", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1",  "-kp=-0.00144086", "-ki=0.00248495", "-kd=0.00057789", "-dead-zone=200.0"]
+#CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=DeadZonePID", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1",  "-kp=-0.00144086", "-ki=0.00248495", "-kd=0.00057789", "-dead-zone=200.0"]
 
-# Execution - P, PI, PID - Ziegler
+# Execution - P, PI, PID, PID DeadZone - Ziegler
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=BasicPID", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1",  "-kp=0.00496689", "-ki=0.00248344", "-kd=0.00248344"]
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=BasicPI", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00384517", "-ki=0.00115355", "-kd=0.00000000"]
+#CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=DeadZonePID", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1",   "-kp=0.00496689", "-ki=0.00248344", "-kd=0.00248344", "-dead-zone=200.0"]
 
-# Execution - P, PI, PID - Cohen
+
+# Execution - P, PI, PID, PID DeadZone - Cohen
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=BasicPID", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00156457", "-ki=0.00148113", "-kd=0.00019962"]
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=BasicPI", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00414897", "-ki=0.01514702", "-kd=0.00000000"]
+#CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=DeadZonePID", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00156457", "-ki=0.00148113", "-kd=0.00019962", "-dead-zone=200.0"]
 
-# Execution - P, PI, PID - AMIGO
+# Execution - P, PI, PID, PID Deadzone - AMIGO
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=BasicPID", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00101407", "-ki=0.00213378", "-kd=0.00012676"]
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=BasicPI", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00069889", "-ki=0.00191040", "-kd=0.00000000"]
+CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=DeadZonePID", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00101407", "-ki=0.00213378", "-kd=0.00012676", "-dead-zone=200.0"]
 
 #************** AsTAR
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=AsTAR", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1", "-hysteresis-band=200"]
