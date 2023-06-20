@@ -10,6 +10,7 @@ import (
 	"main.go/shared"
 	_ "net/http/pprof"
 	"os"
+	"runtime"
 	"time"
 )
 
@@ -41,6 +42,8 @@ type Subscriber struct {
 }
 
 func main() {
+
+	runtime.GOMAXPROCS(1) // TODO
 
 	p := ExecutionParameters{}
 	p.ExecutionType = flag.String("execution-type", shared.StaticGoal, "execution-type is a string")
@@ -219,6 +222,51 @@ func (c Subscriber) RunAdaptive(startTimer, stopTimer chan bool, toAdapter chan 
 
 	count := 0
 
+	for d := range c.Msgs {
+		err := d.Ack(false) // send ack to broker
+		if err != nil {
+			shared.ErrorHandler(shared.GetFunction(), err.Error())
+		}
+		count++ // increment number of received messages
+		select {
+		//case <-startTimer: // start monitor timer
+		// initialise no. of receive messages
+		//	count = 0
+		case <-stopTimer: // stop monitor timer
+			// send no. of messages to adaptation logic
+			toAdapter <- count
+
+			count = 0
+
+			// receive new pc from adaptation logic
+			c.PC = <-fromAdapter
+
+			// inspect queue
+			/*q, err1 := c.Ch.QueueInspect("rpc_queue")
+			if err1 != nil {
+				shared.ErrorHandler(shared.GetFunction(), "Impossible to inspect the queue")
+				os.Exit(0)
+			}
+			*/
+
+			// configure new pc
+			err := c.Ch.Qos(
+				c.PC, // prefetch count
+				0,    // prefetch size
+				true, // global TODO default is false
+			)
+			if err != nil {
+				shared.ErrorHandler(shared.GetFunction(), "Failed to set QoS")
+			}
+		default:
+		}
+	}
+}
+
+func (c Subscriber) RunAdaptiveOld(startTimer, stopTimer chan bool, toAdapter chan int, fromAdapter chan int) {
+
+	count := 0
+
 	for {
 		select {
 		case <-startTimer: // start monitor timer
@@ -232,20 +280,11 @@ func (c Subscriber) RunAdaptive(startTimer, stopTimer chan bool, toAdapter chan 
 			c.PC = <-fromAdapter
 
 			// inspect queue
-			q, err1 := c.Ch.QueueInspect("rpc_queue")
-			if err1 != nil {
-				shared.ErrorHandler(shared.GetFunction(), "Impossible to inspect the queue size")
-				os.Exit(0)
-			}
-			fmt.Print(q.Messages, " ; ")
-
-			// inspect queue
 			/*q, err1 := c.Ch.QueueInspect("rpc_queue")
 			if err1 != nil {
 				shared.ErrorHandler(shared.GetFunction(), "Impossible to inspect the queue")
 				os.Exit(0)
 			}
-			fmt.Println("Subscriber:: HERE", q.Messages)
 			*/
 
 			// configure new pc

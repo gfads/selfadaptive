@@ -28,7 +28,8 @@ func (c *Controller) Update(p ...float64) float64 {
 	setpoint := p[0]
 	y := p[1] // measured arrival rate
 
-	if y < (setpoint - c.Info.HysteresisBand) { // The system is bellow the goal
+	//	if y < (setpoint - c.Info.HysteresisBand) { // The system is bellow the goal  TODO
+	if y < (setpoint - setpoint*0.20) { // The system is bellow the goal  TODO
 		if y > c.Info.PreviousRate {
 			u = c.Info.PreviousOut + 1
 			//fmt.Printf("Below the goal (Accelerating) [%.4f]", c.Info.OptimumLevel-c.Info.HysteresisBand)
@@ -36,7 +37,8 @@ func (c *Controller) Update(p ...float64) float64 {
 			u = c.Info.PreviousOut * 2
 			//fmt.Printf("Below the goal (Accelerating fast) [%.4f]", c.Info.OptimumLevel-c.Info.HysteresisBand)
 		}
-	} else if y > (setpoint + c.Info.HysteresisBand) { // The system is above the goal
+		//} else if y > (setpoint + c.Info.HysteresisBand) { // The system is above the goal TODO
+	} else if y > (setpoint + c.Info.HysteresisBand*0.20) { // The system is above the goal
 		if y < c.Info.PreviousRate {
 			u = c.Info.PreviousOut - 1
 			//fmt.Printf("Above the goal (Reducing) [%.4f]", c.Info.OptimumLevel+c.Info.HysteresisBand)

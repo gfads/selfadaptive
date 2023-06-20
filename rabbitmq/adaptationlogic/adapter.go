@@ -100,8 +100,8 @@ func (al AdaptationLogic) RunDynamicGoal() {
 			// calculate new arrival rate (msg/s)
 			rate := float64(n) / al.MonitorInterval.Seconds()
 
-			// catch pc and its yielded rate
-			fmt.Println(al.PC, ";", rate, ";", RandomGoal[currentGoalIdx])
+			// catch pc nd its yielded rate
+			fmt.Println(n, ";", al.PC, ";", rate, ";", RandomGoal[currentGoalIdx])
 
 			// invoke controller to calculate new pc
 			pc := int(math.Round(al.Controller.Update(RandomGoal[currentGoalIdx], rate)))

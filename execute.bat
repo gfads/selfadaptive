@@ -1,7 +1,8 @@
 @echo off
 docker stop some-rabbit
 docker rm some-rabbit
-docker run -d --memory="6g" --cpus="3.0" --name some-rabbit -p 5672:5672 rabbitmq
+rem docker run -d --memory="6g" --cpus="3.0" --name some-rabbit -p 5672:5672 rabbitmq
+docker run -d --memory="6g" --cpus="5.0" --name some-rabbit -p 5672:5672 rabbitmq
 timeout /t 10
 
 @echo Removing previous containers
@@ -26,7 +27,7 @@ copy Dockerfile-subscriber Dockerfile
 docker build --tag subscriber .
 rem START /B docker run --memory="2g" --cpus="2.0" subscriber
 rem START docker run --memory="6g" --cpus="3.0" subscriber
-docker run --memory="6g" --cpus="3.0" subscriber
+docker run --memory="1g" --cpus="1.0" subscriber
 
 echo ****** Create and Execute Publisher (Local publisher) ******
 rem copy Dockerfile-publisher Dockerfile

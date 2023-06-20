@@ -43,7 +43,7 @@ func (c *Controller) Update(p ...float64) float64 {
 
 	u = math.Round(c.Info.PC * s / y)
 
-	//fmt.Printf("s/y=%.4f round(s/y)=%v\n", s/y, math.Round(s/y))
+	//fmt.Printf("s/y=%.4f round(s/y)=%.4f\n", c.Info.PC*(y/s), c.Info.PC*(s/y))
 
 	//fmt.Printf("Goal=%v y=%.4f PC=%.4f u=%.4f \n", s, y, c.Info.PC, u)
 

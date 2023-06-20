@@ -31,17 +31,19 @@ func (c *Controller) Initialise(p ...float64) {
 	}
 
 	// hard coded gain scheduling table // TODO
-	c.GainTable[0][0] = 1.0 // kp[0] // P
-	c.GainTable[0][1] = 0.0 // ki[1]
-	c.GainTable[0][2] = 0.0 // kd[2]
+	// AMIGO
+	c.GainTable[0][0] = 0.00101407 // kp[0] // P
+	c.GainTable[0][1] = 0.00213378 // ki[1]
+	c.GainTable[0][2] = 0.00012676 // kd[2]
 
 	//c.GainTable[1][0] = -9600 // kp[0] // PID
 	//c.GainTable[1][1] = 0.5   // ki[1]
 	//c.GainTable[1][2] = 0.01  // kd[2]
 
-	c.GainTable[1][0] = 1.0 // kp[0] // PI
-	c.GainTable[1][1] = 2.0 // ki[1]
-	c.GainTable[1][2] = 0.0 // kd[2]
+	// Root Locus
+	c.GainTable[1][0] = -0.00144086 // kp[0] // PI
+	c.GainTable[1][1] = 0.00248495  // ki[1]
+	c.GainTable[1][2] = 0.00057789  // kd[2]
 
 	kp := c.GainTable[0][0]
 	ki := c.GainTable[0][1]
@@ -71,12 +73,12 @@ func (c *Controller) Update(p ...float64) float64 {
 	// errors
 	err := c.Info.Direction * (r - y)
 
-	// decide about the gain -- based on the capacitor energy level
-	if y < c.Info.GainTrigger {
+	// decide about the gain - based on the plant output
+	if y < c.Info.GainTrigger { // AMIGO
 		c.Info.Kp = c.GainTable[0][0]
 		c.Info.Ki = c.GainTable[0][1]
 		c.Info.Kd = c.GainTable[0][2]
-	} else {
+	} else { // Root Locus
 		c.Info.Kp = c.GainTable[1][0]
 		c.Info.Ki = c.GainTable[1][1]
 		c.Info.Kd = c.GainTable[1][2]
