@@ -44,7 +44,7 @@ ENV GOROOT=/usr/local/go/bin/
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=DeadZonePID", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1",  "-kp=-0.00144086", "-ki=0.00248495", "-kd=0.00057789", "-dead-zone=200.0"]
 
 #************** Execution - PID - Root locus
-CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=BasicPID", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1",  "-kp=-0.00144086", "-ki=0.00248495", "-kd=0.00057789"]
+#CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=BasicPID", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1",  "-kp=-0.00144086", "-ki=0.00248495", "-kd=0.00057789"]
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=StaticGoal", "-controller-type=BasicPID", "-monitor-interval=5", "-prefetch-count=1", "-max=10000", "-min=1", "-set-point=1000", "-direction=1", "-kp=-0.00144086", "-ki=0.00248495", "-kd=0.00057789"]
 
 # Execution - P, PI, PID, PID DeadZone - Ziegler
@@ -96,7 +96,7 @@ CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-contro
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=IncrementalFormPID", "-monitor-interval=5", "-prefetch-count=1",  "-max=10000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00496689", "-ki=0.00248344", "-kd=0.00248344"]
 
 #PID Incremental (Cohen)
-#CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=IncrementalFormPID", "-monitor-interval=5", "-prefetch-count=1",  "-max=10000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00156457", "-ki=0.00148113", "-kd=0.00019962"]
+CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=IncrementalFormPID", "-monitor-interval=5", "-prefetch-count=1",  "-max=10000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00156457", "-ki=0.00148113", "-kd=0.00019962"]
 
 #PID Incremental (AMIGO)
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=IncrementalFormPID", "-monitor-interval=5", "-prefetch-count=1",  "-max=10000", "-min=1", "-set-point=1000", "-direction=1",  "-kp=0.00101407", "-ki=0.00213378", "-kd=0.00012676"]

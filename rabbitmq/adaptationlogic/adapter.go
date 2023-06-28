@@ -636,6 +636,8 @@ func CalculateZieglerGains(info TrainingInfo) TrainingInfo {
 		info.Kp = 1.2 * tau / K * L
 		info.Ki = info.Kp / ti
 		info.Kd = info.Kp * td
+
+		fmt.Println(info.Ki, info.Kd, L)
 	}
 	return info
 }

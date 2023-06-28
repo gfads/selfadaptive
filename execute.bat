@@ -29,7 +29,7 @@ rem START /B docker run --memory="2g" --cpus="2.0" subscriber
 rem START docker run --memory="6g" --cpus="3.0" subscriber
 docker run --memory="1g" --cpus="1.0" subscriber
 
-echo ****** Create and Execute Publisher (Local publisher) ******
+rem echo ****** Create and Execute Publisher (Local publisher) ******
 rem copy Dockerfile-publisher Dockerfile
 rem docker build --tag publisher .
 rem START /B docker run publisher
