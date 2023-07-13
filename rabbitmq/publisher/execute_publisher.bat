@@ -14,6 +14,7 @@ rem compile publisher
 c:
 cd C:\Users\user\go\selfadaptive\rabbitmq\publisher
 go build -o client.exe main.go
+for
 go run main.go -message-size=256 -sample-size=20000 -mean-request-time=25 -std-dev-mean-request-time=2 -number-of-clients=100
 cd C:\Users\user\go\selfadaptive\rabbitmq\publisher
 
