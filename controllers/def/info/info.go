@@ -27,4 +27,5 @@ type Controller struct {
 	GainTrigger            float64 // Gain trigger based on two level gains
 	PC                     float64 // for HPA only
 	PreviousRate           float64 // for AsTAR
+	Beta                   float64 // for controller with two degrees of freedom
 }

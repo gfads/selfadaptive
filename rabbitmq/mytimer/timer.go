@@ -19,7 +19,7 @@ func NewMyTimer(d int, chStartTimer, chStopTimer chan bool) MyTimer {
 
 func (t MyTimer) RunMyTimer() {
 	for {
-		//t.ChStartTimer <- true
+		t.ChStartTimer <- true
 		time.Sleep(t.D)
 		t.ChStopTimer <- true
 	}

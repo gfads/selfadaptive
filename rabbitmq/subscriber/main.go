@@ -30,6 +30,7 @@ type ExecutionParameters struct {
 	HysteresisBand  *float64
 	Direction       *float64
 	GainTrigger     *float64
+	Beta            *float64
 }
 
 type Subscriber struct {
@@ -45,23 +46,8 @@ func main() {
 
 	runtime.GOMAXPROCS(1) // TODO
 
-	p := ExecutionParameters{}
-	p.ExecutionType = flag.String("execution-type", shared.StaticGoal, "execution-type is a string")
-	p.IsAdaptive = flag.Bool("is-adaptive", false, "is-adaptive is a boolean")
-	p.ControllerType = flag.String("controller-type", "OnOff", "controller-type is a string")
-	p.MonitorInterval = flag.Int("monitor-interval", 1, "monitor-interval is an int (s)")
-	p.SetPoint = flag.Float64("set-point", 3000.0, "set-point is a float (goal rate)")
-	p.Kp = flag.Float64("kp", 1.0, "Kp is a float")
-	p.Ki = flag.Float64("ki", 1.0, "Ki is a float")
-	p.Kd = flag.Float64("kd", 1.0, "Kd is a float")
-	p.PrefetchCount = flag.Int("prefetch-count", 1, "prefetch-count is an int")
-	p.Min = flag.Float64("min", 0.0, "min is a float")
-	p.Max = flag.Float64("max", 100.0, "max is a float")
-	p.DeadZone = flag.Float64("dead-zone", 0.0, "dead-zone is a float")
-	p.HysteresisBand = flag.Float64("hysteresis-band", 0.0, "hysteresis-band is a float")
-	p.Direction = flag.Float64("direction", 1.0, "direction is a float")
-	p.GainTrigger = flag.Float64("gain-trigger", 1.0, "gain trigger is a float")
-	flag.Parse()
+	// load parameters
+	p := loadParameters()
 
 	// validate parameters
 	validateParameters(p) // TODO
@@ -96,7 +82,7 @@ func main() {
 	if *p.IsAdaptive {
 
 		// Create & start adaptation logic
-		c := info.Controller{TypeName: *p.ControllerType, Direction: *p.Direction, PC: float64(*p.PrefetchCount), Min: *p.Min, Max: *p.Max, Kp: *p.Kp, Ki: *p.Ki, Kd: *p.Kd, DeadZone: *p.DeadZone, HysteresisBand: *p.HysteresisBand, GainTrigger: *p.GainTrigger}
+		c := info.Controller{TypeName: *p.ControllerType, Direction: *p.Direction, PC: float64(*p.PrefetchCount), Min: *p.Min, Max: *p.Max, Kp: *p.Kp, Ki: *p.Ki, Kd: *p.Kd, DeadZone: *p.DeadZone, HysteresisBand: *p.HysteresisBand, GainTrigger: *p.GainTrigger, Beta: *p.Beta}
 		adapter := adaptationlogic.NewAdaptationLogic(*p.ExecutionType, toAdapter, fromAdapter, c, *p.SetPoint, time.Duration(*p.MonitorInterval), *p.PrefetchCount)
 		go adapter.Run() // normal execution
 
@@ -108,103 +94,12 @@ func main() {
 		consumer.RunAdaptive(startTimer, stopTimer, toAdapter, fromAdapter)
 	} else {
 		// run non-adaptive consumer
-		consumer.RunNonAdaptive()
+		//consumer.RunNonAdaptive()
+		// Create timer
+		t := mytimer.NewMyTimer(*p.MonitorInterval, startTimer, stopTimer)
+		go t.RunMyTimer()
+		consumer.RunNonAdaptiveMonitored(startTimer, stopTimer, p)
 	}
-}
-
-func validateParameters(p ExecutionParameters) {
-	if *p.Direction != 1.0 && *p.Direction != -1.0 {
-		shared.ErrorHandler(shared.GetFunction(), "Direction invalid")
-	}
-}
-
-func showParameters(p ExecutionParameters) {
-
-	// validate execution type
-	fmt.Println("************************************************")
-	fmt.Printf("Execution Type  : %v\n", *p.ExecutionType)
-	fmt.Printf("Is Adaptive?    : %v\n", *p.IsAdaptive)
-	fmt.Printf("Controller Type : %v\n", *p.ControllerType)
-	fmt.Printf("Monitor Interval: %v\n", *p.MonitorInterval)
-	fmt.Printf("Goal            : %.4f\n", *p.SetPoint)
-	fmt.Printf("Prefetch Count  : %v\n", *p.PrefetchCount)
-	fmt.Printf("Direction       : %.1f\n", *p.Direction)
-
-	switch *p.ControllerType {
-	case shared.AsTAR:
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-		fmt.Printf("Hysteresis Band : %.4f\n", *p.HysteresisBand)
-	case shared.BasicOnoff:
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-	case shared.DeadZoneOnoff:
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-		fmt.Printf("Dead Zone       : %.4f\n", *p.DeadZone)
-	case shared.HysteresisOnoff:
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-		fmt.Printf("Hystereis Band  : %.4f\n", *p.HysteresisBand)
-	case shared.BasicP:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-	case shared.BasicPi:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-	case shared.BasicPid:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-	case shared.SmoothingPid:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-	case shared.IncrementalFormPid:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-	case shared.ErrorSquarePid:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-	case shared.DeadZonePid:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-		fmt.Printf("Dead Zone       : %.4f\n", *p.DeadZone)
-	case shared.GainScheduling:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-		fmt.Printf("Gain Trigger    : %.4f\n", *p.GainTrigger)
-	case shared.HPA:
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-		fmt.Printf("PC           : %v\n", *p.PrefetchCount)
-	default:
-		fmt.Println(shared.GetFunction(), "Controller type", *p.ControllerType, " is invalid")
-		os.Exit(0)
-	}
-	fmt.Println("************************************************")
 }
 
 func (c Subscriber) RunNonAdaptive() {
@@ -214,6 +109,33 @@ func (c Subscriber) RunNonAdaptive() {
 		err := d.Ack(false) // send ack to broker
 		if err != nil {
 			shared.ErrorHandler(shared.GetFunction(), err.Error())
+		}
+	}
+}
+
+func (c Subscriber) RunNonAdaptiveMonitored(startTimer, stopTimer chan bool, p ExecutionParameters) {
+	count := 0
+	for d := range c.Msgs {
+		err := d.Ack(false) // send ack to broker
+		if err != nil {
+			shared.ErrorHandler(shared.GetFunction(), err.Error())
+		}
+		count++ // increment number of received messages
+		select {
+		case <-startTimer: // start monitor timer
+			// initialise no. of receive messages
+			count = 0
+		case <-stopTimer: // stop monitor timer
+			rate := count / *p.MonitorInterval
+			fmt.Println(0, ";", *p.PrefetchCount, ";", rate)
+			// inspect queue
+			/*q, err1 := c.Ch.QueueInspect("rpc_queue")
+			if err1 != nil {
+				shared.ErrorHandler(shared.GetFunction(), "Impossible to inspect the queue")
+				os.Exit(0)
+			}
+			*/
+		default:
 		}
 	}
 }
@@ -229,14 +151,12 @@ func (c Subscriber) RunAdaptive(startTimer, stopTimer chan bool, toAdapter chan 
 		}
 		count++ // increment number of received messages
 		select {
-		//case <-startTimer: // start monitor timer
-		// initialise no. of receive messages
-		//	count = 0
+		case <-startTimer: // start monitor timer
+			// initialise no. of receive messages
+			count = 0
 		case <-stopTimer: // stop monitor timer
 			// send no. of messages to adaptation logic
 			toAdapter <- count
-
-			count = 0
 
 			// receive new pc from adaptation logic
 			c.PC = <-fromAdapter
@@ -375,4 +295,131 @@ func NewConsumer(isAdaptive bool, pc int) Subscriber {
 	s := Subscriber{IsAdaptive: isAdaptive, PC: pc}
 
 	return s
+}
+
+func loadParameters() ExecutionParameters {
+	p := ExecutionParameters{}
+
+	p.ExecutionType = flag.String("execution-type", shared.StaticGoal, "execution-type is a string")
+	p.IsAdaptive = flag.Bool("is-adaptive", false, "is-adaptive is a boolean")
+	p.ControllerType = flag.String("controller-type", "OnOff", "controller-type is a string")
+	p.MonitorInterval = flag.Int("monitor-interval", 1, "monitor-interval is an int (s)")
+	p.SetPoint = flag.Float64("set-point", 3000.0, "set-point is a float (goal rate)")
+	p.Kp = flag.Float64("kp", 1.0, "Kp is a float")
+	p.Ki = flag.Float64("ki", 1.0, "Ki is a float")
+	p.Kd = flag.Float64("kd", 1.0, "Kd is a float")
+	p.PrefetchCount = flag.Int("prefetch-count", 1, "prefetch-count is an int")
+	p.Min = flag.Float64("min", 0.0, "min is a float")
+	p.Max = flag.Float64("max", 100.0, "max is a float")
+	p.DeadZone = flag.Float64("dead-zone", 0.0, "dead-zone is a float")
+	p.HysteresisBand = flag.Float64("hysteresis-band", 0.0, "hysteresis-band is a float")
+	p.Direction = flag.Float64("direction", 1.0, "direction is a float")
+	p.GainTrigger = flag.Float64("gain-trigger", 1.0, "gain trigger is a float")
+	p.Beta = flag.Float64("beta", 1.0, "Beta is a float (used in PI controllers with two degrees of freedom")
+	flag.Parse()
+
+	return p
+}
+
+func validateParameters(p ExecutionParameters) {
+	if *p.Direction != 1.0 && *p.Direction != -1.0 {
+		shared.ErrorHandler(shared.GetFunction(), "Direction invalid")
+	}
+}
+
+func showParameters(p ExecutionParameters) {
+
+	// validate execution type
+	fmt.Println("************************************************")
+	fmt.Printf("Execution Type  : %v\n", *p.ExecutionType)
+	fmt.Printf("Is Adaptive?    : %v\n", *p.IsAdaptive)
+	fmt.Printf("Controller Type : %v\n", *p.ControllerType)
+	fmt.Printf("Monitor Interval: %v\n", *p.MonitorInterval)
+	fmt.Printf("Goal            : %.4f\n", *p.SetPoint)
+	fmt.Printf("Prefetch Count  : %v\n", *p.PrefetchCount)
+	fmt.Printf("Direction       : %.1f\n", *p.Direction)
+
+	switch *p.ControllerType {
+	case shared.AsTAR:
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+		fmt.Printf("Hysteresis Band : %.4f\n", *p.HysteresisBand)
+	case shared.BasicOnoff:
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+	case shared.DeadZoneOnoff:
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+		fmt.Printf("Dead Zone       : %.4f\n", *p.DeadZone)
+	case shared.HysteresisOnoff:
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+		fmt.Printf("Hystereis Band  : %.4f\n", *p.HysteresisBand)
+	case shared.BasicP:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+	case shared.BasicPi:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+	case shared.BasicPid:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+	case shared.SmoothingPid:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+	case shared.IncrementalFormPid:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+	case shared.ErrorSquarePid:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+	case shared.DeadZonePid:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+		fmt.Printf("Dead Zone       : %.4f\n", *p.DeadZone)
+	case shared.GainScheduling:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+		fmt.Printf("Gain Trigger    : %.4f\n", *p.GainTrigger)
+	case shared.HPA:
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+		fmt.Printf("PC           : %v\n", *p.PrefetchCount)
+	case shared.PIwithTwoDegreesOfFreedom:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+		fmt.Printf("Beta            : %.4f\n", *p.Beta)
+
+	default:
+		fmt.Println(shared.GetFunction(), "Controller type", *p.ControllerType, " is invalid")
+		os.Exit(0)
+	}
+	fmt.Println("************************************************")
 }

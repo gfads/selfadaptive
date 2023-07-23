@@ -21,7 +21,8 @@ var IncreasingGoal = []float64{500, 1000.0, 1250.0, 1500.0, 1750.0, 2000.0, 2250
 
 //var RandomGoal = []float64{500.0, 900.0, 1250.0, 1300.0, 300.0, 800.0, 1000.0, 400.0, 500.0, 1000.0, 2000.0, 1500.0, 500.0, 1100.0, 1500.0, 600.0, 3000.0}
 
-var RandomGoal = []float64{405, 1536, 2918, 3238, 2194, 775, 330, 1280, 2724, 3291, 2442, 984, 300, 1041, 2502, 3297, 2671}
+// sin
+var RandomGoal = []float64{363, 1042, 1871, 2063, 1436, 585, 318, 888, 1754, 2094, 1585, 710, 300, 744, 1621, 2098, 1722}
 
 var L = 1.0
 var tau = 1.0
@@ -76,6 +77,8 @@ func (al AdaptationLogic) Run() {
 		//al.ZieglerTraining() // TODO
 	case shared.OnLineTraining:
 		al.RunOnlineTraining()
+	case shared.WebTraining:
+		al.PIDTunerWeb()
 	default:
 		fmt.Println("Execution type ´", al.ExecutionType, "´ is invalid")
 		os.Exit(0)
@@ -122,6 +125,48 @@ func (al AdaptationLogic) RunDynamicGoal() {
 				}
 			}
 		}
+	}
+}
+
+// Just generate data to be used at pidtuner.com - no calculation of control gains is made
+func (al AdaptationLogic) PIDTunerWeb() {
+
+	var totalTime float64
+
+	// warm up phase
+	time.Sleep(WarmupTime * time.Second)
+
+	// discard first measurement
+	<-al.FromBusiness // receive no. of messages from business
+	al.ToBusiness <- al.PC
+
+	// loop of adaptation logic
+	nSameLevel := 1
+	for {
+
+		n := <-al.FromBusiness // receive no. of messages from business
+
+		// calculate new arrival rate (msg/s)
+		rate := float64(n) / al.MonitorInterval.Seconds()
+
+		fmt.Println(totalTime, ";", al.PC, ";", rate)
+
+		// next pc training
+		nSameLevel++
+		totalTime += al.MonitorInterval.Seconds()
+
+		if nSameLevel > 30 {
+			nSameLevel = 0
+			al.PC += 1
+		}
+
+		if totalTime > 5000 {
+			fmt.Println("End of experiments - copy and paste data")
+			time.Sleep(10 * time.Hour)
+		}
+
+		// send pc to business
+		al.ToBusiness <- al.PC
 	}
 }
 

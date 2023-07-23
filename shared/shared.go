@@ -36,6 +36,7 @@ const ZieglerTraining = "ZieglerTraining"
 const CohenTraining = "CohenTraining"
 const AMIGOTraining = "AMIGOTraining"
 const OnLineTraining = "OnlineTraining"
+const WebTraining = "WebTraining"
 
 // Controller type names
 const BasicOnoff = "OnOff"
@@ -50,6 +51,7 @@ const IncrementalFormPid = "IncrementalFormPID"
 const ErrorSquarePid = "ErrorSquarePID"
 const DeadZonePid = "DeadZonePID"
 const GainScheduling = "GainScheduling"
+const PIwithTwoDegreesOfFreedom = "PIWithTwoDegreesOfFreedom"
 
 const AsTAR = "AsTAR"
 const HPA = "HPA"
