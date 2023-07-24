@@ -15,11 +15,11 @@ import (
 	"os"
 )
 
-//See page 44 The factor DeltaTime is the length of time between
-//successive  control actions, expressed in the units in which
-//we measure time. (If we measure time in seconds and make 100
-//control actions per second, then δt = 0.01; if we measure time
-//in days and make one update per day, then δt = 1.)
+// See page 44: The factor DeltaTime is the length of time between
+// successive  control actions, expressed in the units in which
+// we measure time. (If we measure time in seconds and make 100
+// control actions per second, then Delta time = 0.01; if we measure time
+// in days and make one update per day, then Delta time = 1.)
 
 const DeltaTime = 1
 
