@@ -15,7 +15,13 @@ import (
 	"os"
 )
 
-const DeltaTime = 1 // see page 103
+//See page 44 The factor DeltaTime is the length of time between
+//successive  control actions, expressed in the units in which
+//we measure time. (If we measure time in seconds and make 100
+//control actions per second, then δt = 0.01; if we measure time
+//in days and make one update per day, then δt = 1.)
+
+const DeltaTime = 1
 
 type Controller struct {
 	Info info.Controller
