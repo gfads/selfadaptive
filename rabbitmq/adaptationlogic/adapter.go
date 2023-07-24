@@ -71,10 +71,10 @@ func (al AdaptationLogic) Run() {
 		al.RunDynamicGoal()
 	case shared.RootLocusTraining:
 		al.RootLocusTraining()
-	case shared.ZieglerTraining:
+	case shared.ZieglerTraining: // all non-analytical tune methods
 		al.ZieglerTraining()
-	case shared.CohenTraining:
-		//al.ZieglerTraining() // TODO
+	//case shared.CohenTraining:
+	//al.ZieglerTraining() // TODO
 	case shared.OnLineTraining:
 		al.RunOnlineTraining()
 	case shared.WebTraining:
@@ -312,7 +312,7 @@ func (al AdaptationLogic) ZieglerTraining() {
 	//toAdjuster := make(chan TrainingInfo)
 	count := 0
 	info := TrainingInfo{TypeName: al.TrainingInfo.TypeName}
-	PCS := []int{1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2}
+	InputSteps := []int{1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2}
 
 	// create & execute adjustment mechanism
 	//go AdjustmentMechanism(fromAdjuster, toAdjuster, al.SetPoint)
@@ -321,8 +321,8 @@ func (al AdaptationLogic) ZieglerTraining() {
 	time.Sleep(WarmupTime * time.Second)
 
 	// discard first measurement
-	<-al.FromBusiness       // receive no. of messages from business
-	al.ToBusiness <- PCS[0] // Configure PC to execute the Ziegler Steps
+	<-al.FromBusiness              // receive no. of messages from business
+	al.ToBusiness <- InputSteps[0] // Configure PC to execute the Ziegler Steps
 
 	// loop of adaptation logic
 	for {
@@ -336,10 +336,10 @@ func (al AdaptationLogic) ZieglerTraining() {
 		i := AdjustmenstInfo{PC: al.PC, Rate: rate}
 		info.Data = append(info.Data, i)
 
-		if count < len(PCS)-1 {
+		if count < len(InputSteps)-1 {
 			count++
 			// configure next PC
-			al.PC = PCS[count]
+			al.PC = InputSteps[count]
 
 		} else { // training is over
 			info = CalculateZieglerGains(info)
@@ -646,86 +646,86 @@ func CalculateRootLocusGains(info TrainingInfo) TrainingInfo {
 
 func CalculateZieglerGains(info TrainingInfo) TrainingInfo {
 
-	sumRate1 := 0.0
-	sumRate2 := 0.0
+	sumDeltaY1 := 0.0
+	sumDeltaY2 := 0.0
 
-	for i := 2; i < len(info.Data); i++ { // discard 2 initial measurements, i.e., 5 samples
+	for i := 2; i < len(info.Data); i++ { // discard 2 initial input steps, i.e., 5 samples
 		if i%2 == 0 {
-			sumRate1 += info.Data[i].Rate
+			sumDeltaY1 += info.Data[i].Rate
 		} else {
-			sumRate2 += info.Data[i].Rate
+			sumDeltaY2 += info.Data[i].Rate
 		}
 	}
 
 	fmt.Println("************")
-	dataSize := float64((len(info.Data) - 2) / 2.0) // discard 2 initial measurements
-	meanRate1 := sumRate1 / dataSize
-	meanRate2 := sumRate2 / dataSize
-
-	diffRate := meanRate2 - meanRate1
-	K := diffRate
+	dataSize := float64((len(info.Data) - 2) / 2.0) // discard 2 initial input steps
+	k1 := sumDeltaY1 / dataSize
+	k2 := sumDeltaY2 / dataSize
+	K := k2 - k1
+	lambda := K * tau / T // see Figure 9-2
 
 	switch info.TypeName {
 	case shared.BasicP:
-		info.Kp = tau / K * L
+		k := 1 / lambda
+		info.Kp = k
 		info.Ki = 0.0
 		info.Kd = 0.0
 	case shared.BasicPi:
-		ti := L / 0.3
-		info.Kp = 0.9 * tau / K * L
-		info.Ki = info.Kp / ti
+		k := 0.9 / lambda
+		Ti := 3.0 * tau
+		info.Kp = k
+		info.Ki = k / Ti
 		info.Kd = 0.0
 	case shared.BasicPid:
-		ti := 2 * L
-		td := 0.5 * L
-		info.Kp = 1.2 * tau / K * L
-		info.Ki = info.Kp / ti
-		info.Kd = info.Kp * td
-
-		fmt.Println(info.Ki, info.Kd, L)
+		k := 1.2 / lambda
+		Ti := 2.0 * tau
+		Td := tau / 2.0
+		info.Kp = k
+		info.Ki = k / Ti
+		info.Kd = k * Td
 	}
 	return info
 }
 
 func CalculateCohenGains(info TrainingInfo) TrainingInfo {
 
-	sumRate1 := 0.0
-	sumRate2 := 0.0
+	sumDeltaY1 := 0.0
+	sumDeltaY2 := 0.0
 
 	for i := 2; i < len(info.Data); i++ { // discard 2 initial measurements, i.e., 5 samples
 		if i%2 == 0 {
-			sumRate1 += info.Data[i].Rate
+			sumDeltaY1 += info.Data[i].Rate
 		} else {
-			sumRate2 += info.Data[i].Rate
+			sumDeltaY2 += info.Data[i].Rate
 		}
 	}
 
 	fmt.Println("************")
 	dataSize := float64((len(info.Data) - 2) / 2.0) // discard 2 initial measurements
-	meanRate1 := sumRate1 / dataSize
-	meanRate2 := sumRate2 / dataSize
-
-	diffRate := meanRate2 - meanRate1
-
-	K := diffRate
+	k1 := sumDeltaY1 / dataSize
+	k2 := sumDeltaY2 / dataSize
+	K := k2 - k1
 	theta := tau / (tau + T)
 
 	switch info.TypeName {
 	case shared.BasicP:
-		info.Kp = 1 / K * (1 + (0.35 * theta / (1 - theta))) * T / tau
+		k := 1 / K * (1 + (0.35 * theta / (1 - theta))) * T / tau
+		info.Kp = k
 		info.Ki = 0.0
 		info.Kd = 0.0
 	case shared.BasicPi:
-		ti := ((3.3 - 3.0*theta) / (1 + 1.2*theta)) * tau
-		info.Kp = 0.9 / K * (1 + (0.92 * theta / (1 - theta))) * T / tau
-		info.Ki = info.Kp / ti
+		k := 0.9 / K * (1 + (0.92 * theta / (1 - theta))) * T / tau
+		Ti := ((3.3 - 3.0*theta) / (1 + 1.2*theta)) * tau
+		info.Kp = k
+		info.Ki = k / Ti
 		info.Kd = 0.0
 	case shared.BasicPid:
-		ti := ((2.5 - 2.0*theta) / (1 - 0.39*theta)) * tau
-		td := ((0.37 * (1 - theta)) / (1 - 0.81*theta)) * tau
-		info.Kp = 1.35 / K * (1 + (0.18 * theta / (1 - theta))) * T / tau
-		info.Ki = info.Kp / ti
-		info.Kd = info.Kp * td
+		k := 1.35 / K * (1 + (0.18 * theta / (1 - theta))) * T / tau
+		Ti := ((2.5 - 2.0*theta) / (1 - 0.39*theta)) * tau
+		Td := (0.37 * (1 - theta) / (1 - 0.81*theta)) * tau
+		info.Kp = k
+		info.Ki = k / Ti
+		info.Kd = k * Td
 	}
 
 	return info
@@ -733,37 +733,37 @@ func CalculateCohenGains(info TrainingInfo) TrainingInfo {
 
 func CalculateAMIGOGains(info TrainingInfo) TrainingInfo {
 
-	sumRate1 := 0.0
-	sumRate2 := 0.0
+	sumDeltaY1 := 0.0
+	sumDeltaY2 := 0.0
 
 	for i := 2; i < len(info.Data); i++ { // discard 2 initial measurements, i.e., 5 samples
 		if i%2 == 0 {
-			sumRate1 += info.Data[i].Rate
+			sumDeltaY1 += info.Data[i].Rate
 		} else {
-			sumRate2 += info.Data[i].Rate
+			sumDeltaY2 += info.Data[i].Rate
 		}
 	}
 
 	fmt.Println("************")
 	dataSize := float64((len(info.Data) - 2) / 2.0) // discard 2 initial measurements
-	meanRate1 := sumRate1 / dataSize
-	meanRate2 := sumRate2 / dataSize
-
-	diffRate := meanRate2 - meanRate1
-	K := diffRate
+	k1 := sumDeltaY1 / dataSize
+	k2 := sumDeltaY2 / dataSize
+	K := k2 - k1
 
 	switch info.TypeName {
 	case shared.BasicPi:
-		ti := (0.35 + 13*math.Pow(T, 2)/(math.Pow(T, 2)+12*tau*T+7*math.Pow(tau, 2))) * tau
-		info.Kp = 1 / K * (0.15 + (0.35-tau*T/math.Pow(tau+T, 2))*T/tau)
-		info.Ki = info.Kp / ti
+		k := 1 / K * (0.15 + (0.35-tau*T/math.Pow(tau+T, 2))*T/tau)
+		Ti := (0.35 + 13*math.Pow(T, 2)/(math.Pow(T, 2)+12*tau*T+7*math.Pow(tau, 2))) * tau
+		info.Kp = k
+		info.Ki = k / Ti
 		info.Kd = 0.0
 	case shared.BasicPid:
-		ti := ((0.4*tau + 0.8*T) / (tau + 0.1*T)) * tau
-		td := (0.5 * T / (0.3*tau + T)) * tau
-		info.Kp = 1 / K * (0.2 + 0.45*T/tau)
-		info.Ki = info.Kp / ti
-		info.Kd = info.Kp * td
+		k := 1 / K * (0.2 + 0.45*T/tau)
+		Ti := ((0.4*tau + 0.8*T) / (tau + 0.1*T)) * tau
+		Td := (0.5 * T / (0.3*tau + T)) * tau
+		info.Kp = k
+		info.Ki = k / Ti
+		info.Kd = k * Td
 	}
 	return info
 }
