@@ -19,6 +19,7 @@ import (
 	deadzonepid "main.go/controllers/pid/deadzone"
 	errorsquarepid "main.go/controllers/pid/errorsquarefull"
 	incrementalpid "main.go/controllers/pid/incremental"
+	"main.go/controllers/pid/setpointweighting"
 	smoothingpid "main.go/controllers/pid/smoothing"
 	"main.go/controllers/pid/twodegrees"
 	"main.go/controllers/pid/windup"
@@ -96,7 +97,10 @@ func NewController(i info.Controller) IController {
 		c := windup.Controller{}
 		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd)
 		return &c
-
+	case shared.SetpointWeighting:
+		c := setpointweighting.Controller{}
+		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd, i.Alfa, i.Beta)
+		return &c
 	default:
 		fmt.Println(shared.GetFunction(), "Error: Controller type ´", i.TypeName, "´ is unknown!")
 		os.Exit(0)

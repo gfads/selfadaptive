@@ -14,8 +14,8 @@ import (
 )
 
 const DeltaTime = 1 // see page 103
-const Alfa = 1.00   // Alfa > 0
-const Beta = 0.50   // Beta < 1
+//const Alfa = 1.0    // Alfa > 0
+//const Beta = 0.5    // Beta < 1
 
 type Controller struct {
 	Info info.Controller
@@ -23,8 +23,8 @@ type Controller struct {
 
 func (c *Controller) Initialise(p ...float64) {
 
-	if len(p) < 7 {
-		fmt.Printf("Error: '%s' controller requires 7 info (direction,min,max,kp,ki,kd,beta) \n", shared.BasicPid)
+	if len(p) < 8 {
+		fmt.Printf("Error: '%s' controller requires 8 info (direction,min,max,kp,ki,kd,alfa,beta) \n", shared.BasicPid)
 		os.Exit(0)
 	}
 
@@ -35,7 +35,8 @@ func (c *Controller) Initialise(p ...float64) {
 	c.Info.Kp = p[3]
 	c.Info.Ki = p[4]
 	c.Info.Kd = p[5]
-	c.Info.Beta = p[6]
+	c.Info.Alfa = p[6]
+	c.Info.Beta = p[7]
 
 	c.Info.Integrator = 0.0
 	c.Info.PreviousError = 0.0
@@ -54,14 +55,14 @@ func (c *Controller) Update(p ...float64) float64 {
 	err := c.Info.Direction * (r - y)
 
 	// Proportional
-	proportional := c.Info.Kp * c.Info.Direction * (Alfa*r - y)
+	proportional := c.Info.Kp * c.Info.Direction * (c.Info.Alfa*r - y)
 
 	// Integrator (page 49)
 	c.Info.Integrator += DeltaTime * err
 	integrator := c.Info.Integrator * c.Info.Ki
 
 	// Differentiator (page 108)
-	differentiator := c.Info.Kd * ((1-Beta)*r - y - c.Info.PreviousError) / DeltaTime
+	differentiator := c.Info.Kd * ((1-c.Info.Beta)*r - y - c.Info.PreviousError) / DeltaTime
 
 	// control law
 	c.Info.Out = proportional + integrator + differentiator

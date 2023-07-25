@@ -52,14 +52,15 @@ type AdaptationLogic struct {
 	PC              int
 	ExecutionType   string
 	TrainingInfo    TrainingInfo
+	File            *os.File
 }
 
-func NewAdaptationLogic(executionType string, chFromBusiness chan int, chToBusiness chan int, info info.Controller, setPoint float64, monitorInterval time.Duration, pc int) AdaptationLogic {
+func NewAdaptationLogic(executionType string, chFromBusiness chan int, chToBusiness chan int, info info.Controller, setPoint float64, monitorInterval time.Duration, pc int, f *os.File) AdaptationLogic {
 
 	c := ops.NewController(info)
 	i := TrainingInfo{Kp: info.Kp, Ki: info.Ki, Kd: info.Kd, Data: []AdjustmenstInfo{}, TypeName: info.TypeName, SetPoint: setPoint, PC: pc}
 
-	return AdaptationLogic{ExecutionType: executionType, TrainingInfo: i, FromBusiness: chFromBusiness, ToBusiness: chToBusiness, Controller: c, SetPoint: setPoint, MonitorInterval: monitorInterval * time.Second, PC: pc}
+	return AdaptationLogic{ExecutionType: executionType, TrainingInfo: i, FromBusiness: chFromBusiness, ToBusiness: chToBusiness, Controller: c, SetPoint: setPoint, MonitorInterval: monitorInterval * time.Second, PC: pc, File: f}
 }
 
 func (al AdaptationLogic) Run() {
@@ -103,7 +104,8 @@ func (al AdaptationLogic) RunDynamicGoal() {
 			// calculate new arrival rate (msg/s)
 			rate := float64(n) / al.MonitorInterval.Seconds()
 
-			// catch pc nd its yielded rate
+			// catch pc and its yielded rate
+			fmt.Fprintf(al.File, "%d;%d;%f;%f\n", n, al.PC, rate, RandomGoal[currentGoalIdx])
 			fmt.Println(n, ";", al.PC, ";", rate, ";", RandomGoal[currentGoalIdx])
 
 			// invoke controller to calculate new pc
@@ -115,13 +117,16 @@ func (al AdaptationLogic) RunDynamicGoal() {
 			// send new pc to business
 			al.ToBusiness <- al.PC
 
-			// change goal
+			// check the need for changing the setpoint
 			if count >= SizeOfSameLevel {
 				count = 0
 				currentGoalIdx++
 				if currentGoalIdx >= len(RandomGoal) {
-					fmt.Println("********** Copy/paste data of the experiments **********")
-					time.Sleep(10 * time.Hour)
+					//fmt.Println("********** Copy/paste data of the experiments **********")
+					fmt.Println("********** End of experiment **********")
+					//time.Sleep(10 * time.Hour)
+					al.File.Close()
+					os.Exit(0)
 				}
 			}
 		}

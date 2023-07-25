@@ -53,6 +53,7 @@ const DeadZonePid = "DeadZonePID"
 const GainScheduling = "GainScheduling"
 const PIwithTwoDegreesOfFreedom = "PIWithTwoDegreesOfFreedom"
 const WindUp = "WindUp"
+const SetpointWeighting = "SetpointWeighting"
 
 const RootLocus = "RootLocus"
 const Ziegler = "Ziegler"

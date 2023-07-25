@@ -12,25 +12,12 @@ docker rm publisher
 docker stop subscriber
 docker rm subscriber
 
-rem set clients=1
-rem :loop
-rem  START /B docker run publisher
-rem  set /a clients=clients-1
-rem  if %clients%==0 goto exitloop
-rem  goto loop
-rem :exitloop
-
-timeout /t 10
-
-echo ****** Create and Execute Subscriber ******
-copy Dockerfile-subscriber Dockerfile
+echo ****** Create and Execute Subscriber 1 ******
+copy Dockerfile-sub-setpoint-cohen Dockerfile
 docker build --tag subscriber .
-rem START /B docker run --memory="2g" --cpus="2.0" subscriber
-rem START docker run --memory="6g" --cpus="3.0" subscriber
-docker run --memory="1g" --cpus="1.0" subscriber
+docker run --memory="1g" --cpus="1.0" -v C:\Users\user\go\selfadaptive\rabbitmq\data:/app/data subscriber
 
-rem echo ****** Create and Execute Publisher (Local publisher) ******
-rem copy Dockerfile-publisher Dockerfile
-rem docker build --tag publisher .
-rem START /B docker run publisher
-rem docker run publisher
+echo ****** Create and Execute Subscriber 2 ******
+copy Dockerfile-sub-setpoint-amigo Dockerfile
+docker build --tag subscriber .
+docker run --memory="1g" --cpus="1.0" -v C:\Users\user\go\selfadaptive\rabbitmq\data:/app/data subscriber

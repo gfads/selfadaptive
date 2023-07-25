@@ -31,6 +31,7 @@ type ExecutionParameters struct {
 	HysteresisBand  *float64
 	Direction       *float64
 	GainTrigger     *float64
+	Alfa            *float64
 	Beta            *float64
 }
 
@@ -49,6 +50,14 @@ func main() {
 
 	// load parameters
 	p := loadParameters()
+
+	// define and open log file name
+	fileName := "raw-sin-" + *p.ControllerType + "-" + *p.Tunning + ".csv"
+	dirDocker := "/app/data" // it is mapped into windows dir "C:\Users\user\go\selfadaptive\rabbitmq\data" (see execute.bat)
+	f, err := os.Create(dirDocker + "/" + fileName)
+	if err != nil {
+		shared.ErrorHandler(shared.GetFunction(), err.Error())
+	}
 
 	// validate parameters
 	validateParameters(p) // TODO
@@ -81,10 +90,9 @@ func main() {
 	stopTimer := make(chan bool)  // stop timer
 
 	if *p.IsAdaptive {
-
 		// Create & start adaptation logic
-		c := info.Controller{TypeName: *p.ControllerType, Direction: *p.Direction, PC: float64(*p.PrefetchCount), Min: *p.Min, Max: *p.Max, Kp: *p.Kp, Ki: *p.Ki, Kd: *p.Kd, DeadZone: *p.DeadZone, HysteresisBand: *p.HysteresisBand, GainTrigger: *p.GainTrigger, Beta: *p.Beta}
-		adapter := adaptationlogic.NewAdaptationLogic(*p.ExecutionType, toAdapter, fromAdapter, c, *p.SetPoint, time.Duration(*p.MonitorInterval), *p.PrefetchCount)
+		c := info.Controller{TypeName: *p.ControllerType, Direction: *p.Direction, PC: float64(*p.PrefetchCount), Min: *p.Min, Max: *p.Max, Kp: *p.Kp, Ki: *p.Ki, Kd: *p.Kd, DeadZone: *p.DeadZone, HysteresisBand: *p.HysteresisBand, GainTrigger: *p.GainTrigger, Alfa: *p.Alfa, Beta: *p.Beta}
+		adapter := adaptationlogic.NewAdaptationLogic(*p.ExecutionType, toAdapter, fromAdapter, c, *p.SetPoint, time.Duration(*p.MonitorInterval), *p.PrefetchCount, f)
 		go adapter.Run() // normal execution
 
 		// Create timer
@@ -316,7 +324,8 @@ func loadParameters() ExecutionParameters {
 	p.HysteresisBand = flag.Float64("hysteresis-band", 0.0, "hysteresis-band is a float")
 	p.Direction = flag.Float64("direction", 1.0, "direction is a float")
 	p.GainTrigger = flag.Float64("gain-trigger", 1.0, "gain trigger is a float")
-	p.Beta = flag.Float64("beta", 1.0, "Beta is a float (used in PI controllers with two degrees of freedom")
+	p.Alfa = flag.Float64("alfa", 1.0, "Alfa is a float (Setpoint Weighting)")
+	p.Beta = flag.Float64("beta", 1.0, "Beta is a float (Setpoint Weighting / Two degrees of freedom)")
 	p.Tunning = flag.String("tunning", "RootLocus", "tunning-type is a string")
 	flag.Parse()
 
@@ -429,6 +438,15 @@ func showParameters(p ExecutionParameters) {
 		fmt.Printf("Kd              : %.8f\n", *p.Kd)
 		fmt.Printf("Min             : %.4f\n", *p.Min)
 		fmt.Printf("Max             : %.4f\n", *p.Max)
+	case shared.SetpointWeighting:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+		fmt.Printf("Alpha (Integral): %.4f\n", *p.Alfa)
+		fmt.Printf("Beta (Derivative): %.4f\n", *p.Beta)
+
 	default:
 		fmt.Println(shared.GetFunction(), "Controller type ´", *p.ControllerType, "´ is invalid")
 		os.Exit(0)
