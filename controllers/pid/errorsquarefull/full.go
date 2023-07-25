@@ -6,7 +6,7 @@ Description: This program implements a PID controller with Error Square as defin
 Date: 04/02/2023
 *********************************************************************************/
 
-package errorsquarepid
+package errorsquarefull
 
 import (
 	"fmt"

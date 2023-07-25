@@ -17,7 +17,7 @@ import (
 	hysteresisonoff "main.go/controllers/onoff/hysteresis"
 	basicpid "main.go/controllers/pid/basic"
 	deadzonepid "main.go/controllers/pid/deadzone"
-	errorsquarepid "main.go/controllers/pid/errorsquare"
+	errorsquarepid "main.go/controllers/pid/errorsquarefull"
 	incrementalpid "main.go/controllers/pid/incremental"
 	smoothingpid "main.go/controllers/pid/smoothing"
 	"main.go/controllers/pid/twodegrees"
