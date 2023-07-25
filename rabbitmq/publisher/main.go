@@ -85,8 +85,8 @@ func (c Client) RunWindows(ws *sync.WaitGroup) time.Duration {
 	// make requests
 	startTime := time.Now()
 
-	for i := 0; i < c.SampleSize; i++ {
-		//for { // TODO experimental purpose
+	//for i := 0; i < c.SampleSize; i++ {
+	for { // TODO experimental purpose
 		corrId := shared.RandomString(32)
 
 		// make resquests randomly distributed -- experimental purpose -- comment
