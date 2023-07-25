@@ -59,7 +59,7 @@ func (c *Controller) Update(p ...float64) float64 {
 	deltaU := c.Info.Kp*(err-c.Info.PreviousError) + c.Info.Ki*err*DeltaTime + c.Info.Kd*(err-2*c.Info.PreviousError+c.Info.PreviousPreviousError)/DeltaTime
 
 	// pid output
-	c.Info.Out = c.Info.Out + deltaU // see page 106 why add an integrator TODO to check
+	c.Info.Out = c.Info.Out + deltaU // see page 106 why add an integrator
 
 	if c.Info.Out > c.Info.Max {
 		c.Info.Out = c.Info.Max

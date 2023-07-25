@@ -59,8 +59,8 @@ func (c *Controller) Update(p ...float64) float64 {
 	c.Info.Integrator += DeltaTime * err
 	integrator := c.Info.Integrator * c.Info.Ki
 
-	// Differentiator (page 49)
-	differentiator := 0.0
+	// Differentiator (page 108)
+	differentiator := c.Info.Kd * ((1-c.Info.Beta)*r - y - c.Info.PreviousError) / DeltaTime
 
 	// control law
 	c.Info.Out = proportional + integrator + differentiator
