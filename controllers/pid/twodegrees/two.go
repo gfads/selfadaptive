@@ -1,8 +1,9 @@
 /*********************************************************************************
 Author: Nelson S Rosa
-Description: This program implements a simple PID controller with setpoint weighting
-as defined in Feedback Control for Computer Systems by Philipp K. Janert
-Date: 25/07/2023
+Description: This program implements a simple PI controller with two degrees of freedom
+as defined in "Feedback Systems An Introduction for Scientists and Engineers, SECOND EDITION
+Karl Johan Astrom,Richard M. Murray, Version v3.1.5 (Equation 2.34)
+Date: 19/07/2023
 *********************************************************************************/
 package twodegrees
 
@@ -14,8 +15,6 @@ import (
 )
 
 const DeltaTime = 1 // see page 103
-const Alfa = 1.00   // Alfa > 0
-const Beta = 0.50   // Beta < 1
 
 type Controller struct {
 	Info info.Controller
@@ -54,14 +53,14 @@ func (c *Controller) Update(p ...float64) float64 {
 	err := c.Info.Direction * (r - y)
 
 	// Proportional
-	proportional := c.Info.Kp * c.Info.Direction * (Alfa*r - y)
+	proportional := c.Info.Kp * c.Info.Direction * (c.Info.Beta*r - y)
 
 	// Integrator (page 49)
 	c.Info.Integrator += DeltaTime * err
 	integrator := c.Info.Integrator * c.Info.Ki
 
 	// Differentiator (page 108)
-	differentiator := c.Info.Kd * ((1-Beta)*r - y - c.Info.PreviousError) / DeltaTime
+	differentiator := c.Info.Kd * ((1-c.Info.Beta)*r - y - c.Info.PreviousError) / DeltaTime
 
 	// control law
 	c.Info.Out = proportional + integrator + differentiator

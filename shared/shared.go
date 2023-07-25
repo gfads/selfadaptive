@@ -52,6 +52,12 @@ const ErrorSquarePid = "ErrorSquarePID"
 const DeadZonePid = "DeadZonePID"
 const GainScheduling = "GainScheduling"
 const PIwithTwoDegreesOfFreedom = "PIWithTwoDegreesOfFreedom"
+const WindUp = "WindUp"
+
+const RootLocus = "RootLocus"
+const Ziegler = "Ziegler"
+const Cohen = "Cohen"
+const Amigo = "AMIGO"
 
 const AsTAR = "AsTAR"
 const HPA = "HPA"

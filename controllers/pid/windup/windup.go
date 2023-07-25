@@ -1,10 +1,12 @@
 /*********************************************************************************
 Author: Nelson S Rosa
-Description: This program implements a simple PID controller with setpoint weighting
-as defined in Feedback Control for Computer Systems by Philipp K. Janert
-Date: 25/07/2023
+Description: This program implements a simple PID controller as defined
+			in "Feedback Control for Computer Systems: Introducing Control Theory to
+			Enterprise Programmers", Philipp K. Janert, 2014. (Page 102)
+Date: 04/02/2023
 *********************************************************************************/
-package setpointweighting
+
+package windup
 
 import (
 	"fmt"
@@ -14,8 +16,6 @@ import (
 )
 
 const DeltaTime = 1 // see page 103
-const Alfa = 1.00   // Alfa > 0
-const Beta = 0.50   // Beta < 1
 
 type Controller struct {
 	Info info.Controller
@@ -23,8 +23,8 @@ type Controller struct {
 
 func (c *Controller) Initialise(p ...float64) {
 
-	if len(p) < 7 {
-		fmt.Printf("Error: '%s' controller requires 7 info (direction,min,max,kp,ki,kd,beta) \n", shared.BasicPid)
+	if len(p) < 6 {
+		fmt.Printf("Error: '%s' controller requires 6 info (direction,min,max,kp,ki,kd) \n", shared.BasicPid)
 		os.Exit(0)
 	}
 
@@ -35,7 +35,6 @@ func (c *Controller) Initialise(p ...float64) {
 	c.Info.Kp = p[3]
 	c.Info.Ki = p[4]
 	c.Info.Kd = p[5]
-	c.Info.Beta = p[6]
 
 	c.Info.Integrator = 0.0
 	c.Info.PreviousError = 0.0
@@ -54,26 +53,28 @@ func (c *Controller) Update(p ...float64) float64 {
 	err := c.Info.Direction * (r - y)
 
 	// Proportional
-	proportional := c.Info.Kp * c.Info.Direction * (Alfa*r - y)
+	proportional := c.Info.Kp * err
 
 	// Integrator (page 49)
 	c.Info.Integrator += DeltaTime * err
 	integrator := c.Info.Integrator * c.Info.Ki
 
-	// Differentiator (page 108)
-	differentiator := c.Info.Kd * ((1-Beta)*r - y - c.Info.PreviousError) / DeltaTime
+	// Differentiator (page 49)
+	differentiator := c.Info.Kd * (err - c.Info.PreviousError) / DeltaTime
 
 	// control law
 	c.Info.Out = proportional + integrator + differentiator
 
-	if c.Info.Out > c.Info.Max {
+	if c.Info.Out > c.Info.Max { // saturarion
 		c.Info.Out = c.Info.Max
-	} else if c.Info.Out < c.Info.Min {
+		c.Info.SumPrevErrors += 0.0 // windup - stop summing the error
+	} else if c.Info.Out < c.Info.Min { // saturation
 		c.Info.Out = c.Info.Min
+		c.Info.SumPrevErrors += 0.0 // windup - stop summing the error
+	} else { // no saturation
+		c.Info.SumPrevErrors += err
 	}
-
 	c.Info.PreviousError = err
-	c.Info.SumPrevErrors += err
 
 	return c.Info.Out
 }

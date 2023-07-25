@@ -21,6 +21,7 @@ import (
 	incrementalpid "main.go/controllers/pid/incremental"
 	smoothingpid "main.go/controllers/pid/smoothing"
 	"main.go/controllers/pid/twodegrees"
+	"main.go/controllers/pid/windup"
 	"main.go/shared"
 	"os"
 )
@@ -91,6 +92,11 @@ func NewController(i info.Controller) IController {
 		c := twodegrees.Controller{}
 		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd, i.Beta)
 		return &c
+	case shared.WindUp:
+		c := windup.Controller{}
+		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd)
+		return &c
+
 	default:
 		fmt.Println(shared.GetFunction(), "Error: Controller type ´", i.TypeName, "´ is unknown!")
 		os.Exit(0)

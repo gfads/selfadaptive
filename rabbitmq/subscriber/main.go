@@ -15,6 +15,7 @@ import (
 )
 
 type ExecutionParameters struct {
+	Tunning         *string
 	ExecutionType   *string
 	IsAdaptive      *bool
 	ControllerType  *string
@@ -316,6 +317,7 @@ func loadParameters() ExecutionParameters {
 	p.Direction = flag.Float64("direction", 1.0, "direction is a float")
 	p.GainTrigger = flag.Float64("gain-trigger", 1.0, "gain trigger is a float")
 	p.Beta = flag.Float64("beta", 1.0, "Beta is a float (used in PI controllers with two degrees of freedom")
+	p.Tunning = flag.String("tunning", "RootLocus", "tunning-type is a string")
 	flag.Parse()
 
 	return p
@@ -325,6 +327,10 @@ func validateParameters(p ExecutionParameters) {
 	if *p.Direction != 1.0 && *p.Direction != -1.0 {
 		shared.ErrorHandler(shared.GetFunction(), "Direction invalid")
 	}
+
+	if *p.Tunning != shared.RootLocus && *p.Tunning != shared.Ziegler && *p.Tunning != shared.Cohen && *p.Tunning != shared.Amigo {
+		shared.ErrorHandler(shared.GetFunction(), "Tunning ´"+*p.Tunning+"´ is invalid")
+	}
 }
 
 func showParameters(p ExecutionParameters) {
@@ -333,6 +339,7 @@ func showParameters(p ExecutionParameters) {
 	fmt.Println("************************************************")
 	fmt.Printf("Execution Type  : %v\n", *p.ExecutionType)
 	fmt.Printf("Is Adaptive?    : %v\n", *p.IsAdaptive)
+	fmt.Printf("Tunning         : %v\n", *p.Tunning)
 	fmt.Printf("Controller Type : %v\n", *p.ControllerType)
 	fmt.Printf("Monitor Interval: %v\n", *p.MonitorInterval)
 	fmt.Printf("Goal            : %.4f\n", *p.SetPoint)
@@ -416,9 +423,14 @@ func showParameters(p ExecutionParameters) {
 		fmt.Printf("Min             : %.4f\n", *p.Min)
 		fmt.Printf("Max             : %.4f\n", *p.Max)
 		fmt.Printf("Beta            : %.4f\n", *p.Beta)
-
+	case shared.WindUp:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
 	default:
-		fmt.Println(shared.GetFunction(), "Controller type", *p.ControllerType, " is invalid")
+		fmt.Println(shared.GetFunction(), "Controller type ´", *p.ControllerType, "´ is invalid")
 		os.Exit(0)
 	}
 	fmt.Println("************************************************")
