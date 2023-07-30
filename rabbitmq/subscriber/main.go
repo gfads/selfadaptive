@@ -52,7 +52,7 @@ func main() {
 	p := loadParameters()
 
 	// define and open log file name
-	fileName := "raw-sin-" + *p.ControllerType + "-" + *p.Tunning + ".csv"
+	fileName := "raw-sin-3-" + *p.ControllerType + "-" + *p.Tunning + ".csv"
 	dirDocker := "/app/data" // it is mapped into windows dir "C:\Users\user\go\selfadaptive\rabbitmq\data" (see execute.bat)
 	f, err := os.Create(dirDocker + "/" + fileName)
 	if err != nil {
@@ -337,7 +337,7 @@ func validateParameters(p ExecutionParameters) {
 		shared.ErrorHandler(shared.GetFunction(), "Direction invalid")
 	}
 
-	if *p.Tunning != shared.RootLocus && *p.Tunning != shared.Ziegler && *p.Tunning != shared.Cohen && *p.Tunning != shared.Amigo {
+	if *p.Tunning != shared.RootLocus && *p.Tunning != shared.Ziegler && *p.Tunning != shared.Cohen && *p.Tunning != shared.Amigo && *p.Tunning != shared.None {
 		shared.ErrorHandler(shared.GetFunction(), "Tunning ´"+*p.Tunning+"´ is invalid")
 	}
 }

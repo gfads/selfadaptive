@@ -59,6 +59,7 @@ const RootLocus = "RootLocus"
 const Ziegler = "Ziegler"
 const Cohen = "Cohen"
 const Amigo = "AMIGO"
+const None = "None"
 
 const AsTAR = "AsTAR"
 const HPA = "HPA"

@@ -30,11 +30,10 @@ func (c *Controller) Initialise(p ...float64) {
 		os.Exit(0)
 	}
 
-	// hard coded gain scheduling table // TODO
-	// AMIGO
-	c.GainTable[0][0] = 0.00101407 // kp[0] // P
-	c.GainTable[0][1] = 0.00213378 // ki[1]
-	c.GainTable[0][2] = 0.00012676 // kd[2]
+	// hard coded gain scheduling table P // TODO
+	c.GainTable[0][0] = 0.1 // kp[0] // P
+	c.GainTable[0][1] = 0.0 // ki[1]
+	c.GainTable[0][2] = 0.0 // kd[2]
 
 	//c.GainTable[1][0] = -9600 // kp[0] // PID
 	//c.GainTable[1][1] = 0.5   // ki[1]
@@ -74,7 +73,9 @@ func (c *Controller) Update(p ...float64) float64 {
 	err := c.Info.Direction * (r - y)
 
 	// decide about the gain - based on the plant output
-	if y < c.Info.GainTrigger { // AMIGO
+	//if y < c.Info.GainTrigger { // Full
+	// decide about the gain - based on the error
+	if y < r*0.1 { // Full
 		c.Info.Kp = c.GainTable[0][0]
 		c.Info.Ki = c.GainTable[0][1]
 		c.Info.Kd = c.GainTable[0][2]
@@ -99,7 +100,7 @@ func (c *Controller) Update(p ...float64) float64 {
 
 	if c.Info.Out > c.Info.Max {
 		c.Info.Out = c.Info.Max
-	} else if c.Info.Out < c.Info.Min {
+	} else if c.Info.Out != 0 && c.Info.Out < c.Info.Min { // due to gain scheduling full = 0
 		c.Info.Out = c.Info.Min
 	}
 
