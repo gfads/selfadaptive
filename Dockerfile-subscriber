@@ -62,14 +62,12 @@ ENV GOROOT=/usr/local/go/bin/
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=BasicP", "-monitor-interval=5", "-prefetch-count=1", "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00777594", "-ki=0.00000000", "-kd=0.00000000"]
 
 # Execution - P, PI, PID, PID DeadZone - Ziegler
-#CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-tunning=Ziegler", "-controller-type=PIWithTwoDegreesOfFreedom", "-monitor-interval=5", "-prefetch-count=1", "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00406761", "-ki=0.00122028", "-kd=0.00000000", "-beta=0.5"]
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=BasicP", "-monitor-interval=5", "-prefetch-count=1", "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00596588", "-ki=0.00000000", "-kd=0.00000000"]
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=BasicPID", "-monitor-interval=5", "-prefetch-count=1", "-max=1000", "-min=1", "-set-point=1000", "-direction=1",  "-kp=0.00496689", "-ki=0.00248344", "-kd=0.00248344"]
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=BasicPI", "-monitor-interval=5", "-prefetch-count=1", "-max=1000", "-min=1", "-set-point=1000", "-direction=1",  "-kp=0.00406761", "-ki=0.00122028", "-kd=0.00000000"]
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=DeadZonePID", "-monitor-interval=5", "-prefetch-count=1", "-max=1000", "-min=1", "-set-point=1000", "-direction=1",   "-kp=0.00496689", "-ki=0.00248344", "-kd=0.00248344", "-dead-zone=200.0"]
 
 # Execution - P, PI, PID, PID DeadZone - Cohen
-#CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-tunning=Cohen", "-controller-type=PIWithTwoDegreesOfFreedom", "-monitor-interval=5", "-prefetch-count=1", "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00414897", "-ki=0.01514702", "-kd=0.00000000", "-beta=0.5"]
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=BasicP", "-monitor-interval=5", "-prefetch-count=1", "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00268464", "-ki=0.00000000", "-kd=0.00000000"]
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=BasicPID", "-monitor-interval=5", "-prefetch-count=1", "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00156457", "-ki=0.00148113", "-kd=0.00019962"]
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=BasicPI", "-monitor-interval=5", "-prefetch-count=1", "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00414897", "-ki=0.01514702", "-kd=0.00000000"]
@@ -79,9 +77,6 @@ ENV GOROOT=/usr/local/go/bin/
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=BasicPID", "-monitor-interval=5", "-prefetch-count=1", "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00101407", "-ki=0.00213378", "-kd=0.00012676"]
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=BasicPI", "-monitor-interval=5", "-prefetch-count=1", "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00079877", "-ki=0.00218342", "-kd=0.00000000"]
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=DeadZonePID", "-monitor-interval=5", "-prefetch-count=1", "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00101407", "-ki=0.00213378", "-kd=0.00012676", "-dead-zone=200.0"]
-
-# Execution - PID Windup - Root Locus
-#CMD ["./subscriber","-is-adaptive=true", "-tunning=RootLocus", "-execution-type=DynamicGoal", "-controller-type=WindUp", "-monitor-interval=5", "-prefetch-count=1", "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=-0.00144086", "-ki=0.00248495", "-kd=0.00057789"]
 
 #************** AsTAR
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=AsTAR", "-monitor-interval=5", "-prefetch-count=1", "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-hysteresis-band=200"]
@@ -107,6 +102,9 @@ ENV GOROOT=/usr/local/go/bin/
 #************** Execution - PID - AMIGO
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=BasicPID", "-monitor-interval=5", "-prefetch-count=1", "-max=1000", "-min=1", "-set-point=1000", "-direction=1",   "-kp=0.00314673", "-ki=0.02884503", "-kd=0.00012103"]
 
+#PID SmoothingDerivative
+#CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=SmoothingDerivativePID", "-monitor-interval=5", "-prefetch-count=1", "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=-0.00173398", "-ki=0.00274580", "-kd=0.00063856"]
+
 #PID Incremental (Root)
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=IncrementalFormPID", "-monitor-interval=5", "-prefetch-count=1",  "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=-0.00144086", "-ki=0.00248495", "-kd=0.00057789"]
 
@@ -119,17 +117,17 @@ ENV GOROOT=/usr/local/go/bin/
 #PID Incremental (AMIGO)
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=IncrementalFormPID", "-monitor-interval=5", "-prefetch-count=1",  "-max=1000", "-min=1", "-set-point=1000", "-direction=1",  "-kp=0.00101407", "-ki=0.00213378", "-kd=0.00012676"]
 
-#PID Smoothing - Root, Ziegler, Cohen, AMIGO
-#CMD ["./subscriber","-is-adaptive=true", "-tunning=RootLocus", "-execution-type=DynamicGoal", "-controller-type=SmoothingDerivativePID", "-monitor-interval=5", "-prefetch-count=1",  "-max=1000", "-min=1", "-set-point=1000", "-direction=1",  "-kp=-0.00144086", "-ki=0.00248495", "-kd=0.00057789"]
-#CMD ["./subscriber","-is-adaptive=true", "-tunning=Ziegler", "-execution-type=DynamicGoal", "-controller-type=SmoothingDerivativePID", "-monitor-interval=5", "-prefetch-count=1",  "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00496689", "-ki=0.00248344", "-kd=0.00248344"]
-#CMD ["./subscriber","-is-adaptive=true", "-tunning=Cohen","-execution-type=DynamicGoal", "-controller-type=SmoothingDerivativePID", "-monitor-interval=5", "-prefetch-count=1",  "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00156457", "-ki=0.00148113", "-kd=0.00019962"]
-#CMD ["./subscriber","-is-adaptive=true", "-tunning=AMIGO","-execution-type=DynamicGoal", "-controller-type=SmoothingDerivativePID", "-monitor-interval=5", "-prefetch-count=1",  "-max=1000", "-min=1", "-set-point=1000", "-direction=1",  "-kp=0.00101407", "-ki=0.00213378", "-kd=0.00012676"]
+#PID Smoothing (Root)
+#CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=SmoothingDerivativePID", "-monitor-interval=5", "-prefetch-count=1",  "-max=1000", "-min=1", "-set-point=1000", "-direction=1",  "-kp=-0.00144086", "-ki=0.00248495", "-kd=0.00057789"]
 
-#PID Setpoint weighting - Root, Ziegler, Cohen, AMIGO
-#CMD ["./subscriber","-is-adaptive=true", "-tunning=RootLocus", "-execution-type=DynamicGoal", "-controller-type=SetpointWeighting", "-monitor-interval=5", "-prefetch-count=1",  "-max=1000", "-min=1", "-set-point=1000", "-direction=1",  "-kp=-0.00144086", "-ki=0.00248495", "-kd=0.00057789", "-alfa=1","-beta=0.5"]
-#CMD ["./subscriber","-is-adaptive=true", "-tunning=Ziegler", "-execution-type=DynamicGoal", "-controller-type=SetpointWeighting", "-monitor-interval=5", "-prefetch-count=1",  "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00496689", "-ki=0.00248344", "-kd=0.00248344", "-alfa=1","-beta=0.5"]
-CMD ["./subscriber","-is-adaptive=true", "-tunning=Cohen","-execution-type=DynamicGoal", "-controller-type=SetpointWeighting", "-monitor-interval=5", "-prefetch-count=1",  "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00156457", "-ki=0.00148113", "-kd=0.00019962", "-alfa=1","-beta=0.5"]
-CMD ["./subscriber","-is-adaptive=true", "-tunning=AMIGO","-execution-type=DynamicGoal", "-controller-type=SetpointWeighting", "-monitor-interval=5", "-prefetch-count=1",  "-max=1000", "-min=1", "-set-point=1000", "-direction=1",  "-kp=0.00101407", "-ki=0.00213378", "-kd=0.00012676", "-alfa=1","-beta=0.5"]
+#PID Smoothing (Ziegler)
+#CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=SmoothingDerivativePID", "-monitor-interval=5", "-prefetch-count=1",  "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00496689", "-ki=0.00248344", "-kd=0.00248344"]
+
+#PID Smoothing (Cohen) // remember it has been executed with sin(x)
+#CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=SmoothingDerivativePID", "-monitor-interval=5", "-prefetch-count=1",  "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=0.00156457", "-ki=0.00148113", "-kd=0.00019962"]
+
+#PID Smoothing (AMIGO)
+#CMD ["./subscriber","-is-adaptive=true", "-execution-type=DynamicGoal", "-controller-type=SmoothingDerivativePID", "-monitor-interval=5", "-prefetch-count=1",  "-max=1000", "-min=1", "-set-point=1000", "-direction=1",  "-kp=0.00101407", "-ki=0.00213378", "-kd=0.00012676"]
 
 #PID ErrorSquare
 #CMD ["./subscriber","-is-adaptive=true", "-execution-type=StaticGoal", "-controller-type=ErrorSquarePID", "-monitor-interval=5", "-prefetch-count=1", "-max=1000", "-min=1", "-set-point=1000", "-direction=1", "-kp=-0.00173398", "-ki=0.00274580", "-kd=0.00063856"]
