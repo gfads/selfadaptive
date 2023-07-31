@@ -27,7 +27,7 @@ rem set list=Dockerfile-subscriber
 rem set list=Dockerfile-sub-astar
 rem set list=Dockerfile-sub-astar Dockerfile-sub-hpa Dockerfile-sub-onoff-basic Dockerfile-sub-onoff-deadzone Dockerfile-sub-hysteresis Dockerfile-sub-p-root Dockerfile-sub-p-zigler Dockerfile-sub-p-cohen Dockerfile-sub-pi-root Dockerfile-sub-pi-zigler Dockerfile-sub-pi-cohen Dockerfile-sub-pi-amigo Dockerfile-sub-pid-root Dockerfile-sub-pid-zigler Dockerfile-sub-pid-cohen Dockerfile-sub-pid-amigo
 rem set list=Dockerfile-sub-astar Dockerfile-sub-hpa Dockerfile-sub-p-root Dockerfile-sub-p-ziegler Dockerfile-sub-p-cohen Dockerfile-sub-pi-root Dockerfile-sub-pi-zigler Dockerfile-sub-pi-cohen Dockerfile-sub-pi-amigo Dockerfile-sub-pid-root Dockerfile-sub-pid-zigler Dockerfile-sub-pid-cohen Dockerfile-sub-pid-amigo
-set list=Dockerfile-sub-hpa Dockerfile-sub-pi-root Dockerfile-sub-pi-zigler Dockerfile-sub-pi-cohen Dockerfile-sub-pi-amigo Dockerfile-sub-pid-root Dockerfile-sub-pid-zigler Dockerfile-sub-pid-cohen Dockerfile-sub-pid-amigo
+set list=Apague
 
 echo ****** BEGIN OF EXPERIMENTS *******
 for %%x in (%list%) do (
