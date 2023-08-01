@@ -53,7 +53,7 @@ func main() {
 
 	// define and open log file name
 	fileName := "raw-sin-3-" + *p.ControllerType + "-" + *p.Tunning + ".csv"
-	dirDocker := "/app/data" // it is mapped into windows dir "C:\Users\user\go\selfadaptive\rabbitmq\data" (see execute.bat)
+	dirDocker := "/app/data" // it is mapped into windows dir "C:\Users\user\go\selfadaptive\rabbitmq\data" (see execute-old.bat)
 	f, err := os.Create(dirDocker + "/" + fileName)
 	if err != nil {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())

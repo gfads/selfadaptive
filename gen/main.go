@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"main.go/shared"
 	"os"
+	"time"
 )
 
 func main() {
@@ -11,18 +12,46 @@ func main() {
 	list := []string{}
 
 	/*
-		// Onoff
-		controllers := []string{shared.BasicOnoff, shared.DeadZoneOnoff, shared.HysteresisOnoff}
+			// Onoff
+			controllers := []string{shared.BasicOnoff, shared.DeadZoneOnoff, shared.HysteresisOnoff}
+			tunnings := []string{shared.None}
+			for c := 0; c < len(controllers); c++ {
+				for t := 0; t < len(tunnings); t++ {
+					createDockerFiles(controllers[c], tunnings[t], &list)
+				}
+			}
+
+		// Astar & HPA
+		controllers := []string{shared.AsTAR, shared.HPA}
 		tunnings := []string{shared.None}
 		for c := 0; c < len(controllers); c++ {
 			for t := 0; t < len(tunnings); t++ {
 				createDockerFiles(controllers[c], tunnings[t], &list)
 			}
 		}
+
+		// P
+		controllers = []string{shared.BasicP}
+		tunnings = []string{shared.RootLocus, shared.Ziegler, shared.Cohen}
+		for c := 0; c < len(controllers); c++ {
+			for t := 0; t < len(tunnings); t++ {
+				createDockerFiles(controllers[c], tunnings[t], &list)
+			}
+		}
+
+		// PI
+		controllers = []string{shared.BasicPi}
+		tunnings = []string{shared.RootLocus, shared.Ziegler, shared.Cohen, shared.Amigo}
+		for c := 0; c < len(controllers); c++ {
+			for t := 0; t < len(tunnings); t++ {
+				createDockerFiles(controllers[c], tunnings[t], &list)
+			}
+		}
 	*/
-	// Astar / HPA
-	controllers := []string{shared.AsTAR, shared.HPA}
-	tunnings := []string{shared.None}
+	// PID
+	//controllers = []string{shared.BasicPid, shared.DeadZonePid, shared.IncrementalFormPid, shared.SmoothingPid, shared.GainScheduling, shared.SetpointWeighting, shared.SetpointWeighting}
+	controllers := []string{shared.IncrementalFormPid}
+	tunnings := []string{shared.RootLocus, shared.Ziegler, shared.Cohen, shared.Amigo}
 	for c := 0; c < len(controllers); c++ {
 		for t := 0; t < len(tunnings); t++ {
 			createDockerFiles(controllers[c], tunnings[t], &list)
@@ -30,32 +59,6 @@ func main() {
 	}
 
 	fmt.Println("Docker files created...")
-
-	// P
-	controllers = []string{shared.BasicP}
-	tunnings = []string{shared.RootLocus, shared.Ziegler, shared.Cohen}
-	for c := 0; c < len(controllers); c++ {
-		for t := 0; t < len(tunnings); t++ {
-			createDockerFiles(controllers[c], tunnings[t], &list)
-		}
-	}
-
-	// PI
-	controllers = []string{shared.BasicPi}
-	tunnings = []string{shared.RootLocus, shared.Ziegler, shared.Cohen, shared.Amigo}
-	for c := 0; c < len(controllers); c++ {
-		for t := 0; t < len(tunnings); t++ {
-			createDockerFiles(controllers[c], tunnings[t], &list)
-		}
-	}
-	// PID
-	controllers = []string{shared.BasicPid, shared.DeadZonePid, shared.IncrementalFormPid, shared.SmoothingPid, shared.GainScheduling, shared.SetpointWeighting, shared.SetpointWeighting}
-	tunnings = []string{shared.RootLocus, shared.Ziegler, shared.Cohen, shared.Amigo}
-	for c := 0; c < len(controllers); c++ {
-		for t := 0; t < len(tunnings); t++ {
-			createDockerFiles(controllers[c], tunnings[t], &list)
-		}
-	}
 
 	// create execute
 	createBat(list)
@@ -67,7 +70,7 @@ func main() {
 		// execute exec
 
 			wg.Add(1)
-			cmd := exec.Command("C:\\Users\\user\\go\\selfadaptive\\Apague-execute.bat")
+			cmd := exec.Command("C:\\Users\\user\\go\\selfadaptive\\Apague-execute-old.bat")
 			go func() {
 				defer wg.Done()
 				err := cmd.Run()
@@ -124,7 +127,8 @@ func createDockerFiles(c, t string, list *[]string) {
 
 	// docker files folder
 	dir := "C:\\Users\\user\\go\\selfadaptive"
-	basicDocker := "FROM golang:1.19\n" +
+	basicDocker := "# Self generated file at " + time.Now().String() + "\n" +
+		"FROM golang:1.19\n" +
 		"WORKDIR /app\n" +
 		"COPY go.mod go.sum ./\n" +
 		"RUN go mod download \n" +
@@ -155,7 +159,8 @@ func createDockerFiles(c, t string, list *[]string) {
 }
 
 func createBat(list []string) {
-	basicBat := "@echo off \n" +
+	basicBat := "rem Self generated file at " + time.Now().String() + "\n" +
+		"@echo off \n" +
 		"docker stop some-rabbit \n" +
 		"docker rm some-rabbit\n" +
 		"docker run -d --memory=\"6g\" --cpus=\"5.0\" --name some-rabbit -p 5672:5672 rabbitmq\n" +
@@ -173,16 +178,16 @@ func createBat(list []string) {
 	listCommand += "\n"
 	basicBat += listCommand + "echo ****** BEGIN OF EXPERIMENTS *******\n" +
 		"for %%x in (%list%) do (\n" +
-		"	echo %%x\n" +
 		"   copy %%x Dockerfile\n" +
 		"   docker build --tag subscriber .\n" +
-		"	docker run --memory=\"1g\" --cpus=\"1.0\" -v C:\\Users\\user\\go\\selfadaptive\\rabbitmq\\data:/app/data subscriber\n" +
+		"	docker run --rm --memory=\"1g\" --cpus=\"1.0\" -v C:\\Users\\user\\go\\selfadaptive\\rabbitmq\\data:/app/data subscriber\n" +
+		"   del %%x \n" +
 		")\n" +
 		"echo ****** END OF EXPERIMENTS *******\n"
 
 	// docker files folder
 	dir := "C:\\Users\\user\\go\\selfadaptive"
-	fileName := "Apague-execute.bat"
+	fileName := "execute-all.bat"
 	f, err := os.Create(dir + "\\" + fileName)
 	if err != nil {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
