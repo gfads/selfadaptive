@@ -49,9 +49,11 @@ func main() {
 		}
 	*/
 	// PID
-	//controllers = []string{shared.BasicPid, shared.DeadZonePid, shared.IncrementalFormPid, shared.SmoothingPid, shared.GainScheduling, shared.SetpointWeighting, shared.SetpointWeighting}
-	controllers := []string{shared.IncrementalFormPid}
+	//controllers := []string{shared.BasicPid, shared.DeadZonePid, shared.IncrementalFormPid, shared.SmoothingPid, shared.GainScheduling, shared.SetpointWeighting, shared.SetpointWeighting}
+	controllers := []string{shared.PIwithTwoDegreesOfFreedom}
 	tunnings := []string{shared.RootLocus, shared.Ziegler, shared.Cohen, shared.Amigo}
+	//tunnings := []string{shared.Ziegler}
+
 	for c := 0; c < len(controllers); c++ {
 		for t := 0; t < len(tunnings); t++ {
 			createDockerFiles(controllers[c], tunnings[t], &list)

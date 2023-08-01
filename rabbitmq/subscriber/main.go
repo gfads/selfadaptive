@@ -177,6 +177,7 @@ func (c Subscriber) RunAdaptive(startTimer, stopTimer chan bool, toAdapter chan 
 			}
 
 			// save in file the number of messages in the queue
+			fmt.Printf("%d;", q.Messages)
 			fmt.Fprintf(f, "%d;", q.Messages)
 
 			// configure new pc

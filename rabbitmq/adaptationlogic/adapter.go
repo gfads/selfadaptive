@@ -108,7 +108,7 @@ func (al AdaptationLogic) RunDynamicGoal() {
 
 			// catch pc and its yielded rate
 			fmt.Fprintf(al.File, "%d;%f;%f\n", al.PC, rate, RandomGoal[currentGoalIdx])
-			fmt.Println(n, ";", al.PC, ";", rate, ";", RandomGoal[currentGoalIdx])
+			fmt.Println(al.PC, ";", rate, ";", RandomGoal[currentGoalIdx])
 
 			// invoke controller to calculate new pc
 			pc := int(math.Round(al.Controller.Update(RandomGoal[currentGoalIdx], rate)))
