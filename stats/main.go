@@ -20,6 +20,7 @@ type Data struct {
 }
 
 const DataDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/rabbitmq/data/"
+const FileNameRadical = "raw-sin-3-"
 
 func main() {
 
@@ -30,23 +31,64 @@ func main() {
 	}
 
 	for f := range files {
-		if strings.Contains(files[f].Name(), "raw-sin-3") {
+		if strings.Contains(files[f].Name(), FileNameRadical) {
 			data := readFile(files[f].Name())
-			fmt.Printf(files[f].Name()+" RMSE = %.6f\n", rmse(data))
+			i1 := strings.Index(files[f].Name(), ".csv")
+			temp := strings.Split(files[f].Name()[len(FileNameRadical):i1], "-")
+			controller := temp[0]
+			tunning := temp[1]
+			fmt.Printf("%v;%v;%.6f;%.6f;%.6f;%.6f;%.6f\n", controller, tunning, rmse(data), mae(data), mape(data), smape(data), r2(data))
 		}
 	}
 }
 
 func r2(d []Data) float64 {
-	return 0
+	tss := 0.0
+	rss := 0.0
+	n := len(d)
+	temp := 0.0
+
+	// calculate mean
+	for i := 0; i < n; i++ {
+		temp += d[i].Rate
+	}
+	mean := temp / float64(n)
+	for i := 0; i < n; i++ {
+		tss += math.Pow(d[i].Rate-mean, 2.0)
+		rss += math.Pow(d[i].Rate-d[i].Goal, 2.0)
+	}
+	r := 1 - (rss / tss)
+	return r
+}
+
+func smape(d []Data) float64 {
+	s := 0.0
+	n := len(d)
+	for i := 0; i < n; i++ {
+		s += math.Abs(d[i].Rate-d[i].Goal) / ((d[i].Rate + d[i].Goal) / 2.0)
+	}
+	r := s / float64(n) * 100.0
+	return r
 }
 
 func mape(d []Data) float64 {
-	return 0
+	s := 0.0
+	n := len(d)
+	for i := 0; i < n; i++ {
+		s += math.Abs(d[i].Rate-d[i].Goal) / d[i].Rate
+	}
+	r := s / float64(n) * 100.0
+	return r
 }
 
 func mae(d []Data) float64 {
-	return 0
+	s := 0.0
+	n := len(d)
+	for i := 0; i < n; i++ {
+		s += math.Abs(d[i].Rate - d[i].Goal)
+	}
+	r := s / float64(n)
+	return r
 }
 
 func rmse(d []Data) float64 {
@@ -55,9 +97,9 @@ func rmse(d []Data) float64 {
 	for i := 0; i < n; i++ {
 		s += math.Pow(d[i].Rate-d[i].Goal, 2.0)
 	}
-	rmse := math.Sqrt(s / float64(n))
+	r := math.Sqrt(s / float64(n))
 
-	return rmse
+	return r
 }
 
 func readFile(name string) []Data {
@@ -77,6 +119,11 @@ func readFile(name string) []Data {
 
 	for fileScanner.Scan() {
 		l := fileScanner.Text()
+
+		// check format of number
+		if strings.Contains(l, ",") {
+			l = strings.ReplaceAll(l, ",", ".")
+		}
 		s := strings.Split(l, ";")
 
 		// queue length
