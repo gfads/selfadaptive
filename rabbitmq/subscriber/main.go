@@ -100,7 +100,7 @@ func main() {
 		go t.RunMyTimer()
 
 		// run adaptive consumer
-		consumer.RunAdaptive(startTimer, stopTimer, toAdapter, fromAdapter)
+		consumer.RunAdaptive(startTimer, stopTimer, toAdapter, fromAdapter, f)
 	} else {
 		// run non-adaptive consumer
 		//consumer.RunNonAdaptive()
@@ -149,7 +149,7 @@ func (c Subscriber) RunNonAdaptiveMonitored(startTimer, stopTimer chan bool, p E
 	}
 }
 
-func (c Subscriber) RunAdaptive(startTimer, stopTimer chan bool, toAdapter chan int, fromAdapter chan int) {
+func (c Subscriber) RunAdaptive(startTimer, stopTimer chan bool, toAdapter chan int, fromAdapter chan int, f *os.File) {
 
 	count := 0
 
@@ -171,12 +171,13 @@ func (c Subscriber) RunAdaptive(startTimer, stopTimer chan bool, toAdapter chan 
 			c.PC = <-fromAdapter
 
 			// inspect queue
-			/*q, err1 := c.Ch.QueueInspect("rpc_queue")
+			q, err1 := c.Ch.QueueInspect("rpc_queue")
 			if err1 != nil {
 				shared.ErrorHandler(shared.GetFunction(), "Impossible to inspect the queue")
-				os.Exit(0)
 			}
-			*/
+
+			// save in file the number of messages in the queue
+			fmt.Fprintf(f, "%d;", q.Messages)
 
 			// configure new pc
 			err := c.Ch.Qos(
@@ -209,12 +210,12 @@ func (c Subscriber) RunAdaptiveOld(startTimer, stopTimer chan bool, toAdapter ch
 			c.PC = <-fromAdapter
 
 			// inspect queue
-			/*q, err1 := c.Ch.QueueInspect("rpc_queue")
+			q, err1 := c.Ch.QueueInspect("rpc_queue")
 			if err1 != nil {
 				shared.ErrorHandler(shared.GetFunction(), "Impossible to inspect the queue")
-				os.Exit(0)
 			}
-			*/
+
+			fmt.Print(q.Messages, ";")
 
 			// configure new pc
 			err := c.Ch.Qos(
