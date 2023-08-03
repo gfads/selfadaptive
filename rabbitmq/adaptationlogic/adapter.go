@@ -10,21 +10,11 @@ import (
 	"time"
 )
 
-const TrainingSampleSize = 60
-const TimeBetweenAdjustments = 1200 // seconds
-const MaximumNrmse = 0.30
-const WarmupTime = 30 // seconds
-const TrainingAttempts = 30
-const SizeOfSameLevel = 60
-
-var IncreasingGoal = []float64{500, 1000.0, 1250.0, 1500.0, 1750.0, 2000.0, 2250.0, 2500.0, 2750.0, 3000.0}
-
+//var RandonGoal = []float64{500, 1000.0, 1250.0, 1500.0, 1750.0, 2000.0, 2250.0, 2500.0, 2750.0, 3000.0}
 //var RandomGoal = []float64{500.0, 900.0, 1250.0, 1300.0, 300.0, 800.0, 1000.0, 400.0, 500.0, 1000.0, 2000.0, 1500.0, 500.0, 1100.0, 1500.0, 600.0, 3000.0}
-
-// sin
 //var RandomGoal = []float64{363, 1042, 1871, 2063, 1436, 585, 318, 888, 1754, 2094, 1585, 710, 300, 744, 1621, 2098, 1722}
-
-var RandomGoal = []float64{500, 1000, 750}
+//var RandomGoal = []float64{500, 1000, 750}
+var RandomGoal = []float64{1000}
 
 var L = 1.0
 var tau = 1.0
@@ -68,10 +58,8 @@ func NewAdaptationLogic(executionType string, chFromBusiness chan int, chToBusin
 func (al AdaptationLogic) Run() {
 
 	switch al.ExecutionType {
-	case shared.StaticGoal:
-		al.RunStaticGoal()
-	case shared.DynamicGoal:
-		al.RunDynamicGoal()
+	case shared.Experiment:
+		al.RunExperiment()
 	case shared.RootLocusTraining:
 		al.RootLocusTraining()
 	case shared.ZieglerTraining: // all non-analytical tune methods
@@ -88,7 +76,7 @@ func (al AdaptationLogic) Run() {
 	}
 }
 
-func (al AdaptationLogic) RunDynamicGoal() {
+func (al AdaptationLogic) RunExperiment() {
 
 	// discard first measurement
 	<-al.FromBusiness // receive no. of messages from business
@@ -120,13 +108,10 @@ func (al AdaptationLogic) RunDynamicGoal() {
 			al.ToBusiness <- al.PC
 
 			// check the need for changing the setpoint
-			if count >= SizeOfSameLevel {
+			if count >= shared.SizeOfSameLevel {
 				count = 0
 				currentGoalIdx++
 				if currentGoalIdx >= len(RandomGoal) {
-					//fmt.Println("********** Copy/paste data of the experiments **********")
-					fmt.Println("********** End of experiment **********")
-					//time.Sleep(10 * time.Hour)
 					al.File.Close()
 					os.Exit(0)
 				}
@@ -141,7 +126,7 @@ func (al AdaptationLogic) PIDTunerWeb() {
 	var totalTime float64
 
 	// warm up phase
-	time.Sleep(WarmupTime * time.Second)
+	time.Sleep(shared.WarmupTime * time.Second)
 
 	// discard first measurement
 	<-al.FromBusiness // receive no. of messages from business
@@ -177,35 +162,6 @@ func (al AdaptationLogic) PIDTunerWeb() {
 	}
 }
 
-func (al AdaptationLogic) RunStaticGoal() {
-
-	// discard first measurement
-	<-al.FromBusiness // receive no. of messages from business
-	al.ToBusiness <- al.PC
-
-	// loop of adaptation logic
-	for {
-		select {
-		case n := <-al.FromBusiness: // interaction with the business
-
-			// calculate new arrival rate (msg/s)
-			rate := float64(n) / al.MonitorInterval.Seconds()
-
-			// catch pc and its yielded rate
-			fmt.Println(al.PC, ";", rate, ";", al.SetPoint)
-
-			// invoke controller to calculate new pc
-			pc := int(math.Round(al.Controller.Update(al.SetPoint, rate)))
-
-			// update pc at adaptation mechanism
-			al.PC = pc
-
-			// send new pc to business
-			al.ToBusiness <- al.PC
-		}
-	}
-}
-
 func (al AdaptationLogic) RootLocusTrainingNewNotWorkingProperly() {
 	fromAdjuster := make(chan TrainingInfo)
 	toAdjuster := make(chan TrainingInfo)
@@ -215,7 +171,7 @@ func (al AdaptationLogic) RootLocusTrainingNewNotWorkingProperly() {
 	go AdjustmentMechanism(fromAdjuster, toAdjuster, al.SetPoint)
 
 	// warm up phase
-	time.Sleep(WarmupTime * time.Second)
+	time.Sleep(shared.WarmupTime * time.Second)
 
 	// discard first measurement
 	<-al.FromBusiness // receive no. of messages from business
@@ -264,7 +220,7 @@ func (al AdaptationLogic) RootLocusTraining() {
 	go AdjustmentMechanism(fromAdjuster, toAdjuster, al.SetPoint)
 
 	// warm up phase
-	time.Sleep(WarmupTime * time.Second)
+	time.Sleep(shared.WarmupTime * time.Second)
 
 	// discard first measurement
 	<-al.FromBusiness // receive no. of messages from business
@@ -281,7 +237,7 @@ func (al AdaptationLogic) RootLocusTraining() {
 		l := len(info.Data)
 
 		if l >= 1 && rate < (1.1*info.Data[l-1].Rate) { // TODO remove 1.10
-			if l > TrainingSampleSize || tAttempts >= TrainingAttempts { // training is over
+			if l > shared.TrainingSampleSize || tAttempts >= shared.TrainingAttempts { // training is over
 				info = CalculateRootLocusGains(info)
 				al.TrainingInfo.Kp = info.Kp
 				al.TrainingInfo.Ki = info.Ki
@@ -325,7 +281,7 @@ func (al AdaptationLogic) ZieglerTraining() {
 	//go AdjustmentMechanism(fromAdjuster, toAdjuster, al.SetPoint)
 
 	// warm up phase
-	time.Sleep(WarmupTime * time.Second)
+	time.Sleep(shared.WarmupTime * time.Second)
 
 	// discard first measurement
 	<-al.FromBusiness              // receive no. of messages from business
@@ -394,7 +350,7 @@ func (al AdaptationLogic) CohenTraining() {
 	//go AdjustmentMechanism(fromAdjuster, toAdjuster, al.SetPoint)
 
 	// warm up phase
-	time.Sleep(WarmupTime * time.Second)
+	time.Sleep(shared.WarmupTime * time.Second)
 
 	// discard first measurement
 	<-al.FromBusiness       // receive no. of messages from business
@@ -452,7 +408,7 @@ func (al AdaptationLogic) RunOnlineTraining() {
 	go AdjustmentMechanism(fromAdjuster, toAdjuster, al.SetPoint)
 
 	// warm up phase
-	time.Sleep(WarmupTime * time.Second)
+	time.Sleep(shared.WarmupTime * time.Second)
 
 	// discard first measurement
 	<-al.FromBusiness // receive no. of messages from business
@@ -471,7 +427,7 @@ func (al AdaptationLogic) RunOnlineTraining() {
 			l := len(info.Data)
 
 			if l >= 1 && rate < info.Data[l-1].Rate {
-				if l > TrainingSampleSize || tAttempts >= TrainingAttempts { // training is over
+				if l > shared.TrainingSampleSize || tAttempts >= shared.TrainingAttempts { // training is over
 					info = CalculateRootLocusGains(info)
 					al.TrainingInfo.Kp = info.Kp
 					al.TrainingInfo.Ki = info.Ki
@@ -529,7 +485,7 @@ func (al AdaptationLogic) RunOnlineTraining() {
 				al.ToBusiness <- al.PC
 
 				// update set point dynamically -- ONLY FOR EXPERIMENTS
-				if countCycles > SizeOfSameLevel {
+				if countCycles > shared.SizeOfSameLevel {
 					al.SetPoint = RandomGoal[countExperiments]
 					countCycles = 0
 					countExperiments++
@@ -562,17 +518,17 @@ func AdjustmentMechanism(toAdapter chan TrainingInfo, fromAdapter chan TrainingI
 	state := 0
 
 	for {
-		time.Sleep(TimeBetweenAdjustments * time.Second) // wait for xx seconds before next adjusting
+		time.Sleep(shared.TimeBetweenAdjustments * time.Second) // wait for xx seconds before next adjusting
 		info := <-fromAdapter
 		nrmse := CalculateNRMSE(info)
 		switch state {
 		case 0:
-			if nrmse < MaximumNrmse { /// TODO
-				fmt.Printf("No update of control gains %.4f < %.4f %d\n", nrmse, MaximumNrmse, len(info.Data))
+			if nrmse < shared.MaximumNrmse { /// TODO
+				fmt.Printf("No update of control gains %.4f < %.4f %d\n", nrmse, shared.MaximumNrmse, len(info.Data))
 				toAdapter <- info // send new gains
 				break             // previous gain improved rate - nothing to do
 			} else { // recalculate gains
-				fmt.Printf("Update control gains %.4f >= %.4f %d\n", nrmse, MaximumNrmse, len(info.Data))
+				fmt.Printf("Update control gains %.4f >= %.4f %d\n", nrmse, shared.MaximumNrmse, len(info.Data))
 				info = CalculateRootLocusGains(info) // TODO
 				toAdapter <- info                    // send new gains to adapter
 			}

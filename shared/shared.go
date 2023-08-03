@@ -30,7 +30,7 @@ const PcDefaultLimitMax = 1200 // TODO ASTAR
 
 // Execution Types
 const StaticGoal = "StaticGoal"
-const DynamicGoal = "DynamicGoal"
+const Experiment = "Experiment"
 const RootLocusTraining = "RootLocusTraining"
 const ZieglerTraining = "ZieglerTraining"
 const CohenTraining = "CohenTraining"
@@ -47,7 +47,8 @@ const BasicPi = "BasicPI"
 const BasicPid = "BasicPID"
 const SmoothingPid = "SmoothingDerivativePID"
 const IncrementalFormPid = "IncrementalFormPID"
-const ErrorSquarePid = "ErrorSquarePID"
+const ErrorSquarePidFull = "ErrorSquarePIDFull"
+const ErrorSquarePidProportional = "ErrorSquarePIDProportional"
 const DeadZonePid = "DeadZonePID"
 const GainScheduling = "GainScheduling"
 const PIwithTwoDegreesOfFreedom = "PIWithTwoDegreesOfFreedom"
@@ -63,6 +64,14 @@ const None = "None"
 const AsTAR = "AsTAR"
 const HPA = "HPA"
 
+// Experiments parameters
+const TrainingSampleSize = 60
+const TimeBetweenAdjustments = 1200 // seconds
+const MaximumNrmse = 0.30
+const WarmupTime = 30 // seconds
+const TrainingAttempts = 30
+const SizeOfSameLevel = 60
+
 // Controller parameters
 const MinOnoff = 10
 const MaxOnoff = 600
@@ -74,6 +83,13 @@ const ColorReset = "\033[0m"
 // Base Directories
 const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/source"
 const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/executable"
+const DockerDir = "/app/data" // it is mapped into windows dir "C:\Users\user\go\selfadaptive\rabbitmq\data" (see execute-old.bat)
+
+// const DataDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/rabbitmq/data/" // macos
+const DataDir = "C:\\Users\\user\\go\\selfadaptive\\rabbitmq\\data" // macos
+const DockerfilesDir = "C:\\Users\\user\\go\\selfadaptive"          // macos
+const BatchfilesDir = "C:\\Users\\user\\go\\selfadaptive"           // macos
+const BatchFileExperiments = "execute-all-experiments.bat"
 
 //const SourcesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\sources"
 //const ExecutablesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\executables"

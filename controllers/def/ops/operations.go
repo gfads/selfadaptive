@@ -17,7 +17,8 @@ import (
 	hysteresisonoff "main.go/controllers/onoff/hysteresis"
 	basicpid "main.go/controllers/pid/basic"
 	deadzonepid "main.go/controllers/pid/deadzone"
-	errorsquarepid "main.go/controllers/pid/errorsquarefull"
+	"main.go/controllers/pid/errorsquarefull"
+	"main.go/controllers/pid/errorsquareproportional"
 	incrementalpid "main.go/controllers/pid/incremental"
 	"main.go/controllers/pid/setpointweighting"
 	smoothingpid "main.go/controllers/pid/smoothing"
@@ -81,8 +82,12 @@ func NewController(i info.Controller) IController {
 		c := deadzonepid.Controller{}
 		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd, i.DeadZone)
 		return &c
-	case shared.ErrorSquarePid:
-		c := errorsquarepid.Controller{}
+	case shared.ErrorSquarePidFull:
+		c := errorsquarefull.Controller{}
+		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd)
+		return &c
+	case shared.ErrorSquarePidProportional:
+		c := errorsquareproportional.Controller{}
 		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd)
 		return &c
 	case shared.GainScheduling:

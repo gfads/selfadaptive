@@ -1,4 +1,4 @@
-# Self generated file at 2023-07-31 21:48:53.8961273 -0300 -03 m=+0.042215501
+# Self generated file at 2023-08-02 09:33:14.8434362 -0300 -03 m=+0.043963101
 FROM golang:1.19
 WORKDIR /app
 COPY go.mod go.sum ./

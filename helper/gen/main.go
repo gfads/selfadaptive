@@ -12,24 +12,26 @@ func main() {
 	list := []string{}
 
 	/*
-			// Onoff
-			controllers := []string{shared.BasicOnoff, shared.DeadZoneOnoff, shared.HysteresisOnoff}
-			tunnings := []string{shared.None}
-			for c := 0; c < len(controllers); c++ {
-				for t := 0; t < len(tunnings); t++ {
-					createDockerFiles(controllers[c], tunnings[t], &list)
-				}
-			}
-
-		// Astar & HPA
-		controllers := []string{shared.AsTAR, shared.HPA}
+		// Onoff
+		controllers := []string{shared.BasicOnoff, shared.DeadZoneOnoff, shared.HysteresisOnoff}
 		tunnings := []string{shared.None}
 		for c := 0; c < len(controllers); c++ {
 			for t := 0; t < len(tunnings); t++ {
 				createDockerFiles(controllers[c], tunnings[t], &list)
 			}
 		}
+	*/
+	// Astar & HPA
 
+	/*	controllers := []string{shared.AsTAR, shared.HPA}
+		tunnings := []string{shared.None}
+		for c := 0; c < len(controllers); c++ {
+			for t := 0; t < len(tunnings); t++ {
+				createDockerFiles(controllers[c], tunnings[t], &list)
+			}
+		}
+	*/
+	/*
 		// P
 		controllers = []string{shared.BasicP}
 		tunnings = []string{shared.RootLocus, shared.Ziegler, shared.Cohen}
@@ -38,9 +40,10 @@ func main() {
 				createDockerFiles(controllers[c], tunnings[t], &list)
 			}
 		}
-
+	*/
+	/*
 		// PI
-		controllers = []string{shared.BasicPi}
+		controllers = []string{shared.BasicPi, shared.PIwithTwoDegreesOfFreedom}
 		tunnings = []string{shared.RootLocus, shared.Ziegler, shared.Cohen, shared.Amigo}
 		for c := 0; c < len(controllers); c++ {
 			for t := 0; t < len(tunnings); t++ {
@@ -49,10 +52,10 @@ func main() {
 		}
 	*/
 	// PID
-	//controllers := []string{shared.BasicPid, shared.DeadZonePid, shared.IncrementalFormPid, shared.SmoothingPid, shared.GainScheduling, shared.SetpointWeighting, shared.SetpointWeighting}
-	controllers := []string{shared.PIwithTwoDegreesOfFreedom}
-	tunnings := []string{shared.RootLocus, shared.Ziegler, shared.Cohen, shared.Amigo}
-	//tunnings := []string{shared.Ziegler}
+	//controllers = []string{shared.BasicPid, shared.DeadZonePid, shared.IncrementalFormPid, shared.SmoothingPid, shared.GainScheduling, shared.SetpointWeighting, shared.ErrorSquarePidProportional, shared.ErrorSquarePidFull, shared.WindUp}
+	controllers := []string{shared.BasicPid}
+	//tunnings := []string{shared.RootLocus, shared.Ziegler, shared.Cohen, shared.Amigo}
+	tunnings := []string{shared.RootLocus}
 
 	for c := 0; c < len(controllers); c++ {
 		for t := 0; t < len(tunnings); t++ {
@@ -102,7 +105,9 @@ func createDockerFiles(c, t string, list *[]string) {
 	pExtra[shared.BasicPi+shared.Ziegler] = ", \"-kp=0.00406761\", \"-ki=0.00122028\", \"-kd=0.00000000\""
 	pExtra[shared.BasicPi+shared.Cohen] = ", \"-kp=0.00414897\", \"-ki=0.01514702\", \"-kd=0.00000000\""
 	pExtra[shared.BasicPi+shared.Amigo] = ", \"-kp=0.00079877\", \"-ki=0.00218342\", \"-kd=0.00000000\""
-	pExtra[shared.BasicPid+shared.RootLocus] = ", \"-kp=-0.00144086\", \"-ki=0.00248495\", \"-kd=0.00057789\""
+	// original pExtra[shared.BasicPid+shared.RootLocus] = ", \"-kp=-0.00144086\", \"-ki=0.00248495\", \"-kd=0.00057789\""
+	// first change pExtra[shared.BasicPid+shared.RootLocus] = ", \"-kp=-0.00144086\", \"-ki=0.000248495\", \"-kd=0.00057789\""
+	pExtra[shared.BasicPid+shared.RootLocus] = ", \"-kp=-0.000144086\", \"-ki=0.00248495\", \"-kd=0.00057789\""
 	pExtra[shared.BasicPid+shared.Ziegler] = ", \"-kp=0.00496689\", \"-ki=0.00248344\", \"-kd=0.00248344\""
 	pExtra[shared.BasicPid+shared.Cohen] = ", \"-kp=0.00156457\", \"-ki=0.00148113\", \"-kd=0.00019962\""
 	pExtra[shared.BasicPid+shared.Amigo] = ", \"-kp=0.00101407\", \"-ki=0.00213378\", \"-kd=0.00012676\""
@@ -126,9 +131,20 @@ func createDockerFiles(c, t string, list *[]string) {
 	pExtra[shared.SetpointWeighting+shared.Ziegler] = ", \"-kp=0.00496689\", \"-ki=0.00248344\", \"-kd=0.00248344\", \"-alfa=1\",\"-beta=0.5\""
 	pExtra[shared.SetpointWeighting+shared.Cohen] = ", \"-kp=0.00156457\", \"-ki=0.00148113\", \"-kd=0.00019962\", \"-alfa=1\",\"-beta=0.5\""
 	pExtra[shared.SetpointWeighting+shared.Amigo] = ", \"-kp=0.00101407\", \"-ki=0.00213378\", \"-kd=0.00012676\", \"-alfa=1\",\"-beta=0.5\""
+	pExtra[shared.ErrorSquarePidFull+shared.RootLocus] = ", \"-kp=-0.00144086\", \"-ki=0.00248495\", \"-kd=0.00057789\""
+	pExtra[shared.ErrorSquarePidFull+shared.Ziegler] = ", \"-kp=0.00496689\", \"-ki=0.00248344\", \"-kd=0.00248344\""
+	pExtra[shared.ErrorSquarePidFull+shared.Cohen] = ", \"-kp=0.00156457\", \"-ki=0.00148113\", \"-kd=0.00019962\""
+	pExtra[shared.ErrorSquarePidFull+shared.Amigo] = ", \"-kp=0.00101407\", \"-ki=0.00213378\", \"-kd=0.00012676\""
+	pExtra[shared.ErrorSquarePidProportional+shared.RootLocus] = ", \"-kp=-0.00144086\", \"-ki=0.00248495\", \"-kd=0.00057789\""
+	pExtra[shared.ErrorSquarePidProportional+shared.Ziegler] = ", \"-kp=0.00496689\", \"-ki=0.00248344\", \"-kd=0.00248344\""
+	pExtra[shared.ErrorSquarePidProportional+shared.Cohen] = ", \"-kp=0.00156457\", \"-ki=0.00148113\", \"-kd=0.00019962\""
+	pExtra[shared.ErrorSquarePidProportional+shared.Amigo] = ", \"-kp=0.00101407\", \"-ki=0.00213378\", \"-kd=00012676\""
+	pExtra[shared.WindUp+shared.RootLocus] = ", \"-kp=-0.00144086\", \"-ki=0.00248495\", \"-kd=0.00057789\""
+	pExtra[shared.WindUp+shared.Ziegler] = ", \"-kp=0.00496689\", \"-ki=0.00248344\", \"-kd=0.00248344\""
+	pExtra[shared.WindUp+shared.Cohen] = ", \"-kp=0.00156457\", \"-ki=0.00148113\", \"-kd=0.00019962\""
+	pExtra[shared.WindUp+shared.Amigo] = ", \"-kp=0.00101407\", \"-ki=0.00213378\", \"-kd=00012676\""
 
 	// docker files folder
-	dir := "C:\\Users\\user\\go\\selfadaptive"
 	basicDocker := "# Self generated file at " + time.Now().String() + "\n" +
 		"FROM golang:1.19\n" +
 		"WORKDIR /app\n" +
@@ -141,18 +157,19 @@ func createDockerFiles(c, t string, list *[]string) {
 	min := "\"-min=1.0\""
 	max := "\"-max=100.0\""
 	monitorInterval := "\"-monitor-interval=5\""
+	executionType := "\"-execution-type=" + shared.Experiment + "\""
 
 	controller := "\"-controller-type=" + c + "\""
 	tunning := "\"-tunning=" + t + "\""
 	fileName := "Dockerfile-" + c + "-" + t
-	f, err := os.Create(dir + "\\" + fileName)
+	f, err := os.Create(shared.DockerfilesDir + "\\" + fileName)
 	if err != nil {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
 	}
 
 	*list = append(*list, fileName)
 
-	command := "CMD [\"./subscriber\"," + controller + "," + tunning + ",\"-is-adaptive=true\", \"-execution-type=DynamicGoal\"," + monitorInterval + ", \"-prefetch-count=1\"," + max + "," + min + ", \"-set-point=1000\", \"-direction=1\"" + pExtra[c+t] + "]"
+	command := "CMD [\"./subscriber\"," + controller + "," + tunning + ",\"-is-adaptive=true\"," + executionType + "," + monitorInterval + ", \"-prefetch-count=1\"," + max + "," + min + ", \"-set-point=1000\", \"-direction=1\"" + pExtra[c+t] + "]"
 
 	fmt.Fprintf(f, "%v \n", basicDocker)
 	fmt.Fprintf(f, "%v", command)
@@ -166,31 +183,33 @@ func createBat(list []string) {
 		"docker stop some-rabbit \n" +
 		"docker rm some-rabbit\n" +
 		"docker run -d --memory=\"6g\" --cpus=\"5.0\" --name some-rabbit -p 5672:5672 rabbitmq\n" +
-		"timeout /t 10\n" +
-		"@echo Removing previous containers\n" +
+		"timeout /t 20\n" +
+		"echo Removing previous containers\n" +
 		"docker stop publisher\n" +
 		"docker rm publisher\n" +
 		"docker stop subscriber\n" +
-		"docker rm subscriber\n"
+		"docker rm subscriber\n" +
+		"echo Removing previous volumes\n" +
+		"echo y | docker volume prune\n"
 
 	listCommand := "set list="
 	for i := 0; i < len(list); i++ {
 		listCommand += list[i] + " "
 	}
 	listCommand += "\n"
-	basicBat += listCommand + "echo ****** BEGIN OF EXPERIMENTS *******\n" +
+	basicBat += listCommand + "\n" +
+		"echo ****** BEGIN OF EXPERIMENTS *******\n" +
 		"for %%x in (%list%) do (\n" +
 		"   copy %%x Dockerfile\n" +
 		"   docker build --tag subscriber .\n" +
-		"	docker run --rm --memory=\"1g\" --cpus=\"1.0\" -v C:\\Users\\user\\go\\selfadaptive\\rabbitmq\\data:/app/data subscriber\n" +
+		"   docker run --rm --memory=\"1g\" --cpus=\"1.0\" -v C:\\Users\\user\\go\\selfadaptive\\rabbitmq\\data:/app/data subscriber\n" +
 		"   del %%x \n" +
 		")\n" +
 		"echo ****** END OF EXPERIMENTS *******\n"
 
-	// docker files folder
-	dir := "C:\\Users\\user\\go\\selfadaptive"
-	fileName := "execute-all.bat"
-	f, err := os.Create(dir + "\\" + fileName)
+	// create batch file
+	fileName := shared.BatchFileExperiments
+	f, err := os.Create(shared.BatchfilesDir + "\\" + fileName)
 	if err != nil {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
 	}

@@ -10,7 +10,6 @@ import (
 	"main.go/shared"
 	_ "net/http/pprof"
 	"os"
-	"runtime"
 	"time"
 )
 
@@ -46,15 +45,14 @@ type Subscriber struct {
 
 func main() {
 
-	runtime.GOMAXPROCS(1) // TODO
+	//runtime.GOMAXPROCS(1) // TODO
 
 	// load parameters
 	p := loadParameters()
 
 	// define and open log file name
 	fileName := "raw-sin-3-" + *p.ControllerType + "-" + *p.Tunning + ".csv"
-	dirDocker := "/app/data" // it is mapped into windows dir "C:\Users\user\go\selfadaptive\rabbitmq\data" (see execute-old.bat)
-	f, err := os.Create(dirDocker + "/" + fileName)
+	f, err := os.Create(shared.DockerDir + "/" + fileName)
 	if err != nil {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
 	}
@@ -403,7 +401,13 @@ func showParameters(p ExecutionParameters) {
 		fmt.Printf("Kd              : %.8f\n", *p.Kd)
 		fmt.Printf("Min             : %.4f\n", *p.Min)
 		fmt.Printf("Max             : %.4f\n", *p.Max)
-	case shared.ErrorSquarePid:
+	case shared.ErrorSquarePidFull:
+		fmt.Printf("Kp              : %.8f\n", *p.Kp)
+		fmt.Printf("Ki              : %.8f\n", *p.Ki)
+		fmt.Printf("Kd              : %.8f\n", *p.Kd)
+		fmt.Printf("Min             : %.4f\n", *p.Min)
+		fmt.Printf("Max             : %.4f\n", *p.Max)
+	case shared.ErrorSquarePidProportional:
 		fmt.Printf("Kp              : %.8f\n", *p.Kp)
 		fmt.Printf("Ki              : %.8f\n", *p.Ki)
 		fmt.Printf("Kd              : %.8f\n", *p.Kd)
