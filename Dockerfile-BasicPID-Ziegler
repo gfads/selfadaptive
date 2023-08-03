@@ -1,9 +1,0 @@
-# Self generated file at 2023-08-02 09:33:14.8278981 -0300 -03 m=+0.028425001
-FROM golang:1.19
-WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download 
-COPY ./ ./ 
-RUN CGO_ENABLED=0 GOOS=linux go build -o ./subscriber ./rabbitmq/subscriber/main.go
-ENV GOROOT=/usr/local/go/bin/ 
-CMD ["./subscriber","-controller-type=BasicPID","-tunning=Ziegler","-is-adaptive=true", "-execution-type=DynamicGoal","-monitor-interval=5", "-prefetch-count=1","-max=100.0","-min=1.0", "-set-point=1000", "-direction=1", "-kp=0.00496689", "-ki=0.00248344", "-kd=0.00248344"]

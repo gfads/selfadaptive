@@ -10,16 +10,6 @@ import (
 	"time"
 )
 
-//var RandonGoal = []float64{500, 1000.0, 1250.0, 1500.0, 1750.0, 2000.0, 2250.0, 2500.0, 2750.0, 3000.0}
-//var RandomGoal = []float64{500.0, 900.0, 1250.0, 1300.0, 300.0, 800.0, 1000.0, 400.0, 500.0, 1000.0, 2000.0, 1500.0, 500.0, 1100.0, 1500.0, 600.0, 3000.0}
-//var RandomGoal = []float64{363, 1042, 1871, 2063, 1436, 585, 318, 888, 1754, 2094, 1585, 710, 300, 744, 1621, 2098, 1722}
-//var RandomGoal = []float64{500, 1000, 750}
-var RandomGoal = []float64{1000}
-
-var L = 1.0
-var tau = 1.0
-var T = 0.1
-
 type AdjustmenstInfo struct {
 	PC   int
 	Rate float64
@@ -95,11 +85,11 @@ func (al AdaptationLogic) RunExperiment() {
 			rate := float64(n) / al.MonitorInterval.Seconds()
 
 			// catch pc and its yielded rate
-			fmt.Fprintf(al.File, "%d;%f;%f\n", al.PC, rate, RandomGoal[currentGoalIdx])
-			fmt.Println(al.PC, ";", rate, ";", RandomGoal[currentGoalIdx])
+			fmt.Fprintf(al.File, "%d;%f;%f\n", al.PC, rate, shared.RandomGoals[currentGoalIdx])
+			fmt.Println(al.PC, ";", rate, ";", shared.RandomGoals[currentGoalIdx])
 
 			// invoke controller to calculate new pc
-			pc := int(math.Round(al.Controller.Update(RandomGoal[currentGoalIdx], rate)))
+			pc := int(math.Round(al.Controller.Update(shared.RandomGoals[currentGoalIdx], rate)))
 
 			// update pc at adaptation mechanism
 			al.PC = pc
@@ -111,7 +101,7 @@ func (al AdaptationLogic) RunExperiment() {
 			if count >= shared.SizeOfSameLevel {
 				count = 0
 				currentGoalIdx++
-				if currentGoalIdx >= len(RandomGoal) {
+				if currentGoalIdx >= len(shared.RandomGoals) {
 					al.File.Close()
 					os.Exit(0)
 				}
@@ -271,11 +261,8 @@ func (al AdaptationLogic) RootLocusTraining() {
 }
 
 func (al AdaptationLogic) ZieglerTraining() {
-	//fromAdjuster := make(chan TrainingInfo)
-	//toAdjuster := make(chan TrainingInfo)
 	count := 0
 	info := TrainingInfo{TypeName: al.TrainingInfo.TypeName}
-	InputSteps := []int{1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2}
 
 	// create & execute adjustment mechanism
 	//go AdjustmentMechanism(fromAdjuster, toAdjuster, al.SetPoint)
@@ -284,8 +271,8 @@ func (al AdaptationLogic) ZieglerTraining() {
 	time.Sleep(shared.WarmupTime * time.Second)
 
 	// discard first measurement
-	<-al.FromBusiness              // receive no. of messages from business
-	al.ToBusiness <- InputSteps[0] // Configure PC to execute the Ziegler Steps
+	<-al.FromBusiness                     // receive no. of messages from business
+	al.ToBusiness <- shared.InputSteps[0] // Configure PC to execute the Ziegler Steps
 
 	// loop of adaptation logic
 	for {
@@ -299,10 +286,10 @@ func (al AdaptationLogic) ZieglerTraining() {
 		i := AdjustmenstInfo{PC: al.PC, Rate: rate}
 		info.Data = append(info.Data, i)
 
-		if count < len(InputSteps)-1 {
+		if count < len(shared.InputSteps)-1 {
 			count++
 			// configure next PC
-			al.PC = InputSteps[count]
+			al.PC = shared.InputSteps[count]
 
 		} else { // training is over
 			info = CalculateZieglerGains(info)
@@ -486,7 +473,7 @@ func (al AdaptationLogic) RunOnlineTraining() {
 
 				// update set point dynamically -- ONLY FOR EXPERIMENTS
 				if countCycles > shared.SizeOfSameLevel {
-					al.SetPoint = RandomGoal[countExperiments]
+					al.SetPoint = shared.RandomGoals[countExperiments]
 					countCycles = 0
 					countExperiments++
 				} else {
@@ -625,7 +612,7 @@ func CalculateZieglerGains(info TrainingInfo) TrainingInfo {
 	k1 := sumDeltaY1 / dataSize
 	k2 := sumDeltaY2 / dataSize
 	K := k2 - k1
-	lambda := K * tau / T // see Figure 9-2
+	lambda := K * shared.Tau / shared.T // see Figure 9-2
 
 	switch info.TypeName {
 	case shared.BasicP:
@@ -635,14 +622,14 @@ func CalculateZieglerGains(info TrainingInfo) TrainingInfo {
 		info.Kd = 0.0
 	case shared.BasicPi:
 		k := 0.9 / lambda
-		Ti := 3.0 * tau
+		Ti := 3.0 * shared.Tau
 		info.Kp = k
 		info.Ki = k / Ti
 		info.Kd = 0.0
 	case shared.BasicPid:
 		k := 1.2 / lambda
-		Ti := 2.0 * tau
-		Td := tau / 2.0
+		Ti := 2.0 * shared.Tau
+		Td := shared.Tau / 2.0
 		info.Kp = k
 		info.Ki = k / Ti
 		info.Kd = k * Td
@@ -668,24 +655,24 @@ func CalculateCohenGains(info TrainingInfo) TrainingInfo {
 	k1 := sumDeltaY1 / dataSize
 	k2 := sumDeltaY2 / dataSize
 	K := k2 - k1
-	theta := tau / (tau + T)
+	theta := shared.Tau / (shared.Tau + shared.T)
 
 	switch info.TypeName {
 	case shared.BasicP:
-		k := 1 / K * (1 + (0.35 * theta / (1 - theta))) * T / tau
+		k := 1 / K * (1 + (0.35 * theta / (1 - theta))) * shared.T / shared.Tau
 		info.Kp = k
 		info.Ki = 0.0
 		info.Kd = 0.0
 	case shared.BasicPi:
-		k := 0.9 / K * (1 + (0.92 * theta / (1 - theta))) * T / tau
-		Ti := ((3.3 - 3.0*theta) / (1 + 1.2*theta)) * tau
+		k := 0.9 / K * (1 + (0.92 * theta / (1 - theta))) * shared.T / shared.Tau
+		Ti := ((3.3 - 3.0*theta) / (1 + 1.2*theta)) * shared.Tau
 		info.Kp = k
 		info.Ki = k / Ti
 		info.Kd = 0.0
 	case shared.BasicPid:
-		k := 1.35 / K * (1 + (0.18 * theta / (1 - theta))) * T / tau
-		Ti := ((2.5 - 2.0*theta) / (1 - 0.39*theta)) * tau
-		Td := (0.37 * (1 - theta) / (1 - 0.81*theta)) * tau
+		k := 1.35 / K * (1 + (0.18 * theta / (1 - theta))) * shared.T / shared.Tau
+		Ti := ((2.5 - 2.0*theta) / (1 - 0.39*theta)) * shared.Tau
+		Td := (0.37 * (1 - theta) / (1 - 0.81*theta)) * shared.Tau
 		info.Kp = k
 		info.Ki = k / Ti
 		info.Kd = k * Td
@@ -715,15 +702,15 @@ func CalculateAMIGOGains(info TrainingInfo) TrainingInfo {
 
 	switch info.TypeName {
 	case shared.BasicPi:
-		k := 1 / K * (0.15 + (0.35-tau*T/math.Pow(tau+T, 2))*T/tau)
-		Ti := (0.35 + 13*math.Pow(T, 2)/(math.Pow(T, 2)+12*tau*T+7*math.Pow(tau, 2))) * tau
+		k := 1 / K * (0.15 + (0.35-shared.Tau*shared.T/math.Pow(shared.Tau+shared.T, 2))*shared.T/shared.Tau)
+		Ti := (0.35 + 13*math.Pow(shared.T, 2)/(math.Pow(shared.T, 2)+12*shared.Tau*shared.T+7*math.Pow(shared.Tau, 2))) * shared.Tau
 		info.Kp = k
 		info.Ki = k / Ti
 		info.Kd = 0.0
 	case shared.BasicPid:
-		k := 1 / K * (0.2 + 0.45*T/tau)
-		Ti := ((0.4*tau + 0.8*T) / (tau + 0.1*T)) * tau
-		Td := (0.5 * T / (0.3*tau + T)) * tau
+		k := 1 / K * (0.2 + 0.45*shared.T/shared.Tau)
+		Ti := ((0.4*shared.Tau + 0.8*shared.T) / (shared.Tau + 0.1*shared.T)) * shared.Tau
+		Td := (0.5 * shared.T / (0.3*shared.Tau + shared.T)) * shared.Tau
 		info.Kp = k
 		info.Ki = k / Ti
 		info.Kd = k * Td

@@ -8,141 +8,70 @@ import (
 )
 
 func main() {
+	dockerFileNames := []string{}
+	pExtra := loadExtraParameters()
 
-	list := []string{}
-
-	/*
-		// Onoff
-		controllers := []string{shared.BasicOnoff, shared.DeadZoneOnoff, shared.HysteresisOnoff}
-		tunnings := []string{shared.None}
-		for c := 0; c < len(controllers); c++ {
-			for t := 0; t < len(tunnings); t++ {
-				createDockerFiles(controllers[c], tunnings[t], &list)
-			}
-		}
-	*/
-	// Astar & HPA
-
-	/*	controllers := []string{shared.AsTAR, shared.HPA}
-		tunnings := []string{shared.None}
-		for c := 0; c < len(controllers); c++ {
-			for t := 0; t < len(tunnings); t++ {
-				createDockerFiles(controllers[c], tunnings[t], &list)
-			}
-		}
-	*/
-	/*
-		// P
-		controllers = []string{shared.BasicP}
-		tunnings = []string{shared.RootLocus, shared.Ziegler, shared.Cohen}
-		for c := 0; c < len(controllers); c++ {
-			for t := 0; t < len(tunnings); t++ {
-				createDockerFiles(controllers[c], tunnings[t], &list)
-			}
-		}
-	*/
-	/*
-		// PI
-		controllers = []string{shared.BasicPi, shared.PIwithTwoDegreesOfFreedom}
-		tunnings = []string{shared.RootLocus, shared.Ziegler, shared.Cohen, shared.Amigo}
-		for c := 0; c < len(controllers); c++ {
-			for t := 0; t < len(tunnings); t++ {
-				createDockerFiles(controllers[c], tunnings[t], &list)
-			}
-		}
-	*/
-	// PID
-	//controllers = []string{shared.BasicPid, shared.DeadZonePid, shared.IncrementalFormPid, shared.SmoothingPid, shared.GainScheduling, shared.SetpointWeighting, shared.ErrorSquarePidProportional, shared.ErrorSquarePidFull, shared.WindUp}
-	controllers := []string{shared.BasicPid}
-	//tunnings := []string{shared.RootLocus, shared.Ziegler, shared.Cohen, shared.Amigo}
-	tunnings := []string{shared.RootLocus}
-
-	for c := 0; c < len(controllers); c++ {
-		for t := 0; t < len(tunnings); t++ {
-			createDockerFiles(controllers[c], tunnings[t], &list)
-		}
+	// create Dockerfiles Non-PID Controllers
+	for c := 0; c < len(shared.ControllerTypesNonPid); c++ {
+		//	createDockerFile(shared.ControllerTypesNonPid[c], shared.None, pExtra, &dockerFileNames)
 	}
 
+	// create Dockerfiles PID Controllers
+	for c := 0; c < len(shared.ControllerTypesPid); c++ {
+		for t := 0; t < len(shared.TunningTypes); t++ {
+			createDockerFile(shared.ControllerTypesPid[c], shared.TunningTypes[t], pExtra, &dockerFileNames)
+		}
+	}
 	fmt.Println("Docker files created...")
 
 	// create execute
-	createBat(list)
+	createBat(dockerFileNames)
 
 	fmt.Println("Bat file created...")
-
-	/*
-		wg := sync.WaitGroup{}
-		// execute exec
-
-			wg.Add(1)
-			cmd := exec.Command("C:\\Users\\user\\go\\selfadaptive\\Apague-execute-old.bat")
-			go func() {
-				defer wg.Done()
-				err := cmd.Run()
-				if err != nil {
-					log.Fatal(err)
-				}
-				cmd.Wait()
-			}()
-			wg.Wait()
-			fmt.Println("Bat file executed...")
-	*/
-
 }
 
-func createDockerFiles(c, t string, list *[]string) {
+func loadExtraParameters() map[string]string {
 
-	// extra parameters
-	pExtra := make(map[string]string)
-	pExtra[shared.BasicOnoff+shared.None] = ""
-	pExtra[shared.DeadZoneOnoff+shared.None] = ", \"-dead-zone=200\""
-	pExtra[shared.HysteresisOnoff+shared.None] = ", \"-hysteresis-band=200\""
-	pExtra[shared.AsTAR+shared.None] = ", \"-hysteresis-band=200\""
-	pExtra[shared.BasicP+shared.RootLocus] = ", \"-kp=0.00777594\", \"-ki=0.00000000\", \"-kd=0.00000000\""
-	pExtra[shared.BasicP+shared.Ziegler] = ", \"-kp=0.00596588\", \"-ki=0.00000000\", \"-kd=0.00000000\""
-	pExtra[shared.BasicP+shared.Cohen] = ", \"-kp=0.00268464\", \"-ki=0.00000000\", \"-kd=0.00000000\""
-	pExtra[shared.BasicPi+shared.RootLocus] = ", \"-kp=-0.00211325\", \"-ki=0.00222392\", \"-kd=0.00000000\""
-	pExtra[shared.BasicPi+shared.Ziegler] = ", \"-kp=0.00406761\", \"-ki=0.00122028\", \"-kd=0.00000000\""
-	pExtra[shared.BasicPi+shared.Cohen] = ", \"-kp=0.00414897\", \"-ki=0.01514702\", \"-kd=0.00000000\""
-	pExtra[shared.BasicPi+shared.Amigo] = ", \"-kp=0.00079877\", \"-ki=0.00218342\", \"-kd=0.00000000\""
-	// original pExtra[shared.BasicPid+shared.RootLocus] = ", \"-kp=-0.00144086\", \"-ki=0.00248495\", \"-kd=0.00057789\""
-	// first change pExtra[shared.BasicPid+shared.RootLocus] = ", \"-kp=-0.00144086\", \"-ki=0.000248495\", \"-kd=0.00057789\""
-	pExtra[shared.BasicPid+shared.RootLocus] = ", \"-kp=-0.000144086\", \"-ki=0.00248495\", \"-kd=0.00057789\""
-	pExtra[shared.BasicPid+shared.Ziegler] = ", \"-kp=0.00496689\", \"-ki=0.00248344\", \"-kd=0.00248344\""
-	pExtra[shared.BasicPid+shared.Cohen] = ", \"-kp=0.00156457\", \"-ki=0.00148113\", \"-kd=0.00019962\""
-	pExtra[shared.BasicPid+shared.Amigo] = ", \"-kp=0.00101407\", \"-ki=0.00213378\", \"-kd=0.00012676\""
-	pExtra[shared.DeadZonePid+shared.RootLocus] = ", \"-kp=-0.00144086\", \"-ki=0.00248495\", \"-kd=0.00057789\", \"-dead-zone=200\""
-	pExtra[shared.DeadZonePid+shared.Ziegler] = ", \"-kp=0.00496689\", \"-ki=0.00248344\", \"-kd=0.00248344\", \"-dead-zone=200\""
-	pExtra[shared.DeadZonePid+shared.Cohen] = ", \"-kp=0.00156457\", \"-ki=0.00148113\", \"-kd=0.00019962\", \"-dead-zone=200\""
-	pExtra[shared.DeadZonePid+shared.Amigo] = ", \"-kp=0.00101407\", \"-ki=0.00213378\", \"-kd=0.00012676\", \"-dead-zone=200\""
-	pExtra[shared.IncrementalFormPid+shared.RootLocus] = ", \"-kp=-0.00144086\", \"-ki=0.00248495\", \"-kd=0.00057789\""
-	pExtra[shared.IncrementalFormPid+shared.Ziegler] = ", \"-kp=0.00496689\", \"-ki=0.00248344\", \"-kd=0.00248344\""
-	pExtra[shared.IncrementalFormPid+shared.Cohen] = ", \"-kp=0.00156457\", \"-ki=0.00148113\", \"-kd=0.00019962\""
-	pExtra[shared.IncrementalFormPid+shared.Amigo] = ", \"-kp=0.00101407\", \"-ki=0.00213378\", \"-kd=0.00012676\""
-	pExtra[shared.SmoothingPid+shared.RootLocus] = ", \"-kp=-0.00144086\", \"-ki=0.00248495\", \"-kd=0.00057789\""
-	pExtra[shared.SmoothingPid+shared.Ziegler] = ", \"-kp=0.00496689\", \"-ki=0.00248344\", \"-kd=0.00248344\""
-	pExtra[shared.SmoothingPid+shared.Cohen] = ", \"-kp=0.00156457\", \"-ki=0.00148113\", \"-kd=0.00019962\""
-	pExtra[shared.SmoothingPid+shared.Amigo] = ", \"-kp=0.00101407\", \"-ki=0.00213378\", \"-kd=0.00012676\""
-	pExtra[shared.PIwithTwoDegreesOfFreedom+shared.RootLocus] = ", \"-kp=-0.00211325\", \"-ki=0.00222392\", \"-kd=0.00000000\",\"-beta=0.5\""
-	pExtra[shared.PIwithTwoDegreesOfFreedom+shared.Ziegler] = ", \"-kp=0.00406761\", \"-ki=0.00122028\", \"-kd=0.00000000\", \"-beta=0.5\""
-	pExtra[shared.PIwithTwoDegreesOfFreedom+shared.Cohen] = ", \"-kp=0.00414897\", \"-ki=0.01514702\", \"-kd=0.00000000\", \"-beta=0.5\""
-	pExtra[shared.PIwithTwoDegreesOfFreedom+shared.Amigo] = ", \"-kp=0.00079877\", \"-ki=0.00218342\", \"-kd=0.00000000\", \"-beta=0.5\""
-	pExtra[shared.SetpointWeighting+shared.RootLocus] = ", \"-kp=-0.00144086\", \"-ki=0.00248495\", \"-kd=0.00057789\", \"-alfa=1\",\"-beta=0.5\""
-	pExtra[shared.SetpointWeighting+shared.Ziegler] = ", \"-kp=0.00496689\", \"-ki=0.00248344\", \"-kd=0.00248344\", \"-alfa=1\",\"-beta=0.5\""
-	pExtra[shared.SetpointWeighting+shared.Cohen] = ", \"-kp=0.00156457\", \"-ki=0.00148113\", \"-kd=0.00019962\", \"-alfa=1\",\"-beta=0.5\""
-	pExtra[shared.SetpointWeighting+shared.Amigo] = ", \"-kp=0.00101407\", \"-ki=0.00213378\", \"-kd=0.00012676\", \"-alfa=1\",\"-beta=0.5\""
-	pExtra[shared.ErrorSquarePidFull+shared.RootLocus] = ", \"-kp=-0.00144086\", \"-ki=0.00248495\", \"-kd=0.00057789\""
-	pExtra[shared.ErrorSquarePidFull+shared.Ziegler] = ", \"-kp=0.00496689\", \"-ki=0.00248344\", \"-kd=0.00248344\""
-	pExtra[shared.ErrorSquarePidFull+shared.Cohen] = ", \"-kp=0.00156457\", \"-ki=0.00148113\", \"-kd=0.00019962\""
-	pExtra[shared.ErrorSquarePidFull+shared.Amigo] = ", \"-kp=0.00101407\", \"-ki=0.00213378\", \"-kd=0.00012676\""
-	pExtra[shared.ErrorSquarePidProportional+shared.RootLocus] = ", \"-kp=-0.00144086\", \"-ki=0.00248495\", \"-kd=0.00057789\""
-	pExtra[shared.ErrorSquarePidProportional+shared.Ziegler] = ", \"-kp=0.00496689\", \"-ki=0.00248344\", \"-kd=0.00248344\""
-	pExtra[shared.ErrorSquarePidProportional+shared.Cohen] = ", \"-kp=0.00156457\", \"-ki=0.00148113\", \"-kd=0.00019962\""
-	pExtra[shared.ErrorSquarePidProportional+shared.Amigo] = ", \"-kp=0.00101407\", \"-ki=0.00213378\", \"-kd=00012676\""
-	pExtra[shared.WindUp+shared.RootLocus] = ", \"-kp=-0.00144086\", \"-ki=0.00248495\", \"-kd=0.00057789\""
-	pExtra[shared.WindUp+shared.Ziegler] = ", \"-kp=0.00496689\", \"-ki=0.00248344\", \"-kd=0.00248344\""
-	pExtra[shared.WindUp+shared.Cohen] = ", \"-kp=0.00156457\", \"-ki=0.00148113\", \"-kd=0.00019962\""
-	pExtra[shared.WindUp+shared.Amigo] = ", \"-kp=0.00101407\", \"-ki=0.00213378\", \"-kd=00012676\""
+	r := make(map[string]string)
+
+	// Non PID controllers
+	r[shared.HPA+shared.None] = ""
+	r[shared.BasicOnoff+shared.None] = ""
+	r[shared.DeadZoneOnoff+shared.None] = "\"-dead-zone=" + shared.DeadZone + "\""
+	r[shared.HysteresisOnoff+shared.None] = "\"-hysteresis-band=" + shared.HysteresisBand + "\""
+	r[shared.AsTAR+shared.None] = "\"-hysteresis-band=" + shared.HysteresisBand + "\""
+
+	// PID controllers
+	for i := 0; i < len(shared.ControllerTypesPid); i++ {
+		for j := 0; j < len(shared.TunningTypes); j++ {
+			key := shared.ControllerTypesPid[i] + shared.TunningTypes[j]
+			keyGain := shared.BasicPid + shared.TunningTypes[j] // use the same key whatever the PID controller (see shared)
+			r[key] =
+				"\"-kp=" + shared.Kp[keyGain] + "\", " +
+					"\"-ki=" + shared.Ki[keyGain] + "\", " +
+					"\"-kd=" + shared.Kd[keyGain] + "\""
+		}
+	}
+
+	// Extra parameters of PID controllers
+	r[shared.DeadZonePid+shared.RootLocus] += ",\"-dead-zone=" + shared.DeadZone + "\""
+	r[shared.DeadZonePid+shared.Ziegler] += ",\"-dead-zone=" + shared.DeadZone + "\""
+	r[shared.DeadZonePid+shared.Cohen] += ",\"-dead-zone=" + shared.DeadZone + "\""
+	r[shared.DeadZonePid+shared.Amigo] += ",\"-dead-zone=" + shared.DeadZone + "\""
+
+	r[shared.PIwithTwoDegreesOfFreedom+shared.RootLocus] = ",\"-beta=+" + shared.Beta + "\""
+	r[shared.PIwithTwoDegreesOfFreedom+shared.Ziegler] = ",\"-beta=+" + shared.Beta + "\""
+	r[shared.PIwithTwoDegreesOfFreedom+shared.Cohen] = ",\"-beta=+" + shared.Beta + "\""
+	r[shared.PIwithTwoDegreesOfFreedom+shared.Amigo] = ",\"-beta=+" + shared.Beta + "\""
+	r[shared.SetpointWeighting+shared.RootLocus] = ",\"-alfa=" + shared.Alfa + "," + shared.Beta + "\""
+	r[shared.SetpointWeighting+shared.Ziegler] = ",\"-alfa=" + shared.Alfa + "," + shared.Beta + "\""
+	r[shared.SetpointWeighting+shared.Cohen] = ",\"-alfa=" + shared.Alfa + "," + shared.Beta + "\""
+	r[shared.SetpointWeighting+shared.Amigo] = ",\"-alfa=" + shared.Alfa + "," + shared.Beta + "\""
+
+	return r
+}
+
+func createDockerFile(c, t string, pExtra map[string]string, df *[]string) {
 
 	// docker files folder
 	basicDocker := "# Self generated file at " + time.Now().String() + "\n" +
@@ -154,10 +83,14 @@ func createDockerFiles(c, t string, list *[]string) {
 		"RUN CGO_ENABLED=0 GOOS=linux go build -o ./subscriber ./rabbitmq/subscriber/main.go\n" +
 		"ENV GOROOT=/usr/local/go/bin/"
 
-	min := "\"-min=1.0\""
-	max := "\"-max=100.0\""
-	monitorInterval := "\"-monitor-interval=5\""
+	min := "\"-min=" + shared.MinPC + "\""
+	max := "\"-max=" + shared.MaxPC + "\""
+	monitorInterval := "\"-monitor-interval=" + shared.MonitorInterval + "\""
 	executionType := "\"-execution-type=" + shared.Experiment + "\""
+	adaptability := "\"-is-adaptive=" + shared.Adaptability + "\""
+	prefetchCount := "\"-prefetch-count=" + shared.PrefetchCountInitial + "\""
+	setPoint := "\"-set-point=" + shared.SetPoint + "\""
+	direction := "\"-direction=" + shared.Direction + "\""
 
 	controller := "\"-controller-type=" + c + "\""
 	tunning := "\"-tunning=" + t + "\""
@@ -166,14 +99,14 @@ func createDockerFiles(c, t string, list *[]string) {
 	if err != nil {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
 	}
-
-	*list = append(*list, fileName)
-
-	command := "CMD [\"./subscriber\"," + controller + "," + tunning + ",\"-is-adaptive=true\"," + executionType + "," + monitorInterval + ", \"-prefetch-count=1\"," + max + "," + min + ", \"-set-point=1000\", \"-direction=1\"" + pExtra[c+t] + "]"
+	command := "CMD [\"./subscriber\"," + controller + "," + tunning + "," + adaptability + "," + executionType + "," + monitorInterval + "," + prefetchCount + "," + max + "," + min + "," + setPoint + "," + direction + "," + pExtra[c+t] + "]"
 
 	fmt.Fprintf(f, "%v \n", basicDocker)
 	fmt.Fprintf(f, "%v", command)
 	f.Close()
+
+	*df = append(*df, fileName)
+
 	return
 }
 
@@ -200,10 +133,11 @@ func createBat(list []string) {
 	basicBat += listCommand + "\n" +
 		"echo ****** BEGIN OF EXPERIMENTS *******\n" +
 		"for %%x in (%list%) do (\n" +
-		"   copy %%x Dockerfile\n" +
+		"echo %%x \n" +
+		"   copy " + shared.DockerfilesDir + "\\" + "%%x Dockerfile\n" +
 		"   docker build --tag subscriber .\n" +
-		"   docker run --rm --memory=\"1g\" --cpus=\"1.0\" -v C:\\Users\\user\\go\\selfadaptive\\rabbitmq\\data:/app/data subscriber\n" +
-		"   del %%x \n" +
+		"   docker run --rm --memory=\"1g\" --cpus=\"1.0\" -v " + shared.DataDir + ":" + shared.DockerDir + " subscriber\n" +
+		"   del " + shared.DockerfilesDir + "\\" + "%%x \n" +
 		")\n" +
 		"echo ****** END OF EXPERIMENTS *******\n"
 

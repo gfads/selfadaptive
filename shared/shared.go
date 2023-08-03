@@ -19,6 +19,68 @@ import (
 //const IpPortRabbitMQ = "172.22.40.187:5672" // CIN
 const IpPortRabbitMQ = "192.168.0.20:5672" // Home Recife
 
+// Training/Experiment parameters
+const L = 1.0
+const Tau = 1.0
+const T = 0.1
+
+//var RandomGoal = []float64{363, 1042, 1871, 2063, 1436, 585, 318, 888, 1754, 2094, 1585, 710, 300, 744, 1621, 2098, 1722}
+//var RandomGoal = []float64{500, 1000, 750}
+var RandomGoals = []float64{1000}
+var InputSteps = []int{1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2} // for Ziegler/Cohen/AMIGO
+var Kp = map[string]string{
+	BasicP + RootLocus:   "0.00777594",
+	BasicP + Ziegler:     "0.00596588",
+	BasicP + Cohen:       "0.00268464",
+	BasicP + Amigo:       "0.0",
+	BasicPi + RootLocus:  "0.00211325", // not used
+	BasicPi + Ziegler:    "0.00406761",
+	BasicPi + Cohen:      "0.00414897",
+	BasicPi + Amigo:      "0.00079877",
+	BasicPid + RootLocus: "-0.00144086", // not used
+	BasicPid + Ziegler:   "0.00496689",
+	BasicPid + Cohen:     "0.00156457",
+	BasicPid + Amigo:     "0.00101407",
+}
+var Ki = map[string]string{
+	BasicP + RootLocus:   "0.0",
+	BasicP + Ziegler:     "0.0",
+	BasicP + Cohen:       "0.0",
+	BasicP + Amigo:       "0.0",
+	BasicPi + RootLocus:  "0.00222392", // not used
+	BasicPi + Ziegler:    "0.00122028",
+	BasicPi + Cohen:      "0.01514702",
+	BasicPi + Amigo:      "0.00218342",
+	BasicPid + RootLocus: "0.00248495", // not used
+	BasicPid + Ziegler:   "0.00248344",
+	BasicPid + Cohen:     "0.00148113",
+	BasicPid + Amigo:     "0.00213378"}
+var Kd = map[string]string{
+	BasicP + RootLocus:   "0.0",
+	BasicP + Ziegler:     "0.0",
+	BasicP + Cohen:       "0.0",
+	BasicP + Amigo:       "0.0",
+	BasicPi + RootLocus:  "0.0",
+	BasicPi + Ziegler:    "0.0",
+	BasicPi + Cohen:      "0.0",
+	BasicPi + Amigo:      "0.0",
+	BasicPid + RootLocus: "0.00057789",
+	BasicPid + Ziegler:   "0.00248344",
+	BasicPid + Cohen:     "0.00019962",
+	BasicPid + Amigo:     "0.00012676"}
+
+const MinPC = "1"
+const MaxPC = "100"
+const MonitorInterval = "5"
+const Adaptability = "true"
+const PrefetchCountInitial = "1"
+const SetPoint = "500"
+const Direction = "1.0"
+const DeadZone = "200.0"
+const HysteresisBand = "200.0"
+const Alfa = "1.0"
+const Beta = "0.5"
+
 // Astar
 const SV = 2.7           // Shutoff voltage (page 17) = 2.7 V
 const OV = 3.7           // Optimum voltage (page 17) = 3.7 V
@@ -39,6 +101,9 @@ const OnLineTraining = "OnlineTraining"
 const WebTraining = "WebTraining"
 
 // Controller type names
+
+const AsTAR = "AsTAR"
+const HPA = "HPA"
 const BasicOnoff = "OnOff"
 const DeadZoneOnoff = "OnOffwithDeadZone"
 const HysteresisOnoff = "OnOffwithHysteresis"
@@ -55,14 +120,34 @@ const PIwithTwoDegreesOfFreedom = "PIWithTwoDegreesOfFreedom"
 const WindUp = "WindUp"
 const SetpointWeighting = "SetpointWeighting"
 
+var ControllerTypesPid = []string{
+	BasicP,
+	BasicPi,
+	BasicPid,
+	SmoothingPid,
+	IncrementalFormPid,
+	ErrorSquarePidFull,
+	ErrorSquarePidProportional,
+	DeadZonePid,
+	GainScheduling,
+	PIwithTwoDegreesOfFreedom,
+	WindUp,
+	SetpointWeighting}
+
+var ControllerTypesNonPid = []string{
+	AsTAR,
+	HPA,
+	BasicOnoff,
+	DeadZoneOnoff,
+	HysteresisOnoff}
+
+var TunningTypes = []string{RootLocus, Ziegler, Cohen, Amigo}
+
 const RootLocus = "RootLocus"
 const Ziegler = "Ziegler"
 const Cohen = "Cohen"
 const Amigo = "AMIGO"
 const None = "None"
-
-const AsTAR = "AsTAR"
-const HPA = "HPA"
 
 // Experiments parameters
 const TrainingSampleSize = 60
@@ -87,7 +172,7 @@ const DockerDir = "/app/data" // it is mapped into windows dir "C:\Users\user\go
 
 // const DataDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/rabbitmq/data/" // macos
 const DataDir = "C:\\Users\\user\\go\\selfadaptive\\rabbitmq\\data" // macos
-const DockerfilesDir = "C:\\Users\\user\\go\\selfadaptive"          // macos
+const DockerfilesDir = "C:\\Users\\user\\go\\selfadaptive\\temp"    // macos
 const BatchfilesDir = "C:\\Users\\user\\go\\selfadaptive"           // macos
 const BatchFileExperiments = "execute-all-experiments.bat"
 
