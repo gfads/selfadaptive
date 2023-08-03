@@ -8,29 +8,23 @@ import (
 )
 
 func main() {
+	controllers := shared.ControllerTypes
+	tunnings := shared.TunningTypes
 	dockerFileNames := []string{}
-	pExtra := loadExtraParameters()
+	pExtra := loadExtraParameters(controllers, tunnings)
 
-	// create Dockerfiles Non-PID Controllers
-	for c := 0; c < len(shared.ControllerTypesNonPid); c++ {
-		//	createDockerFile(shared.ControllerTypesNonPid[c], shared.None, pExtra, &dockerFileNames)
-	}
-
-	// create Dockerfiles PID Controllers
-	for c := 0; c < len(shared.ControllerTypesPid); c++ {
-		for t := 0; t < len(shared.TunningTypes); t++ {
-			createDockerFile(shared.ControllerTypesPid[c], shared.TunningTypes[t], pExtra, &dockerFileNames)
+	// create Dockerfiles
+	for c := 0; c < len(controllers); c++ {
+		for t := 0; t < len(tunnings); t++ {
+			dockerFileNames = append(dockerFileNames, createDockerFile(controllers[c], tunnings[t], pExtra))
 		}
 	}
-	fmt.Println("Docker files created...")
 
 	// create execute
 	createBat(dockerFileNames)
-
-	fmt.Println("Bat file created...")
 }
 
-func loadExtraParameters() map[string]string {
+func loadExtraParameters(c, t []string) map[string]string {
 
 	r := make(map[string]string)
 
@@ -42,10 +36,15 @@ func loadExtraParameters() map[string]string {
 	r[shared.AsTAR+shared.None] = "\"-hysteresis-band=" + shared.HysteresisBand + "\""
 
 	// PID controllers
-	for i := 0; i < len(shared.ControllerTypesPid); i++ {
-		for j := 0; j < len(shared.TunningTypes); j++ {
-			key := shared.ControllerTypesPid[i] + shared.TunningTypes[j]
-			keyGain := shared.BasicPid + shared.TunningTypes[j] // use the same key whatever the PID controller (see shared)
+	for i := 0; i < len(c); i++ {
+		for j := 0; j < len(t); j++ {
+			key := c[i] + t[j]
+			keyGain := ""
+			if c[i] == shared.BasicP || c[i] == shared.BasicPi {
+				keyGain = c[i] + t[j]
+			} else {
+				keyGain = shared.BasicPid + t[j] // use the same key whatever the PID controller (see shared)
+			}
 			r[key] =
 				"\"-kp=" + shared.Kp[keyGain] + "\", " +
 					"\"-ki=" + shared.Ki[keyGain] + "\", " +
@@ -71,18 +70,27 @@ func loadExtraParameters() map[string]string {
 	return r
 }
 
-func createDockerFile(c, t string, pExtra map[string]string, df *[]string) {
+func createDockerFile(c, t string, pExtra map[string]string) string {
 
-	// docker files folder
-	basicDocker := "# Self generated file at " + time.Now().String() + "\n" +
-		"FROM golang:1.19\n" +
-		"WORKDIR /app\n" +
-		"COPY go.mod go.sum ./\n" +
-		"RUN go mod download \n" +
-		"COPY ./ ./ \n" +
-		"RUN CGO_ENABLED=0 GOOS=linux go build -o ./subscriber ./rabbitmq/subscriber/main.go\n" +
-		"ENV GOROOT=/usr/local/go/bin/"
+	// remove old docker files
+	err := os.RemoveAll(shared.DockerfilesDir)
+	if err != nil {
+		shared.ErrorHandler(shared.GetFunction(), err.Error())
+	}
 
+	// recreate docker files folder
+	err = os.MkdirAll(shared.DockerfilesDir, 0750)
+	if err != nil && !os.IsExist(err) {
+		shared.ErrorHandler(shared.GetFunction(), err.Error())
+	}
+
+	// set tunning of non pid controllers to None
+	if t == shared.AsTAR || t == shared.HPA || t == shared.BasicOnoff ||
+		t == shared.DeadZoneOnoff || t == shared.HysteresisOnoff {
+		t = shared.None
+	}
+
+	// configure general "command" parameters
 	min := "\"-min=" + shared.MinPC + "\""
 	max := "\"-max=" + shared.MaxPC + "\""
 	monitorInterval := "\"-monitor-interval=" + shared.MonitorInterval + "\""
@@ -91,27 +99,43 @@ func createDockerFile(c, t string, pExtra map[string]string, df *[]string) {
 	prefetchCount := "\"-prefetch-count=" + shared.PrefetchCountInitial + "\""
 	setPoint := "\"-set-point=" + shared.SetPoint + "\""
 	direction := "\"-direction=" + shared.Direction + "\""
-
 	controller := "\"-controller-type=" + c + "\""
 	tunning := "\"-tunning=" + t + "\""
+
+	// create docker file
 	fileName := "Dockerfile-" + c + "-" + t
-	f, err := os.Create(shared.DockerfilesDir + "\\" + fileName)
+	df, err := os.Create(shared.DockerfilesDir + "\\" + fileName)
 	if err != nil {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
 	}
-	command := "CMD [\"./subscriber\"," + controller + "," + tunning + "," + adaptability + "," + executionType + "," + monitorInterval + "," + prefetchCount + "," + max + "," + min + "," + setPoint + "," + direction + "," + pExtra[c+t] + "]"
+	defer df.Close()
 
-	fmt.Fprintf(f, "%v \n", basicDocker)
-	fmt.Fprintf(f, "%v", command)
-	f.Close()
+	// docker file content
+	dockerFileContent := "# Self generated file at " + time.Now().String() + "\n" +
+		"FROM golang:1.19\n" +
+		"WORKDIR /app\n" +
+		"COPY go.mod go.sum ./\n" +
+		"RUN go mod download \n" +
+		"COPY ./ ./ \n" +
+		"RUN CGO_ENABLED=0 GOOS=linux go build -o ./subscriber ./rabbitmq/subscriber/main.go\n" +
+		"ENV GOROOT=/usr/local/go/bin/\n" +
+		"CMD [\"./subscriber\"," + controller + "," + tunning + "," + adaptability + "," + executionType + "," + monitorInterval + "," + prefetchCount + "," + max + "," + min + "," + setPoint + "," + direction + "," + pExtra[c+t] + "]"
 
-	*df = append(*df, fileName)
+	// write in docker file
+	fmt.Fprintf(df, dockerFileContent)
 
-	return
+	return fileName
 }
 
 func createBat(list []string) {
-	basicBat := "rem Self generated file at " + time.Now().String() + "\n" +
+	// define list of docker files include in bat file
+	listCommand := "set list="
+	for i := 0; i < len(list); i++ {
+		listCommand += list[i] + " "
+	}
+	listCommand += "\n"
+
+	batFileContent := "rem Self generated file at " + time.Now().String() + "\n" +
 		"@echo off \n" +
 		"docker stop some-rabbit \n" +
 		"docker rm some-rabbit\n" +
@@ -125,28 +149,25 @@ func createBat(list []string) {
 		"echo Removing previous volumes\n" +
 		"echo y | docker volume prune\n"
 
-	listCommand := "set list="
-	for i := 0; i < len(list); i++ {
-		listCommand += list[i] + " "
-	}
-	listCommand += "\n"
-	basicBat += listCommand + "\n" +
+	batFileContent += listCommand + "\n"
+	batFileContent +=
 		"echo ****** BEGIN OF EXPERIMENTS *******\n" +
-		"for %%x in (%list%) do (\n" +
-		"echo %%x \n" +
-		"   copy " + shared.DockerfilesDir + "\\" + "%%x Dockerfile\n" +
-		"   docker build --tag subscriber .\n" +
-		"   docker run --rm --memory=\"1g\" --cpus=\"1.0\" -v " + shared.DataDir + ":" + shared.DockerDir + " subscriber\n" +
-		"   del " + shared.DockerfilesDir + "\\" + "%%x \n" +
-		")\n" +
-		"echo ****** END OF EXPERIMENTS *******\n"
+			"for %%x in (%list%) do (\n" +
+			"echo %%x \n" +
+			"   copy " + shared.DockerfilesDir + "\\" + "%%x Dockerfile\n" +
+			"   docker build --tag subscriber .\n" +
+			"   docker run --rm --name some-subscriber --memory=\"1g\" --cpus=\"1.0\" -v " + shared.DataDir + ":" + shared.DockerDir + " subscriber\n" +
+			"   del " + shared.DockerfilesDir + "\\" + "%%x \n" +
+			")\n" +
+			"echo ****** END OF EXPERIMENTS *******\n"
 
 	// create batch file
 	fileName := shared.BatchFileExperiments
-	f, err := os.Create(shared.BatchfilesDir + "\\" + fileName)
+	bf, err := os.Create(shared.BatchfilesDir + "\\" + fileName)
 	if err != nil {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
 	}
-	fmt.Fprintf(f, "%v \n", basicBat)
-	f.Close()
+	defer bf.Close()
+
+	fmt.Fprintf(bf, batFileContent)
 }

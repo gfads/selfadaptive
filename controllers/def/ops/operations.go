@@ -9,7 +9,7 @@ package ops
 import (
 	"fmt"
 	algorithm "main.go/controllers/astar"
-	"main.go/controllers/def/info"
+	"main.go/controllers/def/parameters"
 	gainscheduling "main.go/controllers/gain"
 	"main.go/controllers/hpa"
 	onoffbasic "main.go/controllers/onoff/basic"
@@ -35,79 +35,78 @@ type IController interface {
 }
 
 // Create a controller of 'Type' (typeName) and configure its parameters //
-
-func NewController(i info.Controller) IController {
-	switch i.TypeName {
+func NewController(p parameters.ExecutionParameters) IController {
+	switch *p.ControllerType {
 	case shared.HPA:
 		c := hpa.Controller{}
-		c.Initialise(i.Direction, i.Min, i.Max, i.PC)
+		c.Initialise(*p.Direction, *p.Min, *p.Max, float64(*p.PrefetchCount))
 		return &c
 	case shared.AsTAR:
 		c := algorithm.Controller{}
-		c.Initialise(i.Min, i.Max, i.HysteresisBand)
+		c.Initialise(*p.Min, *p.Max, *p.HysteresisBand)
 		return &c
 	case shared.BasicOnoff:
 		c := onoffbasic.Controller{}
-		c.Initialise(i.Direction, i.Min, i.Max)
+		c.Initialise(*p.Direction, *p.Min, *p.Max)
 		return &c
 	case shared.DeadZoneOnoff:
 		c := deadzoneonff.Controller{}
-		c.Initialise(i.Direction, i.Min, i.Max, i.DeadZone)
+		c.Initialise(*p.Direction, *p.Min, *p.Max, *p.DeadZone)
 		return &c
 	case shared.HysteresisOnoff:
 		c := hysteresisonoff.Controller{}
-		c.Initialise(i.Direction, i.Min, i.Max, i.HysteresisBand)
+		c.Initialise(*p.Direction, *p.Min, *p.Max, *p.HysteresisBand)
 		return &c
 	case shared.BasicP:
 		c := basicpid.Controller{}
-		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, 0.0, 0.0)
+		c.Initialise(*p.Direction, *p.Min, *p.Max, *p.Kp, 0.0, 0.0)
 		return &c
 	case shared.BasicPi:
 		c := basicpid.Controller{}
-		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, 0.0)
+		c.Initialise(*p.Direction, *p.Min, *p.Max, *p.Kp, *p.Ki, 0.0)
 		return &c
 	case shared.BasicPid:
 		c := basicpid.Controller{}
-		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd)
+		c.Initialise(*p.Direction, *p.Min, *p.Max, *p.Kp, *p.Ki, *p.Kd)
 		return &c
 	case shared.SmoothingPid:
 		c := smoothingpid.Controller{}
-		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd)
+		c.Initialise(*p.Direction, *p.Min, *p.Max, *p.Kp, *p.Ki, *p.Kd)
 		return &c
 	case shared.IncrementalFormPid:
 		c := incrementalpid.Controller{}
-		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd)
+		c.Initialise(*p.Direction, *p.Min, *p.Max, *p.Kp, *p.Ki, *p.Kd)
 		return &c
 	case shared.DeadZonePid:
 		c := deadzonepid.Controller{}
-		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd, i.DeadZone)
+		c.Initialise(*p.Direction, *p.Min, *p.Max, *p.Kp, *p.Ki, *p.Kd, *p.DeadZone)
 		return &c
 	case shared.ErrorSquarePidFull:
 		c := errorsquarefull.Controller{}
-		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd)
+		c.Initialise(*p.Direction, *p.Min, *p.Max, *p.Kp, *p.Ki, *p.Kd)
 		return &c
 	case shared.ErrorSquarePidProportional:
 		c := errorsquareproportional.Controller{}
-		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd)
+		c.Initialise(*p.Direction, *p.Min, *p.Max, *p.Kp, *p.Ki, *p.Kd)
 		return &c
 	case shared.GainScheduling:
 		c := gainscheduling.Controller{}
-		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd)
+		c.Initialise(*p.Direction, *p.Min, *p.Max, *p.Kp, *p.Ki, *p.Kd)
 		return &c
 	case shared.PIwithTwoDegreesOfFreedom:
 		c := twodegrees.Controller{}
-		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd, i.Beta)
+		c.Initialise(*p.Direction, *p.Min, *p.Max, *p.Kp, *p.Ki, *p.Kd, *p.Beta)
 		return &c
 	case shared.WindUp:
 		c := windup.Controller{}
-		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd)
+		c.Initialise(*p.Direction, *p.Min, *p.Max, *p.Kp, *p.Ki, *p.Kd)
 		return &c
 	case shared.SetpointWeighting:
 		c := setpointweighting.Controller{}
-		c.Initialise(i.Direction, i.Min, i.Max, i.Kp, i.Ki, i.Kd, i.Alfa, i.Beta)
+		c.Initialise(*p.Direction, *p.Min, *p.Max, *p.Kp, *p.Ki, *p.Kd, *p.Alfa, *p.Beta)
 		return &c
 	default:
-		fmt.Println(shared.GetFunction(), "Error: Controller type ´", i.TypeName, "´ is unknown!")
+		fmt.Println(shared.GetFunction(), "Error: Controller type ´", *p.ControllerType, "´ is unknown!")
 		os.Exit(0)
 	}
 

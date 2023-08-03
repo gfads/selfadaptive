@@ -19,9 +19,9 @@ cd C:\Users\user\go\selfadaptive
 echo Remove images
 rem for /F %i in ('docker images -a -q') do docker rmi -f %i
 rem docker system prune --> delete everything (images, containers, volumes)
-rem docker volume prune
-rem docker images prune
-rem docker container prune
+echo y | docker volume prune
+echo y | docker images prune
+echo y | docker container prune
 
 echo Execute Experiments
 execute-all-experiments

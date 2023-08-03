@@ -1,9 +1,9 @@
-# Self generated file at 2023-08-03 14:37:35.5224801 -0300 -03 m=+0.019733701
+# Self generated file at 2023-08-03 18:15:31.704446 -0300 -03 m=+0.018820701
 FROM golang:1.19
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download 
 COPY ./ ./ 
 RUN CGO_ENABLED=0 GOOS=linux go build -o ./subscriber ./rabbitmq/subscriber/main.go
-ENV GOROOT=/usr/local/go/bin/ 
-CMD ["./subscriber","-controller-type=SmoothingDerivativePID","-tunning=AMIGO","-is-adaptive=true","-execution-type=Experiment","-monitor-interval=5","-prefetch-count=1","-max=100","-min=1","-set-point=500","-direction=1.0","-kp=0.00101407", "-ki=0.00213378", "-kd=0.00012676"]
+ENV GOROOT=/usr/local/go/bin/
+CMD ["./subscriber","-controller-type=SmoothingDerivativePID","-tunning=AMIGO","-is-adaptive=true","-execution-type=Experiment","-monitor-interval=4","-prefetch-count=1","-max=100","-min=1","-set-point=500","-direction=1.0","-kp=0.00101407", "-ki=0.00213378", "-kd=0.00012676"]

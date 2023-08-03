@@ -71,7 +71,7 @@ var Kd = map[string]string{
 
 const MinPC = "1"
 const MaxPC = "100"
-const MonitorInterval = "5"
+const MonitorInterval = "4"
 const Adaptability = "true"
 const PrefetchCountInitial = "1"
 const SetPoint = "500"
@@ -80,6 +80,14 @@ const DeadZone = "200.0"
 const HysteresisBand = "200.0"
 const Alfa = "1.0"
 const Beta = "0.5"
+
+// Experiments parameters
+const TrainingSampleSize = 60
+const TimeBetweenAdjustments = 1200 // seconds
+const MaximumNrmse = 0.30
+const WarmupTime = 30 // seconds
+const TrainingAttempts = 30
+const SizeOfSameLevel = 30 // used in the experiments
 
 // Astar
 const SV = 2.7           // Shutoff voltage (page 17) = 2.7 V
@@ -120,7 +128,7 @@ const PIwithTwoDegreesOfFreedom = "PIWithTwoDegreesOfFreedom"
 const WindUp = "WindUp"
 const SetpointWeighting = "SetpointWeighting"
 
-var ControllerTypesPid = []string{
+var ControllerTypes = []string{
 	BasicP,
 	BasicPi,
 	BasicPid,
@@ -132,9 +140,7 @@ var ControllerTypesPid = []string{
 	GainScheduling,
 	PIwithTwoDegreesOfFreedom,
 	WindUp,
-	SetpointWeighting}
-
-var ControllerTypesNonPid = []string{
+	SetpointWeighting,
 	AsTAR,
 	HPA,
 	BasicOnoff,
@@ -148,14 +154,6 @@ const Ziegler = "Ziegler"
 const Cohen = "Cohen"
 const Amigo = "AMIGO"
 const None = "None"
-
-// Experiments parameters
-const TrainingSampleSize = 60
-const TimeBetweenAdjustments = 1200 // seconds
-const MaximumNrmse = 0.30
-const WarmupTime = 30 // seconds
-const TrainingAttempts = 30
-const SizeOfSameLevel = 60
 
 // Controller parameters
 const MinOnoff = 10
@@ -175,6 +173,7 @@ const DataDir = "C:\\Users\\user\\go\\selfadaptive\\rabbitmq\\data" // macos
 const DockerfilesDir = "C:\\Users\\user\\go\\selfadaptive\\temp"    // macos
 const BatchfilesDir = "C:\\Users\\user\\go\\selfadaptive"           // macos
 const BatchFileExperiments = "execute-all-experiments.bat"
+const ExperimentFileBase = "raw-sin-3-"
 
 //const SourcesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\sources"
 //const ExecutablesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\executables"

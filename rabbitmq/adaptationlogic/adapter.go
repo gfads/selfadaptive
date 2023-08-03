@@ -2,8 +2,8 @@ package adaptationlogic
 
 import (
 	"fmt"
-	"main.go/controllers/def/info"
 	"main.go/controllers/def/ops"
+	"main.go/controllers/def/parameters"
 	"main.go/shared"
 	"math"
 	"os"
@@ -37,12 +37,26 @@ type AdaptationLogic struct {
 	File            *os.File
 }
 
-func NewAdaptationLogic(executionType string, chFromBusiness chan int, chToBusiness chan int, info info.Controller, setPoint float64, monitorInterval time.Duration, pc int, f *os.File) AdaptationLogic {
+func NewAdaptationLogic(chFromBusiness, chToBusiness chan int, p parameters.ExecutionParameters, df *os.File) AdaptationLogic {
 
-	c := ops.NewController(info)
-	i := TrainingInfo{Kp: info.Kp, Ki: info.Ki, Kd: info.Kd, Data: []AdjustmenstInfo{}, TypeName: info.TypeName, SetPoint: setPoint, PC: pc}
+	c := ops.NewController(p)
+	i := TrainingInfo{Kp: *p.Kp,
+		Ki:       *p.Ki,
+		Kd:       *p.Kd,
+		Data:     []AdjustmenstInfo{},
+		TypeName: *p.ControllerType,
+		SetPoint: *p.SetPoint,
+		PC:       *p.PrefetchCount}
 
-	return AdaptationLogic{ExecutionType: executionType, TrainingInfo: i, FromBusiness: chFromBusiness, ToBusiness: chToBusiness, Controller: c, SetPoint: setPoint, MonitorInterval: monitorInterval * time.Second, PC: pc, File: f}
+	return AdaptationLogic{ExecutionType: *p.ExecutionType,
+		TrainingInfo:    i,
+		FromBusiness:    chFromBusiness,
+		ToBusiness:      chToBusiness,
+		Controller:      c,
+		SetPoint:        *p.SetPoint,
+		MonitorInterval: time.Duration(*p.MonitorInterval) * time.Second,
+		PC:              *p.PrefetchCount,
+		File:            df}
 }
 
 func (al AdaptationLogic) Run() {
