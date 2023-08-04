@@ -18,15 +18,12 @@ type Data struct {
 	Goal        float64
 }
 
-const nameFilter = "raw-sin-3-"
-
-//const DataBaseName = "RootLocus"
-const StatiticsFileName = "data-all.csv"
+const nameFilter = "raw-sin-" // TODO
 
 func main() {
 
 	// open output stat file
-	statFile, err := os.Create(shared.DataDir + "\\" + StatiticsFileName)
+	statFile, err := os.Create(shared.DataDir + "\\" + shared.StatiticsFileName)
 	if err != nil {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
 	}
@@ -38,18 +35,33 @@ func main() {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
 	}
 
+	for i := range files {
+		fmt.Println("HERE", files[i].Name())
+	}
 	// generate data
-	fmt.Fprintf(statFile, "Controller;Tunning;RMSE;NMRSE;MAE;MAPE;SMAPE;R2;ITAE;ISE;Control Effort;CC \n")
+	fmt.Fprintf(statFile, "Controller;Tunning;RMSE;NMRSE;MAE;MAPE;SMAPE;R2;ITAE;ISE;Control Effort;CC;Goal Range \n")
 	for f := range files {
 		if strings.Contains(files[f].Name(), nameFilter) {
 			data := readFile(files[f].Name())
-			i1 := strings.Index(files[f].Name(), ".csv")
-			temp := strings.Split(files[f].Name()[len(nameFilter):i1], "-")
-			controller := temp[0]
-			tunning := temp[1]
-			fmt.Fprintf(statFile, "%v;%v;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f\n", controller, tunning, rmse(data), nmrse(data), mae(data), mape(data), smape(data), r2(data), itae(data), ise(data), controlEffort(data), cc(data))
+			//i1 := strings.Index(files[f].Name(), ".csv")
+			//temp := strings.Split(files[f].Name()[len(nameFilter):i1], "-")
+			//controller := temp[0]
+			//tunning := temp[1]
+			fmt.Fprintf(statFile, "%v;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f\n", files[f].Name(), rmse(data), nmrse(data), mae(data), mape(data), smape(data), r2(data), itae(data), ise(data), controlEffort(data), cc(data), goalRange(data))
 		}
 	}
+}
+
+func goalRange(d []Data) float64 {
+	n := len(d)
+
+	r := 0
+	for i := 0; i < n; i++ {
+		if d[i].Rate > d[i].Goal*0.9 && d[i].Rate < d[i].Goal*1.1 {
+			r++
+		}
+	}
+	return float64(r) / float64(n) * 100.0
 }
 
 func cc(d []Data) float64 {

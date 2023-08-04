@@ -37,7 +37,7 @@ var Kp = map[string]string{
 	BasicPi + Ziegler:    "0.00406761",
 	BasicPi + Cohen:      "0.00414897",
 	BasicPi + Amigo:      "0.00079877",
-	BasicPid + RootLocus: "-0.00144086", // not used
+	BasicPid + RootLocus: "-0.00144086", // original -v1
 	BasicPid + Ziegler:   "0.00496689",
 	BasicPid + Cohen:     "0.00156457",
 	BasicPid + Amigo:     "0.00101407",
@@ -51,7 +51,7 @@ var Ki = map[string]string{
 	BasicPi + Ziegler:    "0.00122028",
 	BasicPi + Cohen:      "0.01514702",
 	BasicPi + Amigo:      "0.00218342",
-	BasicPid + RootLocus: "0.00248495", // not used
+	BasicPid + RootLocus: "0.00248495", // original
 	BasicPid + Ziegler:   "0.00248344",
 	BasicPid + Cohen:     "0.00148113",
 	BasicPid + Amigo:     "0.00213378"}
@@ -64,14 +64,14 @@ var Kd = map[string]string{
 	BasicPi + Ziegler:    "0.0",
 	BasicPi + Cohen:      "0.0",
 	BasicPi + Amigo:      "0.0",
-	BasicPid + RootLocus: "0.00057789",
+	BasicPid + RootLocus: "0.00057789", // original
 	BasicPid + Ziegler:   "0.00248344",
 	BasicPid + Cohen:     "0.00019962",
 	BasicPid + Amigo:     "0.00012676"}
 
 const MinPC = "1"
 const MaxPC = "100"
-const MonitorInterval = "4"
+const MonitorInterval = "5"
 const Adaptability = "true"
 const PrefetchCountInitial = "1"
 const SetPoint = "500"
@@ -87,7 +87,7 @@ const TimeBetweenAdjustments = 1200 // seconds
 const MaximumNrmse = 0.30
 const WarmupTime = 30 // seconds
 const TrainingAttempts = 30
-const SizeOfSameLevel = 30 // used in the experiments
+const SizeOfSameLevel = 180 // used in the experiments
 
 // Astar
 const SV = 2.7           // Shutoff voltage (page 17) = 2.7 V
@@ -129,8 +129,8 @@ const WindUp = "WindUp"
 const SetpointWeighting = "SetpointWeighting"
 
 var ControllerTypes = []string{
-	BasicP,
-	BasicPi,
+	//BasicP,
+	//BasicPi,
 	BasicPid,
 	SmoothingPid,
 	IncrementalFormPid,
@@ -143,11 +143,18 @@ var ControllerTypes = []string{
 	SetpointWeighting,
 	AsTAR,
 	HPA,
-	BasicOnoff,
-	DeadZoneOnoff,
-	HysteresisOnoff}
+	//BasicOnoff,
+	//DeadZoneOnoff,
+	//HysteresisOnoff
+}
 
-var TunningTypes = []string{RootLocus, Ziegler, Cohen, Amigo}
+var TunningTypes = []string{RootLocus}
+
+//Ziegler,
+//Cohen,
+//Amigo
+
+const ExperimentFileBase = "raw-sin-05-"
 
 const RootLocus = "RootLocus"
 const Ziegler = "Ziegler"
@@ -173,7 +180,7 @@ const DataDir = "C:\\Users\\user\\go\\selfadaptive\\rabbitmq\\data" // macos
 const DockerfilesDir = "C:\\Users\\user\\go\\selfadaptive\\temp"    // macos
 const BatchfilesDir = "C:\\Users\\user\\go\\selfadaptive"           // macos
 const BatchFileExperiments = "execute-all-experiments.bat"
-const ExperimentFileBase = "raw-sin-3-"
+const StatiticsFileName = "data-all.csv"
 
 //const SourcesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\sources"
 //const ExecutablesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\executables"

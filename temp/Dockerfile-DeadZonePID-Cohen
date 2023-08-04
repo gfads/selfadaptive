@@ -1,9 +1,0 @@
-# Self generated file at 2023-08-03 18:15:31.7126745 -0300 -03 m=+0.027049201
-FROM golang:1.19
-WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download 
-COPY ./ ./ 
-RUN CGO_ENABLED=0 GOOS=linux go build -o ./subscriber ./rabbitmq/subscriber/main.go
-ENV GOROOT=/usr/local/go/bin/
-CMD ["./subscriber","-controller-type=DeadZonePID","-tunning=Cohen","-is-adaptive=true","-execution-type=Experiment","-monitor-interval=4","-prefetch-count=1","-max=100","-min=1","-set-point=500","-direction=1.0","-kp=0.00156457", "-ki=0.00148113", "-kd=0.00019962","-dead-zone=200.0"]

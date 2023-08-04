@@ -3,7 +3,7 @@ set GO111MODULE=on
 set GOPATH=C:\Users\user\go;C:\Users\user\go\control\pkg\mod\github.com\streadway\amqp@v1.0.0;C:\Users\user\go\selfadaptive
 set GOROOT=C:\Program Files\Go
 
-echo Compile helpers
+echo #### Compile helpers #####
 c:
 cd C:\Users\user\go\selfadaptive\helper\gen
 go build -o main.exe main.go
@@ -11,22 +11,22 @@ go build -o main.exe main.go
 cd C:\Users\user\go\selfadaptive\helper\stats
 go build -o main.exe main.go
 
-echo Generate Dockerfiles/Batch file
+echo #### Generate Dockerfiles/Batch file ####
 cd C:\Users\user\go\selfadaptive\helper\gen
 main.exe
 cd C:\Users\user\go\selfadaptive
 
-echo Remove images
+echo ##### Remove images ####
 rem for /F %i in ('docker images -a -q') do docker rmi -f %i
 rem docker system prune --> delete everything (images, containers, volumes)
 echo y | docker volume prune
-echo y | docker images prune
+echo y | docker image prune
 echo y | docker container prune
 
-echo Execute Experiments
+echo #### Execute Experiments ####
 execute-all-experiments
 
-echo Generate Statistics
+echo #### Generate Statistics ####
 cd C:\Users\user\go\selfadaptive\helper\stats
 main.exe
 

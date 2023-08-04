@@ -117,6 +117,7 @@ func (al AdaptationLogic) RunExperiment() {
 				currentGoalIdx++
 				if currentGoalIdx >= len(shared.RandomGoals) {
 					al.File.Close()
+					fmt.Println("Adapter", al.File.Name())
 					os.Exit(0)
 				}
 			}

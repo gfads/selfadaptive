@@ -57,7 +57,7 @@ func main() {
 
 	// define and open csv file to record experiment results
 	dataFileName := shared.ExperimentFileBase + *p.ControllerType + "-" + *p.Tunning + ".csv"
-	df, err := os.Create(shared.DataDir + "\\" + dataFileName)
+	df, err := os.Create(shared.DockerDir + "/" + dataFileName)
 	if err != nil {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
 	}
