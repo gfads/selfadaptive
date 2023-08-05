@@ -26,7 +26,7 @@ const T = 0.1
 
 //var RandomGoal = []float64{363, 1042, 1871, 2063, 1436, 585, 318, 888, 1754, 2094, 1585, 710, 300, 744, 1621, 2098, 1722}
 //var RandomGoal = []float64{500, 1000, 750}
-var RandomGoals = []float64{1000}
+var RandomGoals = []float64{300, 1000, 600}
 var InputSteps = []int{1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2} // for Ziegler/Cohen/AMIGO
 var Kp = map[string]string{
 	BasicP + RootLocus:   "0.00777594",
@@ -87,7 +87,7 @@ const TimeBetweenAdjustments = 1200 // seconds
 const MaximumNrmse = 0.30
 const WarmupTime = 30 // seconds
 const TrainingAttempts = 30
-const SizeOfSameLevel = 180 // used in the experiments
+const SizeOfSameLevel = 60 // used in the experiments
 
 // Astar
 const SV = 2.7           // Shutoff voltage (page 17) = 2.7 V
@@ -154,7 +154,7 @@ var TunningTypes = []string{RootLocus}
 //Cohen,
 //Amigo
 
-const ExperimentFileBase = "raw-sin-05-"
+const ExperimentFileBase = "raw-sin-07-3-levels"
 
 const RootLocus = "RootLocus"
 const Ziegler = "Ziegler"
