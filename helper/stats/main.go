@@ -54,10 +54,9 @@ func main() {
 
 func goalRange(d []Data) float64 {
 	n := len(d)
-
 	r := 0
 	for i := 0; i < n; i++ {
-		if d[i].Rate > d[i].Goal*0.9 && d[i].Rate < d[i].Goal*1.1 {
+		if d[i].Rate > d[i].Goal*0.8 && d[i].Rate < d[i].Goal*1.2 {
 			r++
 		}
 	}

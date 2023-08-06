@@ -26,7 +26,7 @@ const T = 0.1
 
 //var RandomGoal = []float64{363, 1042, 1871, 2063, 1436, 585, 318, 888, 1754, 2094, 1585, 710, 300, 744, 1621, 2098, 1722}
 //var RandomGoal = []float64{500, 1000, 750}
-var RandomGoals = []float64{300, 1000, 600}
+var RandomGoals = []float64{866, 1440, 866}
 var InputSteps = []int{1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2} // for Ziegler/Cohen/AMIGO
 var Kp = map[string]string{
 	BasicP + RootLocus:   "0.00777594",
@@ -130,7 +130,7 @@ const SetpointWeighting = "SetpointWeighting"
 
 var ControllerTypes = []string{
 	//BasicP,
-	//BasicPi,
+	BasicPi,
 	BasicPid,
 	SmoothingPid,
 	IncrementalFormPid,
@@ -148,13 +148,13 @@ var ControllerTypes = []string{
 	//HysteresisOnoff
 }
 
-var TunningTypes = []string{RootLocus}
+var TunningTypes = []string{RootLocus,
+	//Ziegler,
+	//Cohen,
+	Amigo,
+}
 
-//Ziegler,
-//Cohen,
-//Amigo
-
-const ExperimentFileBase = "raw-sin-07-3-levels"
+const ExperimentFileBase = "raw-sin-11-3-third-60-same-"
 
 const RootLocus = "RootLocus"
 const Ziegler = "Ziegler"

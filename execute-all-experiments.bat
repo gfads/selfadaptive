@@ -1,4 +1,4 @@
-rem This file has been generated automatically at 2023-08-05 07:01:45.3374021 -0300 -03 m=+0.099471301
+rem This file has been generated automatically at 2023-08-05 20:10:02.4986883 -0300 -03 m=+0.021044901
 @echo off 
 docker stop some-rabbit 
 docker rm some-rabbit
@@ -8,7 +8,7 @@ docker stop publisher
 docker rm publisher
 docker stop subscriber
 docker rm subscriber
-set list=Dockerfile-BasicPID-RootLocus Dockerfile-SmoothingDerivativePID-RootLocus Dockerfile-IncrementalFormPID-RootLocus Dockerfile-ErrorSquarePIDFull-RootLocus Dockerfile-ErrorSquarePIDProportional-RootLocus Dockerfile-DeadZonePID-RootLocus Dockerfile-GainScheduling-RootLocus Dockerfile-PIWithTwoDegreesOfFreedom-RootLocus Dockerfile-WindUp-RootLocus Dockerfile-SetpointWeighting-RootLocus Dockerfile-AsTAR-None Dockerfile-HPA-None 
+set list=Dockerfile-BasicPI-RootLocus Dockerfile-BasicPI-AMIGO Dockerfile-BasicPID-RootLocus Dockerfile-BasicPID-AMIGO Dockerfile-SmoothingDerivativePID-RootLocus Dockerfile-SmoothingDerivativePID-AMIGO Dockerfile-IncrementalFormPID-RootLocus Dockerfile-IncrementalFormPID-AMIGO Dockerfile-ErrorSquarePIDFull-RootLocus Dockerfile-ErrorSquarePIDFull-AMIGO Dockerfile-ErrorSquarePIDProportional-RootLocus Dockerfile-ErrorSquarePIDProportional-AMIGO Dockerfile-DeadZonePID-RootLocus Dockerfile-DeadZonePID-AMIGO Dockerfile-GainScheduling-RootLocus Dockerfile-GainScheduling-AMIGO Dockerfile-PIWithTwoDegreesOfFreedom-RootLocus Dockerfile-PIWithTwoDegreesOfFreedom-AMIGO Dockerfile-WindUp-RootLocus Dockerfile-WindUp-AMIGO Dockerfile-SetpointWeighting-RootLocus Dockerfile-SetpointWeighting-AMIGO Dockerfile-AsTAR-None Dockerfile-AsTAR-None Dockerfile-HPA-None Dockerfile-HPA-None 
 
 for %%x in (%list%) do (
 echo %%x 
