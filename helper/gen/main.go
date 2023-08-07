@@ -163,6 +163,8 @@ func createBat(list []string) {
 			"   docker build --tag subscriber .\n" +
 			"   docker run --rm --name some-subscriber --memory=\"1g\" --cpus=\"1.0\" -v " + shared.DataDir + ":" + shared.DockerDir + " subscriber\n" +
 			"   del " + shared.DockerfilesDir + "\\" + "%%x \n" +
+			"   echo y | docker volume prune \n" +
+			"   echo y | docker image prune \n" +
 			")\n"
 
 	// create batch file

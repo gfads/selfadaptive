@@ -1,4 +1,4 @@
-rem This file has been generated automatically at 2023-08-06 09:08:32.7979411 -0300 -03 m=+0.029457101
+rem This file has been generated automatically at 2023-08-06 19:23:48.3317312 -0300 -03 m=+0.034048801
 @echo off 
 docker stop some-rabbit 
 docker rm some-rabbit
@@ -16,4 +16,6 @@ echo %%x
    docker build --tag subscriber .
    docker run --rm --name some-subscriber --memory="1g" --cpus="1.0" -v C:\Users\user\go\selfadaptive\rabbitmq\data:/app/data subscriber
    del C:\Users\user\go\selfadaptive\temp\%%x 
+   echo y | docker volume prune 
+   echo y | docker image prune 
 )

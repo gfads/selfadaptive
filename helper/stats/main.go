@@ -18,7 +18,7 @@ type Data struct {
 	Goal        float64
 }
 
-const nameFilter = "raw-sin-" // TODO
+const nameFilter = "raw-" // TODO
 
 func main() {
 
@@ -35,13 +35,11 @@ func main() {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
 	}
 
-	for i := range files {
-		fmt.Println("HERE", files[i].Name())
-	}
 	// generate data
 	fmt.Fprintf(statFile, "Controller;Tunning;RMSE;NMRSE;MAE;MAPE;SMAPE;R2;ITAE;ISE;Control Effort;CC;Goal Range \n")
 	for f := range files {
 		if strings.Contains(files[f].Name(), nameFilter) {
+			fmt.Println(files[f].Name())
 			data := readFile(files[f].Name())
 			//i1 := strings.Index(files[f].Name(), ".csv")
 			//temp := strings.Split(files[f].Name()[len(nameFilter):i1], "-")
