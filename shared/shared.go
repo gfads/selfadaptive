@@ -27,6 +27,7 @@ const T = 0.1
 //var RandomGoal = []float64{363, 1042, 1871, 2063, 1436, 585, 318, 888, 1754, 2094, 1585, 710, 300, 744, 1621, 2098, 1722}
 //var RandomGoal = []float64{500, 1000, 750}
 //var RandomGoals = []float64{866, 1440, 866}
+//ar RandomGoals = []float64{866, 1440, 1000}
 var RandomGoals = []float64{1440}
 var InputSteps = []int{1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2} // for Ziegler/Cohen/AMIGO
 var Kp = map[string]string{
@@ -155,7 +156,7 @@ var TunningTypes = []string{RootLocus,
 	Amigo,
 }
 
-const ExperimentFileBase = "raw-sin-15-1-866-"
+const ExperimentFileBase = "raw-sin-18-1440-"
 
 const RootLocus = "RootLocus"
 const Ziegler = "Ziegler"
