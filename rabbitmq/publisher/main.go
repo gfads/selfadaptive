@@ -90,9 +90,8 @@ func (c Client) RunWindows(ws *sync.WaitGroup) time.Duration {
 		corrId := shared.RandomString(32)
 
 		// make resquests randomly distributed -- experimental purpose -- comment
-		interTime := c.Mean + rand.NormFloat64()*c.StdDev
-		time.Sleep(time.Duration(interTime) * time.Millisecond)
-
+		//interTime := c.Mean + rand.NormFloat64()*c.StdDev
+		//time.Sleep(time.Duration(interTime) * time.Millisecond)
 		err = c.Ch.Publish(
 			"",          // exchange
 			"rpc_queue", // routing key
@@ -110,7 +109,8 @@ func (c Client) RunWindows(ws *sync.WaitGroup) time.Duration {
 		if err != nil {
 			shared.ErrorHandler(shared.GetFunction(), "Failed to publish a message")
 		}
-
+		for i := 0; i < 1000000; i++ { // TODO
+		}
 		//fmt.Println("Client ", c.Id, " published message >> ", corrId)
 
 		// Receive response

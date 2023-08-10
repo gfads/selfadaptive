@@ -1,4 +1,4 @@
-rem This file has been generated automatically at 2023-08-08 08:19:48.3477579 -0300 -03 m=+0.068799801
+rem This file has been generated automatically at 2023-08-10 12:54:09.3370398 -0300 -03 m=+0.013468101
 @echo off 
 docker stop some-rabbit 
 docker rm some-rabbit
@@ -8,7 +8,7 @@ docker stop publisher
 docker rm publisher
 docker stop subscriber
 docker rm subscriber
-set list=Dockerfile-BasicPI-RootLocus Dockerfile-BasicPI-AMIGO Dockerfile-BasicPID-RootLocus Dockerfile-BasicPID-AMIGO Dockerfile-SmoothingDerivativePID-RootLocus Dockerfile-SmoothingDerivativePID-AMIGO Dockerfile-IncrementalFormPID-RootLocus Dockerfile-IncrementalFormPID-AMIGO Dockerfile-ErrorSquarePIDFull-RootLocus Dockerfile-ErrorSquarePIDFull-AMIGO Dockerfile-ErrorSquarePIDProportional-RootLocus Dockerfile-ErrorSquarePIDProportional-AMIGO Dockerfile-DeadZonePID-RootLocus Dockerfile-DeadZonePID-AMIGO Dockerfile-GainScheduling-RootLocus Dockerfile-GainScheduling-AMIGO Dockerfile-PIWithTwoDegreesOfFreedom-RootLocus Dockerfile-PIWithTwoDegreesOfFreedom-AMIGO Dockerfile-WindUp-RootLocus Dockerfile-WindUp-AMIGO Dockerfile-SetpointWeighting-RootLocus Dockerfile-SetpointWeighting-AMIGO Dockerfile-AsTAR-None Dockerfile-AsTAR-None Dockerfile-HPA-None Dockerfile-HPA-None 
+set list=Dockerfile-BasicPID-RootLocus Dockerfile-BasicPID-AMIGO 
 
 for %%x in (%list%) do (
 echo %%x 

@@ -132,19 +132,19 @@ const SetpointWeighting = "SetpointWeighting"
 
 var ControllerTypes = []string{
 	//BasicP,
-	BasicPi,
+	//BasicPi,
 	BasicPid,
-	SmoothingPid,
-	IncrementalFormPid,
-	ErrorSquarePidFull,
-	ErrorSquarePidProportional,
-	DeadZonePid,
-	GainScheduling,
-	PIwithTwoDegreesOfFreedom,
-	WindUp,
-	SetpointWeighting,
-	AsTAR,
-	HPA,
+	//SmoothingPid,
+	//IncrementalFormPid,
+	//ErrorSquarePidFull,
+	//ErrorSquarePidProportional,
+	//DeadZonePid,
+	//GainScheduling,
+	//PIwithTwoDegreesOfFreedom,
+	//WindUp,
+	//SetpointWeighting,
+	//AsTAR,
+	//HPA,
 	//BasicOnoff,
 	//DeadZoneOnoff,
 	//HysteresisOnoff
@@ -156,7 +156,7 @@ var TunningTypes = []string{RootLocus,
 	Amigo,
 }
 
-const ExperimentFileBase = "raw-sin-18-1440-"
+const ExperimentFileBase = "raw-sin-19-1440-"
 
 const RootLocus = "RootLocus"
 const Ziegler = "Ziegler"
