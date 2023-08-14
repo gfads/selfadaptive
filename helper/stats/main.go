@@ -7,6 +7,7 @@ import (
 	"main.go/shared"
 	"math"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -18,16 +19,25 @@ type Data struct {
 	Goal        float64
 }
 
-const nameFilter = "raw-" // TODO
+//const rawFilter = "raw-" // TODO
+const experimentFilter = shared.ExperimentInput
+const trainingFilter = shared.TrainingInput
 
 func main() {
 
-	// open output stat file
-	statFile, err := os.Create(shared.DataDir + "\\" + shared.StatiticsFileName)
+	// open output experiemnt file
+	experimentFile, err := os.Create(shared.DataDir + "\\" + shared.ExperimentOutput)
 	if err != nil {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
 	}
-	defer statFile.Close()
+	defer experimentFile.Close()
+
+	// open output training file
+	trainingFile, err := os.Create(shared.DataDir + "\\" + shared.TrainingOutput)
+	if err != nil {
+		shared.ErrorHandler(shared.GetFunction(), err.Error())
+	}
+	defer trainingFile.Close()
 
 	// read folder of files
 	files, err := ioutil.ReadDir(shared.DataDir)
@@ -35,19 +45,47 @@ func main() {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
 	}
 
-	// generate data
-	fmt.Fprintf(statFile, "Controller;Tunning;RMSE;NMRSE;MAE;MAPE;SMAPE;R2;ITAE;ISE;Control Effort;CC;Goal Range \n")
+	// generate data - raw files
+	fmt.Fprintf(experimentFile, "Controller;Tunning;RMSE;NMRSE;MAE;MAPE;SMAPE;R2;ITAE;ISE;Control Effort;CC;Goal Range \n")
 	for f := range files {
-		if strings.Contains(files[f].Name(), nameFilter) {
-			fmt.Println(files[f].Name())
+		if strings.Contains(files[f].Name(), experimentFilter) {
 			data := readFile(files[f].Name())
-			//i1 := strings.Index(files[f].Name(), ".csv")
-			//temp := strings.Split(files[f].Name()[len(nameFilter):i1], "-")
-			//controller := temp[0]
-			//tunning := temp[1]
-			fmt.Fprintf(statFile, "%v;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f\n", files[f].Name(), rmse(data), nmrse(data), mae(data), mape(data), smape(data), r2(data), itae(data), ise(data), controlEffort(data), cc(data), goalRange(data))
+			fmt.Fprintf(experimentFile, "%v;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f\n", files[f].Name(), rmse(data), nmrse(data), mae(data), mape(data), smape(data), r2(data), itae(data), ise(data), controlEffort(data), cc(data), goalRange(data))
+		}
+		if strings.Contains(files[f].Name(), trainingFilter) {
+			data := readFile(files[f].Name())
+			means := calculateMeans(data)
+
+			// order by keys
+			keys := make([]string, 0, len(means))
+			for k := range means {
+				keys = append(keys, k)
+			}
+			sort.Strings(keys)
+
+			for _, k := range keys {
+				fmt.Fprintf(trainingFile, "%v;%v;%.6f;%v\n", 0, k, means[k], 0)
+			}
 		}
 	}
+	// generate data means file - sttatic
+}
+
+func calculateMeans(d []Data) map[string]float64 {
+	n := len(d)
+	sumLevel := make(map[int]float64)
+	sizeLevel := make(map[int]int)
+	means := make(map[string]float64)
+	for i := 0; i < n; i++ {
+		sumLevel[d[i].PC] = sumLevel[d[i].PC] + d[i].Rate
+		sizeLevel[d[i].PC]++
+	}
+	for k, v := range sumLevel {
+		key := strconv.Itoa(k)
+		means[shared.PadLeft(key, 5)] = float64(v) / float64(sizeLevel[k])
+		fmt.Println(shared.PadLeft(key, 6))
+	}
+	return means
 }
 
 func goalRange(d []Data) float64 {
@@ -196,6 +234,7 @@ func nmrse(d []Data) float64 {
 
 	return r
 }
+
 func readFile(name string) []Data {
 
 	data := []Data{}

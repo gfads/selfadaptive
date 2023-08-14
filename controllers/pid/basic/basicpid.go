@@ -21,8 +21,6 @@ import (
 // control actions per second, then Delta time = 0.01; if we measure time
 // in days and make one update per day, then Delta time = 1.)
 
-const DeltaTime = 1
-
 type Controller struct {
 	Info info.Controller
 }
@@ -62,11 +60,10 @@ func (c *Controller) Update(p ...float64) float64 {
 	proportional := c.Info.Kp * err
 
 	// Integrator (page 49)
-	c.Info.Integrator += DeltaTime * err
-	integrator := c.Info.Integrator * c.Info.Ki
+	integrator := (c.Info.SumPrevErrors + err) * c.Info.Ki * shared.DeltaTime
 
 	// Differentiator (page 49)
-	differentiator := c.Info.Kd * (err - c.Info.PreviousError) / DeltaTime
+	differentiator := c.Info.Kd * (err - c.Info.PreviousError) / shared.DeltaTime
 
 	// control law
 	c.Info.Out = proportional + integrator + differentiator

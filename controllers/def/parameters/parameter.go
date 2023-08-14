@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"main.go/shared"
 	"os"
+	"strconv"
 )
 
 type ExecutionParameters struct {
@@ -66,118 +67,90 @@ func (e ExecutionParameters) Validate(p ExecutionParameters) {
 
 func (e ExecutionParameters) Show(p ExecutionParameters) {
 
-	// validate execution type
-	fmt.Println("************************************************")
-	fmt.Printf("Execution Type  : %v\n", *p.ExecutionType)
-	fmt.Printf("Is Adaptive?    : %v\n", *p.IsAdaptive)
-	fmt.Printf("Tunning         : %v\n", *p.Tunning)
-	fmt.Printf("Controller Type : %v\n", *p.ControllerType)
-	fmt.Printf("Monitor Interval: %v\n", *p.MonitorInterval)
-	fmt.Printf("Goal            : %.4f\n", *p.SetPoint)
-	fmt.Printf("Prefetch Count  : %v\n", *p.PrefetchCount)
-	fmt.Printf("Direction       : %.1f\n", *p.Direction)
+	r := "************************************************ \n" +
+		"Execution Type  : " + *p.ExecutionType + "\n"
+
+	switch *p.ExecutionType {
+	case shared.StaticCharacterisation:
+	default:
+		r += "Tunning         : " + *p.Tunning + "\n" +
+			"Controller Type : " + *p.ControllerType + "\n" +
+			"Monitor Interval: " + strconv.Itoa(*p.MonitorInterval) + "\n" +
+			"Goal            : " + strconv.FormatFloat(*p.SetPoint, 'E', -1, 32) + "\n" +
+			"Prefetch Count  : " + strconv.Itoa(*p.PrefetchCount) + "\n" +
+			"Direction       : " + strconv.FormatFloat(*p.Direction, 'E', -1, 32) + "\n"
+		r += "Min             : " + strconv.FormatFloat(*p.Min, 'E', -1, 32) + "\n"
+		r += "Max             : " + strconv.FormatFloat(*p.Max, 'E', -1, 32) + "\n"
+	}
 
 	switch *p.ControllerType {
+	case shared.None:
 	case shared.AsTAR:
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-		fmt.Printf("Hysteresis Band : %.4f\n", *p.HysteresisBand)
+		r += "Hysteresis Band : " + strconv.FormatFloat(*p.HysteresisBand, 'E', -1, 32)
 	case shared.BasicOnoff:
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
 	case shared.DeadZoneOnoff:
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-		fmt.Printf("Dead Zone       : %.4f\n", *p.DeadZone)
+		r += "Dead Zone       : " + strconv.FormatFloat(*p.DeadZone, 'E', -1, 32) + "\n"
 	case shared.HysteresisOnoff:
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-		fmt.Printf("Hystereis Band  : %.4f\n", *p.HysteresisBand)
+		r += "Hysteresis Band  : " + strconv.FormatFloat(*p.DeadZone, 'E', -1, 32) + "\n"
 	case shared.BasicP:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
+		r += "Kp              : " + strconv.FormatFloat(*p.Kp, 'E', -1, 32) + "\n"
+		r += "Ki              : " + strconv.FormatFloat(*p.Ki, 'E', -1, 32) + "\n"
+		r += "Kd              : " + strconv.FormatFloat(*p.Kd, 'E', -1, 32) + "\n"
 	case shared.BasicPi:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
+		r += "Kp              : " + strconv.FormatFloat(*p.Kp, 'E', -1, 32) + "\n"
+		r += "Ki              : " + strconv.FormatFloat(*p.Ki, 'E', -1, 32) + "\n"
+		r += "Kd              : " + strconv.FormatFloat(*p.Kd, 'E', -1, 32) + "\n"
 	case shared.BasicPid:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
+		r += "Kp              : " + strconv.FormatFloat(*p.Kp, 'E', -1, 32) + "\n"
+		r += "Ki              : " + strconv.FormatFloat(*p.Ki, 'E', -1, 32) + "\n"
+		r += "Kd              : " + strconv.FormatFloat(*p.Kd, 'E', -1, 32) + "\n"
 	case shared.SmoothingPid:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
+		r += "Kp              : " + strconv.FormatFloat(*p.Kp, 'E', -1, 32) + "\n"
+		r += "Ki              : " + strconv.FormatFloat(*p.Ki, 'E', -1, 32) + "\n"
+		r += "Kd              : " + strconv.FormatFloat(*p.Kd, 'E', -1, 32) + "\n"
 	case shared.IncrementalFormPid:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
+		r += "Kp              : " + strconv.FormatFloat(*p.Kp, 'E', -1, 32) + "\n"
+		r += "Ki              : " + strconv.FormatFloat(*p.Ki, 'E', -1, 32) + "\n"
+		r += "Kd              : " + strconv.FormatFloat(*p.Kd, 'E', -1, 32) + "\n"
 	case shared.ErrorSquarePidFull:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
+		r += "Kp              : " + strconv.FormatFloat(*p.Kp, 'E', -1, 32) + "\n"
+		r += "Ki              : " + strconv.FormatFloat(*p.Ki, 'E', -1, 32) + "\n"
+		r += "Kd              : " + strconv.FormatFloat(*p.Kd, 'E', -1, 32) + "\n"
 	case shared.ErrorSquarePidProportional:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
+		r += "Kp              : " + strconv.FormatFloat(*p.Kp, 'E', -1, 32) + "\n"
+		r += "Ki              : " + strconv.FormatFloat(*p.Ki, 'E', -1, 32) + "\n"
+		r += "Kd              : " + strconv.FormatFloat(*p.Kd, 'E', -1, 32) + "\n"
 	case shared.DeadZonePid:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-		fmt.Printf("Dead Zone       : %.4f\n", *p.DeadZone)
+		r += "Kp              : " + strconv.FormatFloat(*p.Kp, 'E', -1, 32) + "\n"
+		r += "Ki              : " + strconv.FormatFloat(*p.Ki, 'E', -1, 32) + "\n"
+		r += "Kd              : " + strconv.FormatFloat(*p.Kd, 'E', -1, 32) + "\n"
+		r += "Dead Zone       : " + strconv.FormatFloat(*p.DeadZone, 'E', -1, 32) + "\n"
 	case shared.GainScheduling:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-		fmt.Printf("Gain Trigger    : %.4f\n", *p.GainTrigger)
+		r += "Kp              : " + strconv.FormatFloat(*p.Kp, 'E', -1, 32) + "\n"
+		r += "Ki              : " + strconv.FormatFloat(*p.Ki, 'E', -1, 32) + "\n"
+		r += "Kd              : " + strconv.FormatFloat(*p.Kd, 'E', -1, 32) + "\n"
+		r += "Gain Trigger    : " + strconv.FormatFloat(*p.GainTrigger, 'E', -1, 32) + "\n"
 	case shared.HPA:
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-		fmt.Printf("PC           : %v\n", *p.PrefetchCount)
+		r += "PC           : " + strconv.Itoa(*p.PrefetchCount) + "\n"
 	case shared.PIwithTwoDegreesOfFreedom:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-		fmt.Printf("Beta            : %.4f\n", *p.Beta)
+		r += "Kp              : " + strconv.FormatFloat(*p.Kp, 'E', -1, 32) + "\n"
+		r += "Ki              : " + strconv.FormatFloat(*p.Ki, 'E', -1, 32) + "\n"
+		r += "Kd              : " + strconv.FormatFloat(*p.Kd, 'E', -1, 32) + "\n"
+		r += "Beta            : " + strconv.FormatFloat(*p.Beta, 'E', -1, 32) + "\n"
 	case shared.WindUp:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
+		r += "Kp              : " + strconv.FormatFloat(*p.Kp, 'E', -1, 32) + "\n"
+		r += "Ki              : " + strconv.FormatFloat(*p.Ki, 'E', -1, 32) + "\n"
+		r += "Kd              : " + strconv.FormatFloat(*p.Kd, 'E', -1, 32) + "\n"
 	case shared.SetpointWeighting:
-		fmt.Printf("Kp              : %.8f\n", *p.Kp)
-		fmt.Printf("Ki              : %.8f\n", *p.Ki)
-		fmt.Printf("Kd              : %.8f\n", *p.Kd)
-		fmt.Printf("Min             : %.4f\n", *p.Min)
-		fmt.Printf("Max             : %.4f\n", *p.Max)
-		fmt.Printf("Alpha (Integral): %.4f\n", *p.Alfa)
-		fmt.Printf("Beta (Derivative): %.4f\n", *p.Beta)
-
+		r += "Kp               : " + strconv.FormatFloat(*p.Kp, 'E', -1, 32) + "\n"
+		r += "Ki               : " + strconv.FormatFloat(*p.Ki, 'E', -1, 32) + "\n"
+		r += "Kd               : " + strconv.FormatFloat(*p.Kd, 'E', -1, 32) + "\n"
+		r += "Alpha (Integral) : " + strconv.FormatFloat(*p.Alfa, 'E', -1, 32) + "\n"
+		r += "Beta (Derivative): " + strconv.FormatFloat(*p.Beta, 'E', -1, 32) + "\n"
 	default:
 		fmt.Println(shared.GetFunction(), "Controller type ´", *p.ControllerType, "´ is invalid")
 		os.Exit(0)
 	}
-	fmt.Println("************************************************")
+	r += "************************************************"
+	fmt.Println(r)
 }

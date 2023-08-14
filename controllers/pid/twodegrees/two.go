@@ -14,8 +14,6 @@ import (
 	"os"
 )
 
-const DeltaTime = 1 // see page 103
-
 type Controller struct {
 	Info info.Controller
 }
@@ -56,11 +54,10 @@ func (c *Controller) Update(p ...float64) float64 {
 	proportional := c.Info.Kp * c.Info.Direction * (c.Info.Beta*r - y)
 
 	// Integrator (page 49)
-	c.Info.Integrator += DeltaTime * err
-	integrator := c.Info.Integrator * c.Info.Ki
+	integrator := (c.Info.SumPrevErrors + err) * c.Info.Ki * shared.DeltaTime
 
 	// Differentiator (page 108)
-	differentiator := c.Info.Kd * (err - c.Info.PreviousError) / DeltaTime
+	differentiator := c.Info.Kd * (err - c.Info.PreviousError) / shared.DeltaTime
 
 	// control law
 	c.Info.Out = proportional + integrator + differentiator

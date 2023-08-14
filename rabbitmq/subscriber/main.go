@@ -74,12 +74,56 @@ func main() {
 		// run adaptive consumer
 		consumer.RunAdaptive(startTimer, stopTimer, toAdapter, fromAdapter, df)
 	} else {
-		// run non-adaptive consumer
 		//consumer.RunNonAdaptive()
 		// Create timer
 		t := mytimer.NewMyTimer(*p.MonitorInterval, startTimer, stopTimer)
+
 		go t.RunMyTimer()
-		consumer.RunNonAdaptiveMonitored(startTimer, stopTimer, p)
+		//consumer.RunNonAdaptiveMonitored(startTimer, stopTimer, p)
+		consumer.RunStaticExperiment(startTimer, stopTimer, p, df)
+	}
+}
+
+func (c Subscriber) RunStaticExperiment(startTimer, stopTimer chan bool, p parameters.ExecutionParameters, df *os.File) {
+	count := 0
+	nSameLevel := 0
+	c.PC = *p.PrefetchCount
+	for d := range c.Msgs {
+		err := d.Ack(false) // send ack to broker
+		if err != nil {
+			shared.ErrorHandler(shared.GetFunction(), err.Error())
+		}
+		count++ // increment number of received messages
+		select {
+		case <-startTimer: // start monitor timer
+			// initialise no. of receive messages
+			count = 0
+		case <-stopTimer: // stop monitor timer
+			nSameLevel++
+			rate := float64(count) / float64(*p.MonitorInterval)
+			fmt.Fprintf(df, "%d;%d;%f;%f\n", 0, c.PC, rate, 0.0) // queue size; pc;rate;goal
+			fmt.Printf("%d;%d;%f;%f\n", 0, c.PC, rate, 0.0)
+			if nSameLevel > shared.SizeOfSameLevel {
+				c.PC++
+				nSameLevel = 0
+				if c.PC >= shared.TrainingSampleSize {
+					fmt.Println("End of Experiment!!")
+					df.Close()
+					os.Exit(0)
+				} else {
+					// configure new pc
+					err := c.Ch.Qos(
+						c.PC, // prefetch count
+						0,    // prefetch size
+						true, // global TODO default is false
+					)
+					if err != nil {
+						shared.ErrorHandler(shared.GetFunction(), "Failed to set QoS")
+					}
+				}
+			}
+		default:
+		}
 	}
 }
 

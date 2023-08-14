@@ -15,8 +15,6 @@ import (
 	"os"
 )
 
-const DeltaTime = 1 // see page 103
-
 type Controller struct {
 	Info info.Controller
 }
@@ -56,7 +54,7 @@ func (c *Controller) Update(p ...float64) float64 {
 	//integrator := c.Info.Integrator * c.Info.Ki
 
 	// Delta of the new PC
-	deltaU := c.Info.Kp*(err-c.Info.PreviousError) + c.Info.Ki*err*DeltaTime + c.Info.Kd*(err-2*c.Info.PreviousError+c.Info.PreviousPreviousError)/DeltaTime
+	deltaU := c.Info.Kp*(err-c.Info.PreviousError) + c.Info.Ki*err*shared.DeltaTime + c.Info.Kd*(err-2*c.Info.PreviousError+c.Info.PreviousPreviousError)/shared.DeltaTime
 
 	// pid output
 	c.Info.Out = c.Info.Out + deltaU // see page 106 why add an integrator
@@ -69,7 +67,7 @@ func (c *Controller) Update(p ...float64) float64 {
 
 	c.Info.PreviousPreviousError = c.Info.PreviousError
 	c.Info.PreviousError = err
-	c.Info.SumPrevErrors = c.Info.SumPrevErrors + err
+	c.Info.SumPrevErrors += err
 
 	return c.Info.Out
 }

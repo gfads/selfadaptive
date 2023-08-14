@@ -11,7 +11,6 @@ func main() {
 	controllers := shared.ControllerTypes
 	tunnings := shared.TunningTypes
 	dockerFileNames := []string{}
-	pExtra := loadExtraParameters(controllers, tunnings)
 
 	// remove old docker files
 	err := os.RemoveAll(shared.DockerfilesDir)
@@ -28,9 +27,13 @@ func main() {
 	// create Dockerfiles
 	for c := 0; c < len(controllers); c++ {
 		for t := 0; t < len(tunnings); t++ {
-			dockerFileNames = append(dockerFileNames, createDockerFile(controllers[c], tunnings[t], pExtra))
+			//pExtra := loadExtraParameters(controllers, tunnings)
+			//dockerFileNames = append(dockerFileNames, createDockerFile(controllers[c], tunnings[t], pExtra))
 		}
 	}
+
+	// create docker file static experiment
+	dockerFileNames = append(dockerFileNames, createDockerFileStatic())
 
 	// create execute
 	createBat(dockerFileNames)
@@ -54,6 +57,8 @@ func loadExtraParameters(c, t []string) map[string]string {
 			keyGain := ""
 			if c[i] == shared.BasicP || c[i] == shared.BasicPi {
 				keyGain = c[i] + t[j]
+			} else if c[i] == shared.PIwithTwoDegreesOfFreedom {
+				keyGain = shared.BasicPi + t[j]
 			} else {
 				keyGain = shared.BasicPid + t[j] // use the same key whatever the PID controller (see shared)
 			}
@@ -70,14 +75,14 @@ func loadExtraParameters(c, t []string) map[string]string {
 	r[shared.DeadZonePid+shared.Cohen] += ",\"-dead-zone=" + shared.DeadZone + "\""
 	r[shared.DeadZonePid+shared.Amigo] += ",\"-dead-zone=" + shared.DeadZone + "\""
 
-	r[shared.PIwithTwoDegreesOfFreedom+shared.RootLocus] = ",\"-beta=+" + shared.Beta + "\""
-	r[shared.PIwithTwoDegreesOfFreedom+shared.Ziegler] = ",\"-beta=+" + shared.Beta + "\""
-	r[shared.PIwithTwoDegreesOfFreedom+shared.Cohen] = ",\"-beta=+" + shared.Beta + "\""
-	r[shared.PIwithTwoDegreesOfFreedom+shared.Amigo] = ",\"-beta=+" + shared.Beta + "\""
-	r[shared.SetpointWeighting+shared.RootLocus] = ",\"-alfa=" + shared.Alfa + "," + shared.Beta + "\""
-	r[shared.SetpointWeighting+shared.Ziegler] = ",\"-alfa=" + shared.Alfa + "," + shared.Beta + "\""
-	r[shared.SetpointWeighting+shared.Cohen] = ",\"-alfa=" + shared.Alfa + "," + shared.Beta + "\""
-	r[shared.SetpointWeighting+shared.Amigo] = ",\"-alfa=" + shared.Alfa + "," + shared.Beta + "\""
+	r[shared.PIwithTwoDegreesOfFreedom+shared.RootLocus] += ",\"-beta=" + shared.Beta + "\""
+	r[shared.PIwithTwoDegreesOfFreedom+shared.Ziegler] += ",\"-beta=" + shared.Beta + "\""
+	r[shared.PIwithTwoDegreesOfFreedom+shared.Cohen] += ",\"-beta=" + shared.Beta + "\""
+	r[shared.PIwithTwoDegreesOfFreedom+shared.Amigo] += ",\"-beta=" + shared.Beta + "\""
+	r[shared.SetpointWeighting+shared.RootLocus] += ",\"-alfa=" + shared.Alfa + "\",\"-beta=" + shared.Beta + "\""
+	r[shared.SetpointWeighting+shared.Ziegler] += ",\"-alfa=" + shared.Alfa + "\",\"-beta=" + shared.Beta + "\""
+	r[shared.SetpointWeighting+shared.Cohen] += ",\"-alfa=" + shared.Alfa + "\",\"-beta=" + shared.Beta + "\""
+	r[shared.SetpointWeighting+shared.Amigo] += ",\"-alfa=" + shared.Alfa + "\",\"-beta=" + shared.Beta + "\""
 
 	return r
 }
@@ -136,6 +141,46 @@ func createDockerFile(c, t string, pExtra map[string]string) string {
 	return fileName
 }
 
+func createDockerFileStatic() string {
+
+	// configure general "command" parameters
+	controllerType := "\"-controller-type=" + shared.None + "\""
+	adaptability := "\"-is-adaptive=false" + "\""
+	min := "\"-min=" + shared.MinPC + "\""
+	max := "\"-max=" + shared.MaxPC + "\""
+	monitorInterval := "\"-monitor-interval=" + shared.MonitorInterval + "\""
+	executionType := "\"-execution-type=" + shared.StaticCharacterisation + "\""
+	prefetchCount := "\"-prefetch-count=" + shared.PrefetchCountInitial + "\""
+
+	// create docker file
+	fileName := shared.DockerFileStatic
+	df, err := os.Create(shared.DockerfilesDir + "\\" + fileName)
+	if err != nil {
+		shared.ErrorHandler(shared.GetFunction(), err.Error())
+	}
+	defer df.Close()
+
+	// docker file content
+	dockerFileContent := "# This file has been generated automatically at " + time.Now().String() + "\n" +
+		"FROM golang:1.19\n" +
+		"WORKDIR /app\n" +
+		"COPY go.mod go.sum ./\n" +
+		"RUN go mod download \n" +
+		"COPY ./ ./ \n" +
+		"RUN CGO_ENABLED=0 GOOS=linux go build -o ./subscriber ./rabbitmq/subscriber/main.go\n" +
+		"ENV GOROOT=/usr/local/go/bin/\n"
+
+	cmd := "CMD [\"./subscriber\"," + controllerType + "," + executionType + "," + adaptability + "," + monitorInterval + "," + prefetchCount + "," + max + "," + min + "]"
+
+	// include command in docker file
+	dockerFileContent += cmd
+
+	// write in docker file
+	fmt.Fprintf(df, dockerFileContent)
+
+	return fileName
+}
+
 func createBat(list []string) {
 	// define list of docker files include in bat file
 	listCommand := "set list="
@@ -165,7 +210,9 @@ func createBat(list []string) {
 			"   del " + shared.DockerfilesDir + "\\" + "%%x \n" +
 			"   echo y | docker volume prune \n" +
 			"   echo y | docker image prune \n" +
-			")\n"
+			")\n" +
+			"docker stop some-rabbit \n" +
+			"docker rm some-rabbit\n"
 
 	// create batch file
 	fileName := shared.BatchFileExperiments

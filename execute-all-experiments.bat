@@ -1,4 +1,4 @@
-rem This file has been generated automatically at 2023-08-10 12:54:09.3370398 -0300 -03 m=+0.013468101
+rem This file has been generated automatically at 2023-08-13 20:45:03.5169279 -0300 -03 m=+0.013446401
 @echo off 
 docker stop some-rabbit 
 docker rm some-rabbit
@@ -8,7 +8,7 @@ docker stop publisher
 docker rm publisher
 docker stop subscriber
 docker rm subscriber
-set list=Dockerfile-BasicPID-RootLocus Dockerfile-BasicPID-AMIGO 
+set list=Dockerfile-static 
 
 for %%x in (%list%) do (
 echo %%x 
@@ -19,3 +19,5 @@ echo %%x
    echo y | docker volume prune 
    echo y | docker image prune 
 )
+docker stop some-rabbit 
+docker rm some-rabbit

@@ -13,7 +13,7 @@ import (
 	"os"
 )
 
-const DeltaTime = 1 // see page 103
+//const DeltaTime = 1 // see page 103
 //const Alfa = 1.0    // Alfa > 0
 //const Beta = 0.5    // Beta < 1
 
@@ -58,11 +58,11 @@ func (c *Controller) Update(p ...float64) float64 {
 	proportional := c.Info.Kp * c.Info.Direction * (c.Info.Alfa*r - y)
 
 	// Integrator (page 49)
-	c.Info.Integrator += DeltaTime * err
+	c.Info.Integrator += shared.DeltaTime * err
 	integrator := c.Info.Integrator * c.Info.Ki
 
 	// Differentiator (page 108)
-	differentiator := c.Info.Kd * ((1-c.Info.Beta)*r - y - c.Info.PreviousError) / DeltaTime
+	differentiator := c.Info.Kd * ((1-c.Info.Beta)*r - y - c.Info.PreviousError) / shared.DeltaTime
 
 	// control law
 	c.Info.Out = proportional + integrator + differentiator

@@ -27,8 +27,9 @@ const T = 0.1
 //var RandomGoal = []float64{363, 1042, 1871, 2063, 1436, 585, 318, 888, 1754, 2094, 1585, 710, 300, 744, 1621, 2098, 1722}
 //var RandomGoal = []float64{500, 1000, 750}
 //var RandomGoals = []float64{866, 1440, 866}
-//ar RandomGoals = []float64{866, 1440, 1000}
-var RandomGoals = []float64{1440}
+var RandomGoals = []float64{866, 1440, 1000}
+
+//var RandomGoals = []float64{1440}
 var InputSteps = []int{1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2} // for Ziegler/Cohen/AMIGO
 var Kp = map[string]string{
 	BasicP + RootLocus:   "0.00777594",
@@ -81,15 +82,15 @@ const Direction = "1.0"
 const DeadZone = "200.0"
 const HysteresisBand = "200.0"
 const Alfa = "1.0"
-const Beta = "0.5"
+const Beta = "0.9"
 
 // Experiments parameters
-const TrainingSampleSize = 60
+const TrainingSampleSize = 100
 const TimeBetweenAdjustments = 1200 // seconds
 const MaximumNrmse = 0.30
 const WarmupTime = 30 // seconds
 const TrainingAttempts = 30
-const SizeOfSameLevel = 60 // used in the experiments
+const SizeOfSameLevel = 30 // used in the experiments
 
 // Astar
 const SV = 2.7           // Shutoff voltage (page 17) = 2.7 V
@@ -103,12 +104,15 @@ const PcDefaultLimitMax = 1200 // TODO ASTAR
 // Execution Types
 const StaticGoal = "StaticGoal"
 const Experiment = "Experiment"
+const StaticCharacterisation = "Static"
 const RootLocusTraining = "RootLocusTraining"
 const ZieglerTraining = "ZieglerTraining"
 const CohenTraining = "CohenTraining"
 const AMIGOTraining = "AMIGOTraining"
 const OnLineTraining = "OnlineTraining"
 const WebTraining = "WebTraining"
+
+const DockerFileStatic = "Dockerfile-static"
 
 // Controller type names
 
@@ -132,15 +136,15 @@ const SetpointWeighting = "SetpointWeighting"
 
 var ControllerTypes = []string{
 	//BasicP,
-	//BasicPi,
-	BasicPid,
+	BasicPi,
+	//BasicPid,
 	//SmoothingPid,
 	//IncrementalFormPid,
 	//ErrorSquarePidFull,
 	//ErrorSquarePidProportional,
 	//DeadZonePid,
 	//GainScheduling,
-	//PIwithTwoDegreesOfFreedom,
+	PIwithTwoDegreesOfFreedom,
 	//WindUp,
 	//SetpointWeighting,
 	//AsTAR,
@@ -150,13 +154,18 @@ var ControllerTypes = []string{
 	//HysteresisOnoff
 }
 
-var TunningTypes = []string{RootLocus,
-	//Ziegler,
-	//Cohen,
+var TunningTypes = []string{
+	RootLocus,
+	Ziegler,
+	Cohen,
 	Amigo,
 }
 
-const ExperimentFileBase = "raw-sin-19-1440-"
+//const ExperimentFileBase = "raw-sin-36-static-"
+const ExperimentInput = "experiment-36-"
+const ExperimentOutput = "data-all.csv"
+const TrainingInput = "training-experiment-04-"
+const TrainingOutput = "training-experiment-04-mean.csv"
 
 const RootLocus = "RootLocus"
 const Ziegler = "Ziegler"
@@ -171,6 +180,7 @@ const MaxOnoff = 600
 const MonitorTime = 10 // seconds
 const NumberOfColors = 7
 const ColorReset = "\033[0m"
+const DeltaTime = 1 // see page 103
 
 // Base Directories
 const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/source"
@@ -182,7 +192,6 @@ const DataDir = "C:\\Users\\user\\go\\selfadaptive\\rabbitmq\\data" // macos
 const DockerfilesDir = "C:\\Users\\user\\go\\selfadaptive\\temp"    // macos
 const BatchfilesDir = "C:\\Users\\user\\go\\selfadaptive"           // macos
 const BatchFileExperiments = "execute-all-experiments.bat"
-const StatiticsFileName = "data-all.csv"
 
 //const SourcesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\sources"
 //const ExecutablesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\executables"
@@ -408,4 +417,12 @@ func RandomString(l int) string {
 
 func RandInt(min int, max int) int {
 	return min + rand.Intn(max-min)
+}
+
+//creating a function to add zeroes to a string
+func PadLeft(str string, length int) string {
+	for len(str) < length {
+		str = "0" + str
+	}
+	return str
 }

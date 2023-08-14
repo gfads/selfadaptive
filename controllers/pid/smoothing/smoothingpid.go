@@ -15,8 +15,7 @@ import (
 	"os"
 )
 
-const DeltaTime = 1 // see page 103
-const Alpha = 0.01  // alpha variates from 0 to 1 (see page 104),e.g., quanto mais baixo Alpha, maior a filtragem do alto ruido
+const Alpha = 0.01 // alpha variates from 0 to 1 (see page 104),e.g., quanto mais baixo Alpha, maior a filtragem do alto ruido
 
 type Controller struct {
 	Info info.Controller
@@ -57,11 +56,10 @@ func (c *Controller) Update(p ...float64) float64 {
 	proportional := c.Info.Kp * err
 
 	// Integrator (David page 49)
-	c.Info.Integrator += DeltaTime * err
-	integrator := c.Info.Integrator * c.Info.Ki
+	integrator := (c.Info.SumPrevErrors + err) * c.Info.Ki * shared.DeltaTime
 
 	// smoothing the derivative term (page 104)
-	differentiator := c.Info.Kd * (Alpha*(err-c.Info.PreviousError)/DeltaTime + (1-Alpha)*c.Info.PreviousDifferentiator)
+	differentiator := c.Info.Kd * (Alpha*(err-c.Info.PreviousError)/shared.DeltaTime + (1-Alpha)*c.Info.PreviousDifferentiator)
 	c.Info.PreviousDifferentiator = differentiator
 
 	// pid output
@@ -74,7 +72,7 @@ func (c *Controller) Update(p ...float64) float64 {
 	}
 
 	c.Info.PreviousError = err
-	c.Info.SumPrevErrors = c.Info.SumPrevErrors + err
+	c.Info.SumPrevErrors += err
 
 	return c.Info.Out
 }
