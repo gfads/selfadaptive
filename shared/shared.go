@@ -136,7 +136,7 @@ const SetpointWeighting = "SetpointWeighting"
 
 var ControllerTypes = []string{
 	//BasicP,
-	BasicPi,
+	//BasicPi,
 	//BasicPid,
 	//SmoothingPid,
 	//IncrementalFormPid,
@@ -144,7 +144,7 @@ var ControllerTypes = []string{
 	//ErrorSquarePidProportional,
 	//DeadZonePid,
 	//GainScheduling,
-	PIwithTwoDegreesOfFreedom,
+	//PIwithTwoDegreesOfFreedom,
 	//WindUp,
 	//SetpointWeighting,
 	//AsTAR,
@@ -164,8 +164,8 @@ var TunningTypes = []string{
 //const ExperimentFileBase = "raw-sin-36-static-"
 const ExperimentInput = "experiment-36-"
 const ExperimentOutput = "data-all.csv"
-const TrainingInput = "training-experiment-04-"
-const TrainingOutput = "training-experiment-04-mean.csv"
+const TrainingInput = "training-experiment-06-25-publishers.csv"
+const TrainingOutput = "training-experiment-06-mean.csv"
 
 const RootLocus = "RootLocus"
 const Ziegler = "Ziegler"

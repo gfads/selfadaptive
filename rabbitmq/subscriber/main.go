@@ -56,7 +56,7 @@ func main() {
 	stopTimer := make(chan bool)  // stop timer
 
 	// define and open csv file to record experiment results
-	dataFileName := shared.ExperimentFileBase + *p.ControllerType + "-" + *p.Tunning + ".csv"
+	dataFileName := shared.ExperimentInput + *p.ControllerType + "-" + *p.Tunning + ".csv"
 	df, err := os.Create(shared.DockerDir + "/" + dataFileName)
 	if err != nil {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
