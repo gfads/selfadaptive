@@ -83,7 +83,6 @@ func calculateMeans(d []Data) map[string]float64 {
 	for k, v := range sumLevel {
 		key := strconv.Itoa(k)
 		means[shared.PadLeft(key, 5)] = float64(v) / float64(sizeLevel[k])
-		fmt.Println(shared.PadLeft(key, 6))
 	}
 	return means
 }
