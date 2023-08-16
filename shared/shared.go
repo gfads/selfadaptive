@@ -166,7 +166,7 @@ var TunningTypes = []string{
 const ExperimentInput = "experiment-36-"
 const ExperimentOutput = "data-all.csv"
 const TrainingInput = "training-experiment-03-75-publishers.csv"
-const TrainingOutput = "training-experiment-03-75-publishers-mean.csv"
+const TrainingOutput = "training-experiment-04-75-publishers-mean.csv"
 
 const RootLocus = "RootLocus"
 const Ziegler = "Ziegler"
