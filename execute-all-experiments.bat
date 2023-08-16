@@ -1,4 +1,4 @@
-rem This file has been generated automatically at 2023-08-14 21:59:25.7267178 -0300 -03 m=+0.014176501
+rem This file has been generated automatically at 2023-08-15 20:59:12.6321777 -0300 -03 m=+0.013861601
 @echo off 
 docker stop some-rabbit 
 docker rm some-rabbit

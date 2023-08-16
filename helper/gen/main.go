@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"main.go/shared"
 	"os"
@@ -8,31 +9,74 @@ import (
 )
 
 func main() {
+
+	executionType := flag.String("execution-type", "", "execution-type is a string")
+	flag.Parse()
+
+	switch *executionType {
+	case shared.Experiment:
+		experimentExecution()
+	case shared.StaticExecution:
+		staticExecution()
+	default:
+		fmt.Println("Execution type unknown")
+		os.Exit(0)
+	}
+}
+
+func experimentExecution() {
 	controllers := shared.ControllerTypes
 	tunnings := shared.TunningTypes
 	dockerFileNames := []string{}
 
-	// remove old docker files
-	err := os.RemoveAll(shared.DockerfilesDir)
-	if err != nil {
-		shared.ErrorHandler(shared.GetFunction(), err.Error())
+	// check if directory exist
+	dir := shared.DockerfilesDir
+	if _, err := os.Stat(dir); !os.IsNotExist(err) {
+		// remove old docker files
+		err := os.RemoveAll(shared.DockerfilesDir)
+		if err != nil {
+			shared.ErrorHandler(shared.GetFunction(), err.Error())
+		}
 	}
 
 	// recreate docker files folder
-	err = os.MkdirAll(shared.DockerfilesDir, 0750)
+	err := os.MkdirAll(shared.DockerfilesDir, 0750)
 	if err != nil && !os.IsExist(err) {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
 	}
 
-	// create Dockerfiles
+	// create dockerfiles for experiments
 	for c := 0; c < len(controllers); c++ {
 		for t := 0; t < len(tunnings); t++ {
-			//pExtra := loadExtraParameters(controllers, tunnings)
-			//dockerFileNames = append(dockerFileNames, createDockerFile(controllers[c], tunnings[t], pExtra))
+			pExtra := loadExtraParameters(controllers, tunnings)
+			dockerFileNames = append(dockerFileNames, createDockerFileExperiment(controllers[c], tunnings[t], pExtra))
 		}
 	}
 
-	// create docker file static experiment
+	// create execute
+	createBat(dockerFileNames)
+}
+
+func staticExecution() {
+	dockerFileNames := []string{}
+
+	// check if directory exist
+	dir := shared.DockerfilesDir
+	if _, err := os.Stat(dir); !os.IsNotExist(err) {
+		// remove old docker files
+		err := os.RemoveAll(shared.DockerfilesDir)
+		if err != nil {
+			shared.ErrorHandler(shared.GetFunction(), err.Error())
+		}
+	}
+
+	// recreate docker files folder
+	err := os.MkdirAll(shared.DockerfilesDir, 0750)
+	if err != nil && !os.IsExist(err) {
+		shared.ErrorHandler(shared.GetFunction(), err.Error())
+	}
+
+	// create docker file training
 	dockerFileNames = append(dockerFileNames, createDockerFileStatic())
 
 	// create execute
@@ -87,7 +131,7 @@ func loadExtraParameters(c, t []string) map[string]string {
 	return r
 }
 
-func createDockerFile(c, t string, pExtra map[string]string) string {
+func createDockerFileExperiment(c, t string, pExtra map[string]string) string {
 	// set tunning of non pid controllers to None
 	if c == shared.AsTAR || c == shared.HPA || c == shared.BasicOnoff ||
 		c == shared.DeadZoneOnoff || c == shared.HysteresisOnoff {

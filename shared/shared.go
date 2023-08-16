@@ -102,6 +102,7 @@ const PcDefaultLimitMin = 1
 const PcDefaultLimitMax = 1200 // TODO ASTAR
 
 // Execution Types
+const StaticExecution = "Static"
 const StaticGoal = "StaticGoal"
 const Experiment = "Experiment"
 const StaticCharacterisation = "Static"
@@ -137,7 +138,7 @@ const SetpointWeighting = "SetpointWeighting"
 var ControllerTypes = []string{
 	//BasicP,
 	//BasicPi,
-	//BasicPid,
+	BasicPid,
 	//SmoothingPid,
 	//IncrementalFormPid,
 	//ErrorSquarePidFull,
@@ -156,16 +157,16 @@ var ControllerTypes = []string{
 
 var TunningTypes = []string{
 	RootLocus,
-	Ziegler,
-	Cohen,
-	Amigo,
+	//Ziegler,
+	//Cohen,
+	//Amigo,
 }
 
 //const ExperimentFileBase = "raw-sin-36-static-"
 const ExperimentInput = "experiment-36-"
 const ExperimentOutput = "data-all.csv"
-const TrainingInput = "training-experiment-06-25-publishers.csv"
-const TrainingOutput = "training-experiment-06-mean.csv"
+const TrainingInput = "training-experiment-02-50-publishers.csv"
+const TrainingOutput = "training-experiment-02-50-publishers-mean.csv"
 
 const RootLocus = "RootLocus"
 const Ziegler = "Ziegler"

@@ -55,14 +55,14 @@ func main() {
 	startTimer := make(chan bool) // start timer
 	stopTimer := make(chan bool)  // stop timer
 
-	// define and open csv file to record experiment results
-	dataFileName := shared.ExperimentInput + *p.ControllerType + "-" + *p.Tunning + ".csv"
-	df, err := os.Create(shared.DockerDir + "/" + dataFileName)
-	if err != nil {
-		shared.ErrorHandler(shared.GetFunction(), err.Error())
-	}
-
 	if *p.IsAdaptive {
+		// define and open csv file to record experiment results
+		dataFileName := shared.ExperimentInput + *p.ControllerType + "-" + *p.Tunning + ".csv"
+		df, err := os.Create(shared.DockerDir + "/" + dataFileName)
+		if err != nil {
+			shared.ErrorHandler(shared.GetFunction(), err.Error())
+		}
+
 		// Create & start adaptation logic
 		adapter := adaptationlogic.NewAdaptationLogic(toAdapter, fromAdapter, p, df)
 		go adapter.Run() // normal execution
@@ -74,6 +74,12 @@ func main() {
 		// run adaptive consumer
 		consumer.RunAdaptive(startTimer, stopTimer, toAdapter, fromAdapter, df)
 	} else {
+		// define and open csv file to record experiment results
+		dataFileName := shared.TrainingInput
+		df, err := os.Create(shared.DockerDir + "/" + dataFileName)
+		if err != nil {
+			shared.ErrorHandler(shared.GetFunction(), err.Error())
+		}
 		//consumer.RunNonAdaptive()
 		// Create timer
 		t := mytimer.NewMyTimer(*p.MonitorInterval, startTimer, stopTimer)
