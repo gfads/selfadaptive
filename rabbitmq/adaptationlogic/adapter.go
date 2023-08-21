@@ -373,7 +373,7 @@ func (al AdaptationLogic) ZieglerTraining2() {
 		i := AdjustmenstInfo{PC: al.PC, Rate: rate}
 		info.Data = append(info.Data, i)
 
-		if count < len(shared.InputSteps)-1 {
+		if count < 100 {
 			if count < len(shared.InputSteps)/2 { // TODO
 				al.PC = shared.InputSteps[0]
 			} else {
