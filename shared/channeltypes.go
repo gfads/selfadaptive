@@ -9,3 +9,8 @@ type ToPlannerChan struct {
 	ChangeRequest     string
 	SelectedBehaviour string
 }
+
+type SubscriberToAdapter struct {
+	QueueSize        int
+	ReceivedMessages int
+}

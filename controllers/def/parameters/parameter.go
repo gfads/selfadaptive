@@ -11,7 +11,6 @@ import (
 type ExecutionParameters struct {
 	Tunning         *string
 	ExecutionType   *string
-	IsAdaptive      *bool
 	ControllerType  *string
 	MonitorInterval *int
 	SetPoint        *float64
@@ -33,7 +32,6 @@ func (e ExecutionParameters) Load() ExecutionParameters {
 	p := ExecutionParameters{}
 
 	p.ExecutionType = flag.String("execution-type", shared.StaticGoal, "execution-type is a string")
-	p.IsAdaptive = flag.Bool("is-adaptive", false, "is-adaptive is a boolean")
 	p.ControllerType = flag.String("controller-type", "OnOff", "controller-type is a string")
 	p.MonitorInterval = flag.Int("monitor-interval", 1, "monitor-interval is an int (s)")
 	p.SetPoint = flag.Float64("set-point", 3000.0, "set-point is a float (goal rate)")

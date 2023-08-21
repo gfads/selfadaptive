@@ -21,8 +21,11 @@ const IpPortRabbitMQ = "192.168.0.20:5672" // Home Recife
 
 // Training/Experiment parameters
 const L = 1.0
-const Tau = 1.0
-const T = 0.1
+
+//const Tau = 1.0  // original
+//const T = 0.1 // original
+const Tau = 0.1 // modified
+const T = 0.01  // modified
 
 //var RandomGoal = []float64{363, 1042, 1871, 2063, 1436, 585, 318, 888, 1754, 2094, 1585, 710, 300, 744, 1621, 2098, 1722}
 //var RandomGoal = []float64{500, 1000, 750}
@@ -31,6 +34,7 @@ var RandomGoals = []float64{866, 1440, 1000}
 
 //var RandomGoals = []float64{1440}
 var InputSteps = []int{1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2} // for Ziegler/Cohen/AMIGO
+
 var Kp = map[string]string{
 	BasicP + RootLocus:   "0.00777594",
 	BasicP + Ziegler:     "0.00596588",
@@ -41,7 +45,7 @@ var Kp = map[string]string{
 	BasicPi + Cohen:      "0.00414897",
 	BasicPi + Amigo:      "0.00079877",
 	BasicPid + RootLocus: "-0.00144086", // original -v1
-	BasicPid + Ziegler:   "0.00496689",
+	BasicPid + Ziegler:   "0.00048518",
 	BasicPid + Cohen:     "0.00156457",
 	BasicPid + Amigo:     "0.00101407",
 }
@@ -55,7 +59,7 @@ var Ki = map[string]string{
 	BasicPi + Cohen:      "0.01514702",
 	BasicPi + Amigo:      "0.00218342",
 	BasicPid + RootLocus: "0.00248495", // original
-	BasicPid + Ziegler:   "0.00248344",
+	BasicPid + Ziegler:   "0.00242588",
 	BasicPid + Cohen:     "0.00148113",
 	BasicPid + Amigo:     "0.00213378"}
 var Kd = map[string]string{
@@ -68,7 +72,7 @@ var Kd = map[string]string{
 	BasicPi + Cohen:      "0.0",
 	BasicPi + Amigo:      "0.0",
 	BasicPid + RootLocus: "0.00057789", // original
-	BasicPid + Ziegler:   "0.00248344",
+	BasicPid + Ziegler:   "0.00002426",
 	BasicPid + Cohen:     "0.00019962",
 	BasicPid + Amigo:     "0.00012676"}
 
@@ -114,6 +118,8 @@ const OnLineTraining = "OnlineTraining"
 const WebTraining = "WebTraining"
 
 const DockerFileStatic = "Dockerfile-static"
+const DockerFileRoot = "Dockerfile-root"
+const DockerFileZiegler = "Dockerfile-ziegler"
 
 // Controller type names
 
@@ -156,13 +162,16 @@ var ControllerTypes = []string{
 }
 
 var TunningTypes = []string{
-	RootLocus,
-	//Ziegler,
+	//RootLocus,
+	Ziegler,
 	//Cohen,
 	//Amigo,
 }
 
 //const ExperimentFileBase = "raw-sin-36-static-"
+const ZieglerInput = "ziegler-01.csv"
+const RootInput = "root-01.csv"
+const RootOutput = "root-01-output.csv"
 const ExperimentInput = "experiment-36-"
 const ExperimentOutput = "data-all.csv"
 const TrainingInput = "training-experiment-03-75-publishers.csv"

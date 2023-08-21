@@ -6,7 +6,10 @@ set GOROOT=C:\Program Files\Go
 echo #### Generate Dockerfiles/Batch file ####
 cd C:\Users\user\go\selfadaptive\helper\gen
 rem go run main.go -execution-type=Experiment
-go run main.go -execution-type=Static
+rem go run main.go -execution-type=Static
+rem go run main.go -execution-type=RootLocusTraining
+go run main.go -execution-type=ZieglerTraining
+
 cd C:\Users\user\go\selfadaptive
 
 echo ##### Remove images ####

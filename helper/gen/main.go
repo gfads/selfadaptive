@@ -18,6 +18,10 @@ func main() {
 		experimentExecution()
 	case shared.StaticExecution:
 		staticExecution()
+	case shared.RootLocusTraining:
+		rootLocusExecution()
+	case shared.ZieglerTraining:
+		zieglerExecution()
 	default:
 		fmt.Println("Execution type unknown")
 		os.Exit(0)
@@ -83,6 +87,58 @@ func staticExecution() {
 	createBat(dockerFileNames)
 }
 
+func rootLocusExecution() {
+	dockerFileNames := []string{}
+
+	// check if directory exist
+	dir := shared.DockerfilesDir
+	if _, err := os.Stat(dir); !os.IsNotExist(err) {
+		// remove old docker files
+		err := os.RemoveAll(shared.DockerfilesDir)
+		if err != nil {
+			shared.ErrorHandler(shared.GetFunction(), err.Error())
+		}
+	}
+
+	// recreate docker files folder
+	err := os.MkdirAll(shared.DockerfilesDir, 0750)
+	if err != nil && !os.IsExist(err) {
+		shared.ErrorHandler(shared.GetFunction(), err.Error())
+	}
+
+	// create docker file training
+	dockerFileNames = append(dockerFileNames, createDockerFileRoot())
+
+	// create execute
+	createBat(dockerFileNames)
+}
+
+func zieglerExecution() {
+	dockerFileNames := []string{}
+
+	// check if directory exist
+	dir := shared.DockerfilesDir
+	if _, err := os.Stat(dir); !os.IsNotExist(err) {
+		// remove old docker files
+		err := os.RemoveAll(shared.DockerfilesDir)
+		if err != nil {
+			shared.ErrorHandler(shared.GetFunction(), err.Error())
+		}
+	}
+
+	// recreate docker files folder
+	err := os.MkdirAll(shared.DockerfilesDir, 0750)
+	if err != nil && !os.IsExist(err) {
+		shared.ErrorHandler(shared.GetFunction(), err.Error())
+	}
+
+	// create docker file training
+	dockerFileNames = append(dockerFileNames, createDockerFileZiegler())
+
+	// create execute
+	createBat(dockerFileNames)
+}
+
 func loadExtraParameters(c, t []string) map[string]string {
 
 	r := make(map[string]string)
@@ -143,7 +199,7 @@ func createDockerFileExperiment(c, t string, pExtra map[string]string) string {
 	max := "\"-max=" + shared.MaxPC + "\""
 	monitorInterval := "\"-monitor-interval=" + shared.MonitorInterval + "\""
 	executionType := "\"-execution-type=" + shared.Experiment + "\""
-	adaptability := "\"-is-adaptive=" + shared.Adaptability + "\""
+	//adaptability := "\"-is-adaptive=" + shared.Adaptability + "\""
 	prefetchCount := "\"-prefetch-count=" + shared.PrefetchCountInitial + "\""
 	setPoint := "\"-set-point=" + shared.SetPoint + "\""
 	direction := "\"-direction=" + shared.Direction + "\""
@@ -171,9 +227,11 @@ func createDockerFileExperiment(c, t string, pExtra map[string]string) string {
 	// define Docker file CMD
 	cmd := ""
 	if pExtra[c+t] == "" {
-		cmd = "CMD [\"./subscriber\"," + controller + "," + tunning + "," + adaptability + "," + executionType + "," + monitorInterval + "," + prefetchCount + "," + max + "," + min + "," + setPoint + "," + direction + "]"
+		//cmd = "CMD [\"./subscriber\"," + controller + "," + tunning + "," + adaptability + "," + executionType + "," + monitorInterval + "," + prefetchCount + "," + max + "," + min + "," + setPoint + "," + direction + "]"
+		cmd = "CMD [\"./subscriber\"," + controller + "," + tunning + "," + "," + executionType + "," + monitorInterval + "," + prefetchCount + "," + max + "," + min + "," + setPoint + "," + direction + "]"
 	} else {
-		cmd = "CMD [\"./subscriber\"," + controller + "," + tunning + "," + adaptability + "," + executionType + "," + monitorInterval + "," + prefetchCount + "," + max + "," + min + "," + setPoint + "," + direction + "," + pExtra[c+t] + "]"
+		//cmd = "CMD [\"./subscriber\"," + controller + "," + tunning + "," + adaptability + "," + executionType + "," + monitorInterval + "," + prefetchCount + "," + max + "," + min + "," + setPoint + "," + direction + "," + pExtra[c+t] + "]"
+		cmd = "CMD [\"./subscriber\"," + controller + "," + tunning + "," + executionType + "," + monitorInterval + "," + prefetchCount + "," + max + "," + min + "," + setPoint + "," + direction + "," + pExtra[c+t] + "]"
 	}
 
 	// include command in docker file
@@ -189,7 +247,7 @@ func createDockerFileStatic() string {
 
 	// configure general "command" parameters
 	controllerType := "\"-controller-type=" + shared.None + "\""
-	adaptability := "\"-is-adaptive=false" + "\""
+	//adaptability := "\"-is-adaptive=false" + "\""
 	min := "\"-min=" + shared.MinPC + "\""
 	max := "\"-max=" + shared.MaxPC + "\""
 	monitorInterval := "\"-monitor-interval=" + shared.MonitorInterval + "\""
@@ -214,7 +272,88 @@ func createDockerFileStatic() string {
 		"RUN CGO_ENABLED=0 GOOS=linux go build -o ./subscriber ./rabbitmq/subscriber/main.go\n" +
 		"ENV GOROOT=/usr/local/go/bin/\n"
 
-	cmd := "CMD [\"./subscriber\"," + controllerType + "," + executionType + "," + adaptability + "," + monitorInterval + "," + prefetchCount + "," + max + "," + min + "]"
+	//cmd := "CMD [\"./subscriber\"," + controllerType + "," + executionType + "," + adaptability + "," + monitorInterval + "," + prefetchCount + "," + max + "," + min + "]"
+	cmd := "CMD [\"./subscriber\"," + controllerType + "," + executionType + "," + monitorInterval + "," + prefetchCount + "," + max + "," + min + "]"
+	// include command in docker file
+	dockerFileContent += cmd
+
+	// write in docker file
+	fmt.Fprintf(df, dockerFileContent)
+
+	return fileName
+}
+
+func createDockerFileRoot() string {
+
+	// configure general "command" parameters
+	controllerType := "\"-controller-type=" + shared.BasicPid + "\""
+	//adaptability := "\"-is-adaptive=true" + "\""
+	min := "\"-min=" + shared.MinPC + "\""
+	max := "\"-max=" + shared.MaxPC + "\""
+	monitorInterval := "\"-monitor-interval=" + shared.MonitorInterval + "\""
+	executionType := "\"-execution-type=" + shared.RootLocusTraining + "\""
+	prefetchCount := "\"-prefetch-count=" + shared.PrefetchCountInitial + "\""
+
+	// create docker file
+	fileName := shared.DockerFileRoot
+	df, err := os.Create(shared.DockerfilesDir + "\\" + fileName)
+	if err != nil {
+		shared.ErrorHandler(shared.GetFunction(), err.Error())
+	}
+	defer df.Close()
+
+	// docker file content
+	dockerFileContent := "# This file has been generated automatically at " + time.Now().String() + "\n" +
+		"FROM golang:1.19\n" +
+		"WORKDIR /app\n" +
+		"COPY go.mod go.sum ./\n" +
+		"RUN go mod download \n" +
+		"COPY ./ ./ \n" +
+		"RUN CGO_ENABLED=0 GOOS=linux go build -o ./subscriber ./rabbitmq/subscriber/main.go\n" +
+		"ENV GOROOT=/usr/local/go/bin/\n"
+
+	//cmd := "CMD [\"./subscriber\"," + controllerType + "," + executionType + "," + adaptability + "," + monitorInterval + "," + prefetchCount + "," + max + "," + min + "]"
+	cmd := "CMD [\"./subscriber\"," + controllerType + "," + executionType + "," + monitorInterval + "," + prefetchCount + "," + max + "," + min + "]"
+
+	// include command in docker file
+	dockerFileContent += cmd
+
+	// write in docker file
+	fmt.Fprintf(df, dockerFileContent)
+
+	return fileName
+}
+
+func createDockerFileZiegler() string {
+
+	// configure general "command" parameters
+	controllerType := "\"-controller-type=" + shared.BasicPid + "\""
+	min := "\"-min=" + shared.MinPC + "\""
+	max := "\"-max=" + shared.MaxPC + "\""
+	monitorInterval := "\"-monitor-interval=" + shared.MonitorInterval + "\""
+	executionType := "\"-execution-type=" + shared.ZieglerTraining + "\""
+	prefetchCount := "\"-prefetch-count=" + shared.PrefetchCountInitial + "\""
+
+	// create docker file
+	fileName := shared.DockerFileZiegler
+	df, err := os.Create(shared.DockerfilesDir + "\\" + fileName)
+	if err != nil {
+		shared.ErrorHandler(shared.GetFunction(), err.Error())
+	}
+	defer df.Close()
+
+	// docker file content
+	dockerFileContent := "# This file has been generated automatically at " + time.Now().String() + "\n" +
+		"FROM golang:1.19\n" +
+		"WORKDIR /app\n" +
+		"COPY go.mod go.sum ./\n" +
+		"RUN go mod download \n" +
+		"COPY ./ ./ \n" +
+		"RUN CGO_ENABLED=0 GOOS=linux go build -o ./subscriber ./rabbitmq/subscriber/main.go\n" +
+		"ENV GOROOT=/usr/local/go/bin/\n"
+
+	//cmd := "CMD [\"./subscriber\"," + controllerType + "," + executionType + "," + adaptability + "," + monitorInterval + "," + prefetchCount + "," + max + "," + min + "]"
+	cmd := "CMD [\"./subscriber\"," + controllerType + "," + executionType + "," + monitorInterval + "," + prefetchCount + "," + max + "," + min + "]"
 
 	// include command in docker file
 	dockerFileContent += cmd

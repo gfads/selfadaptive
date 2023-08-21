@@ -1,4 +1,4 @@
-# This file has been generated automatically at 2023-08-16 13:03:02.9099352 -0300 -03 m=+0.002677301
+# This file has been generated automatically at 2023-08-21 15:29:17.8327596 -0300 -03 m=+0.004591201
 FROM golang:1.19
 WORKDIR /app
 COPY go.mod go.sum ./
@@ -6,4 +6,4 @@ RUN go mod download
 COPY ./ ./ 
 RUN CGO_ENABLED=0 GOOS=linux go build -o ./subscriber ./rabbitmq/subscriber/main.go
 ENV GOROOT=/usr/local/go/bin/
-CMD ["./subscriber","-controller-type=None","-execution-type=Static","-is-adaptive=false","-monitor-interval=5","-prefetch-count=1","-max=100","-min=1"]
+CMD ["./subscriber","-controller-type=BasicPID","-execution-type=ZieglerTraining","-monitor-interval=5","-prefetch-count=1","-max=100","-min=1"]

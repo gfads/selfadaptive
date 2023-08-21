@@ -27,7 +27,7 @@ type TrainingInfo struct {
 
 type AdaptationLogic struct {
 	MonitorInterval time.Duration
-	FromBusiness    chan int
+	FromBusiness    chan shared.SubscriberToAdapter
 	ToBusiness      chan int
 	Controller      ops.IController
 	SetPoint        float64
@@ -37,7 +37,7 @@ type AdaptationLogic struct {
 	File            *os.File
 }
 
-func NewAdaptationLogic(chFromBusiness, chToBusiness chan int, p parameters.ExecutionParameters, df *os.File) AdaptationLogic {
+func NewAdaptationLogic(chFromBusiness chan shared.SubscriberToAdapter, chToBusiness chan int, p parameters.ExecutionParameters, df *os.File) AdaptationLogic {
 
 	c := ops.NewController(p)
 	i := TrainingInfo{Kp: *p.Kp,
@@ -67,7 +67,8 @@ func (al AdaptationLogic) Run() {
 	case shared.RootLocusTraining:
 		al.RootLocusTraining()
 	case shared.ZieglerTraining: // all non-analytical tune methods
-		al.ZieglerTraining()
+		//al.ZieglerTraining()
+		al.ZieglerTraining2()
 	//case shared.CohenTraining:
 	//al.ZieglerTraining() // TODO
 	case shared.OnLineTraining:
@@ -96,11 +97,11 @@ func (al AdaptationLogic) RunExperiment() {
 			count++
 
 			// calculate new arrival rate (msg/s)
-			rate := float64(n) / al.MonitorInterval.Seconds()
+			rate := float64(n.ReceivedMessages) / al.MonitorInterval.Seconds()
 
 			// catch pc and its yielded rate
-			fmt.Fprintf(al.File, "%d;%f;%f\n", al.PC, rate, shared.RandomGoals[currentGoalIdx])
-			fmt.Println(al.PC, ";", rate, ";", shared.RandomGoals[currentGoalIdx])
+			fmt.Fprintf(al.File, "%d;%d;%f;%f\n", n.QueueSize, al.PC, rate, shared.RandomGoals[currentGoalIdx])
+			fmt.Printf("%d;%d;%f;%f\n", n.QueueSize, al.PC, rate, shared.RandomGoals[currentGoalIdx])
 
 			// invoke controller to calculate new pc
 			pc := int(math.Round(al.Controller.Update(shared.RandomGoals[currentGoalIdx], rate)))
@@ -144,7 +145,7 @@ func (al AdaptationLogic) PIDTunerWeb() {
 		n := <-al.FromBusiness // receive no. of messages from business
 
 		// calculate new arrival rate (msg/s)
-		rate := float64(n) / al.MonitorInterval.Seconds()
+		rate := float64(n.ReceivedMessages) / al.MonitorInterval.Seconds()
 
 		fmt.Println(totalTime, ";", al.PC, ";", rate)
 
@@ -189,7 +190,7 @@ func (al AdaptationLogic) RootLocusTrainingNewNotWorkingProperly() {
 		n := <-al.FromBusiness // receive no. of messages from business
 
 		// calculate new arrival rate (msg/s)
-		rate := float64(n) / al.MonitorInterval.Seconds()
+		rate := float64(n.ReceivedMessages) / al.MonitorInterval.Seconds()
 		info.Data = append(info.Data, AdjustmenstInfo{PC: al.PC, Rate: rate})
 
 		if idx > 0 {
@@ -237,7 +238,7 @@ func (al AdaptationLogic) RootLocusTraining() {
 		n := <-al.FromBusiness // receive no. of messages from business
 
 		// calculate new arrival rate (msg/s)
-		rate := float64(n) / al.MonitorInterval.Seconds()
+		rate := float64(n.ReceivedMessages) / al.MonitorInterval.Seconds()
 
 		l := len(info.Data)
 
@@ -248,20 +249,22 @@ func (al AdaptationLogic) RootLocusTraining() {
 				al.TrainingInfo.Ki = info.Ki
 				al.TrainingInfo.Kd = info.Kd
 
-				fmt.Printf("\"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+				fmt.Printf("\n \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
 
 				if al.TrainingInfo.Kp > 0 && al.TrainingInfo.Ki > 0 {
 					fmt.Println("Bad gains...")
 				}
-				fmt.Println("***** End of Training - Copy/paste Gains *****")
-				time.Sleep(10 * time.Hour)
+				al.File.Close()
+				fmt.Println("***** End of Root Locus Tuning *****")
+				os.Exit(0)
 
 			} else { // redo the training && keep already collected data
 				//fmt.Println("Training attempts=", tAttempts, len(info.Data), rate, al.PC)
 				tAttempts++
 			}
 		} else { // continue the training
-			fmt.Println(al.PC, ";", rate)
+			fmt.Printf("%v;%v;%f;%f\n", n.QueueSize, al.PC, rate, 0.0)
+			fmt.Fprintf(al.File, "%v;%v;%f;%f\n", n.QueueSize, al.PC, rate, 0.0)
 
 			// store training pc and rate
 			info.Data = append(info.Data, AdjustmenstInfo{PC: al.PC, Rate: rate})
@@ -291,21 +294,21 @@ func (al AdaptationLogic) ZieglerTraining() {
 
 	// loop of adaptation logic
 	for {
-
-		n := <-al.FromBusiness // receive no. of messages from business
+		count++
+		// receive no. of messages from business
+		n := <-al.FromBusiness
 
 		// calculate new arrival rate (msg/s)
-		rate := float64(n) / al.MonitorInterval.Seconds()
+		rate := float64(n.ReceivedMessages) / al.MonitorInterval.Seconds()
 
-		fmt.Println(al.PC, ";", rate)
+		fmt.Printf("%v;%v;%f;%f\n", n.QueueSize, al.PC, rate, 0.0)
+		fmt.Fprintf(al.File, "%v;%v;%f;%f\n", n.QueueSize, al.PC, rate, 0.0)
+
 		i := AdjustmenstInfo{PC: al.PC, Rate: rate}
 		info.Data = append(info.Data, i)
 
 		if count < len(shared.InputSteps)-1 {
-			count++
-			// configure next PC
 			al.PC = shared.InputSteps[count]
-
 		} else { // training is over
 			info = CalculateZieglerGains(info)
 			al.TrainingInfo.Kp = info.Kp
@@ -332,8 +335,80 @@ func (al AdaptationLogic) ZieglerTraining() {
 				fmt.Println("Bad gains...")
 			}
 			fmt.Println("***** End of Training - Copy/paste Gains *****")
-			time.Sleep(10 * time.Hour)
+			al.File.Close()
+			os.Exit(0)
+		}
 
+		// send pc to business
+		al.ToBusiness <- al.PC
+	}
+}
+
+func (al AdaptationLogic) ZieglerTraining2() {
+	count := 0
+	info := TrainingInfo{TypeName: al.TrainingInfo.TypeName}
+
+	// create & execute adjustment mechanism
+	//go AdjustmentMechanism(fromAdjuster, toAdjuster, al.SetPoint)
+
+	// warm up phase
+	time.Sleep(shared.WarmupTime * time.Second)
+
+	// discard first measurement
+	<-al.FromBusiness                     // receive no. of messages from business
+	al.ToBusiness <- shared.InputSteps[0] // Configure PC to execute the Ziegler Steps
+
+	// loop of adaptation logic
+	for {
+		count++
+		// receive no. of messages from business
+		n := <-al.FromBusiness
+
+		// calculate new arrival rate (msg/s)
+		rate := float64(n.ReceivedMessages) / al.MonitorInterval.Seconds()
+
+		fmt.Printf("%v;%v;%f;%f\n", n.QueueSize, al.PC, rate, 0.0)
+		fmt.Fprintf(al.File, "%v;%v;%f;%f\n", n.QueueSize, al.PC, rate, 0.0)
+
+		i := AdjustmenstInfo{PC: al.PC, Rate: rate}
+		info.Data = append(info.Data, i)
+
+		if count < len(shared.InputSteps)-1 {
+			if count < len(shared.InputSteps)/2 { // TODO
+				al.PC = shared.InputSteps[0]
+			} else {
+				al.PC = shared.InputSteps[1]
+			}
+		} else { // training is over
+			info = CalculateZieglerGains2(info)
+			al.TrainingInfo.Kp = info.Kp
+			al.TrainingInfo.Ki = info.Ki
+			al.TrainingInfo.Kd = info.Kd
+
+			fmt.Printf("Ziegler: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+
+			os.Exit(0)
+
+			info = CalculateCohenGains(info)
+			al.TrainingInfo.Kp = info.Kp
+			al.TrainingInfo.Ki = info.Ki
+			al.TrainingInfo.Kd = info.Kd
+
+			fmt.Printf("Cohen: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+
+			info = CalculateAMIGOGains(info)
+			al.TrainingInfo.Kp = info.Kp
+			al.TrainingInfo.Ki = info.Ki
+			al.TrainingInfo.Kd = info.Kd
+
+			fmt.Printf("AMIGO: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+
+			if al.TrainingInfo.Kp > 0 && al.TrainingInfo.Ki > 0 {
+				fmt.Println("Bad gains...")
+			}
+			fmt.Println("***** End of Training - Copy/paste Gains *****")
+			al.File.Close()
+			os.Exit(0)
 		}
 
 		// send pc to business
@@ -364,7 +439,7 @@ func (al AdaptationLogic) CohenTraining() {
 		n := <-al.FromBusiness // receive no. of messages from business
 
 		// calculate new arrival rate (msg/s)
-		rate := float64(n) / al.MonitorInterval.Seconds()
+		rate := float64(n.ReceivedMessages) / al.MonitorInterval.Seconds()
 
 		fmt.Println(al.PC, ";", rate)
 		i := AdjustmenstInfo{PC: al.PC, Rate: rate}
@@ -424,7 +499,7 @@ func (al AdaptationLogic) RunOnlineTraining() {
 			n := <-al.FromBusiness // receive no. of messages from business
 
 			// calculate new arrival rate (msg/s)
-			rate := float64(n) / al.MonitorInterval.Seconds()
+			rate := float64(n.ReceivedMessages) / al.MonitorInterval.Seconds()
 
 			l := len(info.Data)
 
@@ -469,7 +544,7 @@ func (al AdaptationLogic) RunOnlineTraining() {
 			case n := <-al.FromBusiness: // interaction with the business
 
 				// calculate new arrival rate (msg/s)
-				rate := float64(n) / al.MonitorInterval.Seconds()
+				rate := float64(n.ReceivedMessages) / al.MonitorInterval.Seconds()
 
 				// store pc and rate
 				info.Data = append(info.Data, AdjustmenstInfo{PC: al.PC, Rate: rate})
@@ -618,6 +693,51 @@ func CalculateZieglerGains(info TrainingInfo) TrainingInfo {
 		if i%2 == 0 {
 			sumDeltaY1 += info.Data[i].Rate
 		} else {
+			sumDeltaY2 += info.Data[i].Rate
+		}
+	}
+
+	fmt.Println("************")
+	dataSize := float64((len(info.Data) - 2) / 2.0) // discard 2 initial input steps
+	k1 := sumDeltaY1 / dataSize
+	k2 := sumDeltaY2 / dataSize
+	K := k2 - k1
+	lambda := K * shared.Tau / shared.T // see Figure 9-2
+
+	switch info.TypeName {
+	case shared.BasicP:
+		k := 1 / lambda
+		info.Kp = k
+		info.Ki = 0.0
+		info.Kd = 0.0
+	case shared.BasicPi:
+		k := 0.9 / lambda
+		Ti := 3.0 * shared.Tau
+		info.Kp = k
+		info.Ki = k / Ti
+		info.Kd = 0.0
+	case shared.BasicPid:
+		k := 1.2 / lambda
+		Ti := 2.0 * shared.Tau
+		Td := shared.Tau / 2.0
+		info.Kp = k
+		info.Ki = k / Ti
+		info.Kd = k * Td
+	}
+	return info
+}
+
+func CalculateZieglerGains2(info TrainingInfo) TrainingInfo {
+
+	sumDeltaY1 := 0.0
+	sumDeltaY2 := 0.0
+
+	for i := 0; i < len(info.Data); i++ { // discard 2 initial input steps, i.e., 5 samples
+		if i < len(shared.InputSteps)/2 {
+			fmt.Println("1", info.Data[i])
+			sumDeltaY1 += info.Data[i].Rate
+		} else {
+			fmt.Println("2", info.Data[i])
 			sumDeltaY2 += info.Data[i].Rate
 		}
 	}

@@ -12,12 +12,12 @@ import (
 )
 
 type Subscriber struct {
-	IsAdaptive bool
-	Conn       *amqp.Connection
-	Ch         *amqp.Channel
-	Queue      amqp.Queue
-	Msgs       <-chan amqp.Delivery
-	PC         int
+	ExecutionType string
+	Conn          *amqp.Connection
+	Ch            *amqp.Channel
+	Queue         amqp.Queue
+	Msgs          <-chan amqp.Delivery
+	PC            int
 }
 
 func main() {
@@ -32,7 +32,7 @@ func main() {
 	e.Show(p)
 
 	// create new consumer
-	var consumer = NewConsumer(*p.IsAdaptive, *p.PrefetchCount)
+	var consumer = NewConsumer(*p.ExecutionType, *p.PrefetchCount)
 
 	// Configure RabbitMQ
 	consumer.ConfigureRabbitMQ(consumer.PC)
@@ -50,12 +50,27 @@ func main() {
 	}(consumer.Ch)
 
 	// create channels
-	toAdapter := make(chan int)   // no. of messages
-	fromAdapter := make(chan int) // pc
-	startTimer := make(chan bool) // start timer
-	stopTimer := make(chan bool)  // stop timer
+	toAdapter := make(chan shared.SubscriberToAdapter) // no. of messages
+	fromAdapter := make(chan int)                      // pc
+	startTimer := make(chan bool)                      // start timer
+	stopTimer := make(chan bool)                       // stop timer
 
-	if *p.IsAdaptive {
+	switch *p.ExecutionType {
+	case shared.StaticExecution:
+		// define and open csv file to record experiment results
+		dataFileName := shared.TrainingInput
+		df, err := os.Create(shared.DockerDir + "/" + dataFileName)
+		if err != nil {
+			shared.ErrorHandler(shared.GetFunction(), err.Error())
+		}
+		//consumer.RunNonAdaptive()
+		// Create timer
+		t := mytimer.NewMyTimer(*p.MonitorInterval, startTimer, stopTimer)
+
+		go t.RunMyTimer()
+		//consumer.RunNonAdaptiveMonitored(startTimer, stopTimer, p)
+		consumer.RunStaticExperiment(startTimer, stopTimer, p, df)
+	case shared.Experiment:
 		// define and open csv file to record experiment results
 		dataFileName := shared.ExperimentInput + *p.ControllerType + "-" + *p.Tunning + ".csv"
 		df, err := os.Create(shared.DockerDir + "/" + dataFileName)
@@ -73,20 +88,44 @@ func main() {
 
 		// run adaptive consumer
 		consumer.RunAdaptive(startTimer, stopTimer, toAdapter, fromAdapter, df)
-	} else {
+	case shared.RootLocusTraining:
 		// define and open csv file to record experiment results
-		dataFileName := shared.TrainingInput
+		dataFileName := shared.RootInput
 		df, err := os.Create(shared.DockerDir + "/" + dataFileName)
 		if err != nil {
 			shared.ErrorHandler(shared.GetFunction(), err.Error())
 		}
-		//consumer.RunNonAdaptive()
-		// Create timer
-		t := mytimer.NewMyTimer(*p.MonitorInterval, startTimer, stopTimer)
 
+		// Create & start adaptation logic
+		adapter := adaptationlogic.NewAdaptationLogic(toAdapter, fromAdapter, p, df)
+		go adapter.Run() // normal execution
+
+		// Start timer
+		t := mytimer.NewMyTimer(*p.MonitorInterval, startTimer, stopTimer)
 		go t.RunMyTimer()
-		//consumer.RunNonAdaptiveMonitored(startTimer, stopTimer, p)
-		consumer.RunStaticExperiment(startTimer, stopTimer, p, df)
+
+		// run adaptive consumer
+		consumer.RunAdaptive(startTimer, stopTimer, toAdapter, fromAdapter, df)
+	case shared.ZieglerTraining:
+		// define and open csv file to record experiment results
+		dataFileName := shared.ZieglerInput
+		df, err := os.Create(shared.DockerDir + "/" + dataFileName)
+		if err != nil {
+			shared.ErrorHandler(shared.GetFunction(), err.Error())
+		}
+
+		// Create & start adaptation logic
+		adapter := adaptationlogic.NewAdaptationLogic(toAdapter, fromAdapter, p, df)
+		go adapter.Run() // normal execution
+
+		// Start timer
+		t := mytimer.NewMyTimer(*p.MonitorInterval, startTimer, stopTimer)
+		go t.RunMyTimer()
+
+		// run adaptive consumer
+		consumer.RunAdaptive(startTimer, stopTimer, toAdapter, fromAdapter, df)
+	default:
+		shared.ErrorHandler(shared.GetFunction(), "Execution type´"+*p.ExecutionType+"´ is unknown")
 	}
 }
 
@@ -171,7 +210,7 @@ func (c Subscriber) RunNonAdaptiveMonitored(startTimer, stopTimer chan bool, p p
 	}
 }
 
-func (c Subscriber) RunAdaptive(startTimer, stopTimer chan bool, toAdapter chan int, fromAdapter chan int, f *os.File) {
+func (c Subscriber) RunAdaptive(startTimer, stopTimer chan bool, toAdapter chan shared.SubscriberToAdapter, fromAdapter chan int, f *os.File) {
 
 	count := 0
 
@@ -186,21 +225,17 @@ func (c Subscriber) RunAdaptive(startTimer, stopTimer chan bool, toAdapter chan 
 			// initialise no. of receive messages
 			count = 0
 		case <-stopTimer: // stop monitor timer
-			// send no. of messages to adaptation logic
-			toAdapter <- count
-
-			// receive new pc from adaptation logic
-			c.PC = <-fromAdapter
-
 			// inspect queue
 			q, err1 := c.Ch.QueueInspect("rpc_queue")
 			if err1 != nil {
 				shared.ErrorHandler(shared.GetFunction(), "Impossible to inspect the queue")
 			}
 
-			// save in file the number of messages in the queue
-			fmt.Printf("%d;", q.Messages)
-			fmt.Fprintf(f, "%d;", q.Messages)
+			// send no. of messages to adaptation logic
+			toAdapter <- shared.SubscriberToAdapter{ReceivedMessages: count, QueueSize: q.Messages}
+
+			// receive new pc from adaptation logic
+			c.PC = <-fromAdapter
 
 			// configure new pc
 			err := c.Ch.Qos(
@@ -271,8 +306,8 @@ func (c *Subscriber) ConfigureRabbitMQ(pc int) {
 	return
 }
 
-func NewConsumer(isAdaptive bool, pc int) Subscriber {
-	s := Subscriber{IsAdaptive: isAdaptive, PC: pc}
+func NewConsumer(e string, pc int) Subscriber {
+	s := Subscriber{ExecutionType: e, PC: pc}
 
 	return s
 }
