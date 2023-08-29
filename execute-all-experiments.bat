@@ -1,4 +1,4 @@
-rem This file has been generated automatically at 2023-08-29 12:48:57.9838042 -0300 -03 m=+0.013656701
+rem This file has been generated automatically at 2023-08-29 14:01:28.3476293 -0300 -03 m=+0.013409001
 @echo off 
 docker stop some-rabbit 
 docker rm some-rabbit
@@ -8,7 +8,7 @@ docker stop publisher
 docker rm publisher
 docker stop subscriber
 docker rm subscriber
-set list=Dockerfile-Experiment-BasicPID-None 
+set list=Dockerfile-Experiment-BasicPID-Ziegler 
 
 for %%x in (%list%) do (
 echo %%x 

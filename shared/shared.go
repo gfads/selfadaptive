@@ -106,7 +106,7 @@ const PcDefaultLimitMin = 1
 const PcDefaultLimitMax = 1200 // TODO ASTAR
 
 // Execution Types
-const StaticExecution = "Static"
+const OpenLoop = "OpenLoop"
 const StaticGoal = "StaticGoal"
 const Experiment = "Experiment"
 const InputStep = "InputStep"

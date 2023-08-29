@@ -55,85 +55,32 @@ func main() {
 	startTimer := make(chan bool)                      // start timer
 	stopTimer := make(chan bool)                       // stop timer
 
-	switch *p.ExecutionType {
-	case shared.StaticExecution:
-		// define and open csv file to record experiment results
-		//dataFileName := shared.TrainingInput
-		dataFileName := *p.OutputFile
-		df, err := os.Create(shared.DockerDir + "/" + dataFileName)
-		if err != nil {
-			shared.ErrorHandler(shared.GetFunction(), err.Error())
-		}
-		//consumer.RunNonAdaptive()
-		// Create timer
-		t := mytimer.NewMyTimer(*p.MonitorInterval, startTimer, stopTimer)
+	// define and open csv file to record experiment results
+	dataFileName := *p.OutputFile
+	df, err := os.Create(shared.DockerDir + "/" + dataFileName)
+	if err != nil {
+		shared.ErrorHandler(shared.GetFunction(), err.Error())
+	}
 
-		go t.RunMyTimer()
-		//consumer.RunNonAdaptiveMonitored(startTimer, stopTimer, p)
-		consumer.RunStaticExperiment(startTimer, stopTimer, p, df)
-	case shared.Experiment:
-		// define and open csv file to record experiment results
-		//dataFileName := shared.ExperimentInput + *p.ControllerType + "-" + *p.Tunning + ".csv"
-		dataFileName := *p.OutputFile
-		df, err := os.Create(shared.DockerDir + "/" + dataFileName)
-		if err != nil {
-			shared.ErrorHandler(shared.GetFunction(), err.Error())
-		}
+	// rreate & start timer
+	t := mytimer.NewMyTimer(*p.MonitorInterval, startTimer, stopTimer)
+	go t.RunMyTimer()
 
-		// Create & start adaptation logic
-		adapter := adaptationlogic.NewAdaptationLogic(toAdapter, fromAdapter, p, df)
-		go adapter.Run() // normal execution
+	// create adapter
+	adapter := adaptationlogic.NewAdaptationLogic(toAdapter, fromAdapter, p, df)
 
-		// Start timer
-		t := mytimer.NewMyTimer(*p.MonitorInterval, startTimer, stopTimer)
-		go t.RunMyTimer()
+	if *p.ExecutionType == shared.OpenLoop {
+		consumer.RunOpenLoop(startTimer, stopTimer, p, df)
+	} else {
+		// stard adapter
+		go adapter.Run()
 
-		// run adaptive consumer
+		// start consumer
 		consumer.RunAdaptive(startTimer, stopTimer, toAdapter, fromAdapter, df)
-	case shared.RootTraining:
-		// define and open csv file to record experiment results
-		//dataFileName := shared.RootInput
-		dataFileName := *p.OutputFile
-		df, err := os.Create(shared.DockerDir + "/" + dataFileName)
-		if err != nil {
-			shared.ErrorHandler(shared.GetFunction(), err.Error())
-		}
-
-		// Create & start adaptation logic
-		adapter := adaptationlogic.NewAdaptationLogic(toAdapter, fromAdapter, p, df)
-		go adapter.Run() // normal execution
-
-		// Start timer
-		t := mytimer.NewMyTimer(*p.MonitorInterval, startTimer, stopTimer)
-		go t.RunMyTimer()
-
-		// run adaptive consumer
-		consumer.RunAdaptive(startTimer, stopTimer, toAdapter, fromAdapter, df)
-	case shared.ZieglerTraining:
-		// define and open csv file to record experiment results
-		//dataFileName := shared.ZieglerInput
-		dataFileName := *p.OutputFile
-		df, err := os.Create(shared.DockerDir + "/" + dataFileName)
-		if err != nil {
-			shared.ErrorHandler(shared.GetFunction(), err.Error())
-		}
-
-		// Create & start adaptation logic
-		adapter := adaptationlogic.NewAdaptationLogic(toAdapter, fromAdapter, p, df)
-		go adapter.Run() // normal execution
-
-		// Start timer
-		t := mytimer.NewMyTimer(*p.MonitorInterval, startTimer, stopTimer)
-		go t.RunMyTimer()
-
-		// run adaptive consumer
-		consumer.RunAdaptive(startTimer, stopTimer, toAdapter, fromAdapter, df)
-	default:
-		shared.ErrorHandler(shared.GetFunction(), "Execution type´"+*p.ExecutionType+"´ is unknown")
 	}
 }
 
-func (c Subscriber) RunStaticExperiment(startTimer, stopTimer chan bool, p parameters.ExecutionParameters, df *os.File) {
+func (c Subscriber) RunOpenLoop(startTimer, stopTimer chan bool, p parameters.ExecutionParameters, df *os.File) {
 	count := 0
 	nSameLevel := 0
 	c.PC = *p.PrefetchCount
@@ -226,7 +173,7 @@ func (c Subscriber) RunAdaptive(startTimer, stopTimer chan bool, toAdapter chan 
 		count++ // increment number of received messages
 		select {
 		case <-startTimer: // start monitor timer
-			// initialise no. of receive messages
+			// resume no. of received messages
 			count = 0
 		case <-stopTimer: // stop monitor timer
 			// inspect queue
@@ -235,7 +182,7 @@ func (c Subscriber) RunAdaptive(startTimer, stopTimer chan bool, toAdapter chan 
 				shared.ErrorHandler(shared.GetFunction(), "Impossible to inspect the queue")
 			}
 
-			// send no. of messages to adaptation logic
+			// send no. of received messages to adaptation logic
 			toAdapter <- shared.SubscriberToAdapter{ReceivedMessages: count, QueueSize: q.Messages}
 
 			// receive new pc from adaptation logic
