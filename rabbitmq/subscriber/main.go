@@ -58,7 +58,8 @@ func main() {
 	switch *p.ExecutionType {
 	case shared.StaticExecution:
 		// define and open csv file to record experiment results
-		dataFileName := shared.TrainingInput
+		//dataFileName := shared.TrainingInput
+		dataFileName := *p.OutputFile
 		df, err := os.Create(shared.DockerDir + "/" + dataFileName)
 		if err != nil {
 			shared.ErrorHandler(shared.GetFunction(), err.Error())
@@ -72,7 +73,8 @@ func main() {
 		consumer.RunStaticExperiment(startTimer, stopTimer, p, df)
 	case shared.Experiment:
 		// define and open csv file to record experiment results
-		dataFileName := shared.ExperimentInput + *p.ControllerType + "-" + *p.Tunning + ".csv"
+		//dataFileName := shared.ExperimentInput + *p.ControllerType + "-" + *p.Tunning + ".csv"
+		dataFileName := *p.OutputFile
 		df, err := os.Create(shared.DockerDir + "/" + dataFileName)
 		if err != nil {
 			shared.ErrorHandler(shared.GetFunction(), err.Error())
@@ -88,9 +90,10 @@ func main() {
 
 		// run adaptive consumer
 		consumer.RunAdaptive(startTimer, stopTimer, toAdapter, fromAdapter, df)
-	case shared.RootLocusTraining:
+	case shared.RootTraining:
 		// define and open csv file to record experiment results
-		dataFileName := shared.RootInput
+		//dataFileName := shared.RootInput
+		dataFileName := *p.OutputFile
 		df, err := os.Create(shared.DockerDir + "/" + dataFileName)
 		if err != nil {
 			shared.ErrorHandler(shared.GetFunction(), err.Error())
@@ -108,7 +111,8 @@ func main() {
 		consumer.RunAdaptive(startTimer, stopTimer, toAdapter, fromAdapter, df)
 	case shared.ZieglerTraining:
 		// define and open csv file to record experiment results
-		dataFileName := shared.ZieglerInput
+		//dataFileName := shared.ZieglerInput
+		dataFileName := *p.OutputFile
 		df, err := os.Create(shared.DockerDir + "/" + dataFileName)
 		if err != nil {
 			shared.ErrorHandler(shared.GetFunction(), err.Error())

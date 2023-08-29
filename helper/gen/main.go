@@ -5,138 +5,142 @@ import (
 	"fmt"
 	"main.go/shared"
 	"os"
+	"strings"
 	"time"
 )
 
 func main() {
 
-	executionType := flag.String("execution-type", "", "execution-type is a string")
+	// execution type
+	et := flag.String("execution-type", "", "execution-type is a string")
+	ct := flag.String("controller-type", "", "controller-type is a string")
+	t := flag.String("tunning", "", "tunning is a string")
+	f := flag.String("output-file", "", "output-file is a string")
 	flag.Parse()
 
-	switch *executionType {
-	case shared.Experiment:
-		experimentExecution()
-	case shared.StaticExecution:
-		staticExecution()
-	case shared.RootLocusTraining:
-		rootLocusExecution()
-	case shared.ZieglerTraining:
-		zieglerExecution()
-	default:
-		fmt.Println("Execution type unknown")
-		os.Exit(0)
+	if flag.NFlag() != 4 {
+		shared.ErrorHandler(shared.GetFunction(), "Four parameters are necessary: execution-type, controller-type, tunning, output-file")
 	}
-}
 
-func experimentExecution() {
-	controllers := shared.ControllerTypes
-	tunnings := shared.TunningTypes
-	dockerFileNames := []string{}
+	// configure dockerfile dir
+	shared.ConfigureDockerfileDir(shared.DockerfilesDir)
 
-	// check if directory exist
-	dir := shared.DockerfilesDir
-	if _, err := os.Stat(dir); !os.IsNotExist(err) {
-		// remove old docker files
-		err := os.RemoveAll(shared.DockerfilesDir)
+	dockerFile := map[string]string{}
+	dockerFile = configureDockerFile(*et, *ct, *t, *f)
+
+	for k, v := range dockerFile {
+		//fmt.Println(k, v)
+
+		// create docker file
+		df, err := os.Create(shared.DockerfilesDir + "\\" + k)
 		if err != nil {
 			shared.ErrorHandler(shared.GetFunction(), err.Error())
 		}
-	}
+		defer df.Close()
 
-	// recreate docker files folder
-	err := os.MkdirAll(shared.DockerfilesDir, 0750)
-	if err != nil && !os.IsExist(err) {
-		shared.ErrorHandler(shared.GetFunction(), err.Error())
+		// write to docker file
+		fmt.Fprintf(df, v)
 	}
+	// create batch file
+	createBat(dockerFile)
+}
+
+func configureDockerFile(et, ct, t, f string) map[string]string {
+
+	// header - common to all executions
+	h := "# This file has been generated automatically at " + time.Now().String() + "\n" +
+		"FROM golang:1.19\n" +
+		"WORKDIR /app\n" +
+		"COPY go.mod go.sum ./\n" +
+		"RUN go mod download \n" +
+		"COPY ./ ./ \n" +
+		"RUN CGO_ENABLED=0 GOOS=linux go build -o ./subscriber ./rabbitmq/subscriber/main.go\n" +
+		"ENV GOROOT=/usr/local/go/bin/\n"
+
+	// command general parameters
+	params := map[string]string{}
+	params["min"] = shared.MinPC
+	params["max"] = shared.MaxPC
+	params["monitor-interval"] = shared.MonitorInterval
+	params["prefetch-count"] = shared.InitialPC
+	params["execution-type"] = et
+	params["set-point"] = shared.SetPoint
+	params["direction"] = shared.Direction
+	params["tunning"] = t
+	params["controller-type"] = ct
+	params["output-file"] = f
+
+	r := map[string]string{}
+	fileName := "Dockerfile" + "-" + params["execution-type"] + "-" + params["controller-type"] + "-" + params["tunning"]
+	content := h
+	p := ""
+	for k, v := range params {
+		p += "\"" + "-" + k + "=" + v + "\","
+	}
+	// remove last ´,´
+	cmd := "CMD [\"./subscriber\"," + p + "]"
+	cmd = strings.Replace(cmd, ",]", "]", 100)
+	content += cmd
+	r[fileName] = content
+
+	return r
+}
+
+func experimentExecution(c []string, t []string, d string) {
+	dockerFileNames := []string{}
+
+	// configure dockerfile dir
+	shared.ConfigureDockerfileDir(d)
 
 	// create dockerfiles for experiments
-	for c := 0; c < len(controllers); c++ {
-		for t := 0; t < len(tunnings); t++ {
-			pExtra := loadExtraParameters(controllers, tunnings)
-			dockerFileNames = append(dockerFileNames, createDockerFileExperiment(controllers[c], tunnings[t], pExtra))
+	for i := 0; i < len(c); i++ {
+		for j := 0; j < len(t); j++ {
+			pExtra := loadExtraParameters(c, t)
+			dockerFileNames = append(dockerFileNames, createDockerFileExperiment(c[i], t[j], pExtra))
 		}
 	}
 
 	// create execute
-	createBat(dockerFileNames)
+	//createBat(dockerFileNames)
 }
 
-func staticExecution() {
+func staticExecution(d string) {
 	dockerFileNames := []string{}
 
-	// check if directory exist
-	dir := shared.DockerfilesDir
-	if _, err := os.Stat(dir); !os.IsNotExist(err) {
-		// remove old docker files
-		err := os.RemoveAll(shared.DockerfilesDir)
-		if err != nil {
-			shared.ErrorHandler(shared.GetFunction(), err.Error())
-		}
-	}
-
-	// recreate docker files folder
-	err := os.MkdirAll(shared.DockerfilesDir, 0750)
-	if err != nil && !os.IsExist(err) {
-		shared.ErrorHandler(shared.GetFunction(), err.Error())
-	}
+	// configure dockerfile dir
+	shared.ConfigureDockerfileDir(d)
 
 	// create docker file training
-	dockerFileNames = append(dockerFileNames, createDockerFileStatic())
+	dockerFileNames = append(dockerFileNames, createDockerFileStatic(shared.DockerFileStatic))
 
 	// create execute
-	createBat(dockerFileNames)
+	//createBat(dockerFileNames)
 }
 
-func rootLocusExecution() {
+func rootLocusExecution(d string) {
 	dockerFileNames := []string{}
 
-	// check if directory exist
-	dir := shared.DockerfilesDir
-	if _, err := os.Stat(dir); !os.IsNotExist(err) {
-		// remove old docker files
-		err := os.RemoveAll(shared.DockerfilesDir)
-		if err != nil {
-			shared.ErrorHandler(shared.GetFunction(), err.Error())
-		}
-	}
-
-	// recreate docker files folder
-	err := os.MkdirAll(shared.DockerfilesDir, 0750)
-	if err != nil && !os.IsExist(err) {
-		shared.ErrorHandler(shared.GetFunction(), err.Error())
-	}
+	// configure dockerfile dir
+	shared.ConfigureDockerfileDir(d)
 
 	// create docker file training
-	dockerFileNames = append(dockerFileNames, createDockerFileRoot())
+	dockerFileNames = append(dockerFileNames, createDockerFileRoot(shared.DockerFileRoot))
 
 	// create execute
-	createBat(dockerFileNames)
+	//createBat(dockerFileNames)
 }
 
-func zieglerExecution() {
+func zieglerExecution(d string) {
 	dockerFileNames := []string{}
 
-	// check if directory exist
-	dir := shared.DockerfilesDir
-	if _, err := os.Stat(dir); !os.IsNotExist(err) {
-		// remove old docker files
-		err := os.RemoveAll(shared.DockerfilesDir)
-		if err != nil {
-			shared.ErrorHandler(shared.GetFunction(), err.Error())
-		}
-	}
-
-	// recreate docker files folder
-	err := os.MkdirAll(shared.DockerfilesDir, 0750)
-	if err != nil && !os.IsExist(err) {
-		shared.ErrorHandler(shared.GetFunction(), err.Error())
-	}
+	// configure dockerfile dir
+	shared.ConfigureDockerfileDir(d)
 
 	// create docker file training
-	dockerFileNames = append(dockerFileNames, createDockerFileZiegler())
+	dockerFileNames = append(dockerFileNames, createDockerFileZiegler(shared.DockerFileZiegler))
 
 	// create execute
-	createBat(dockerFileNames)
+	//createBat(dockerFileNames)
 }
 
 func loadExtraParameters(c, t []string) map[string]string {
@@ -199,8 +203,7 @@ func createDockerFileExperiment(c, t string, pExtra map[string]string) string {
 	max := "\"-max=" + shared.MaxPC + "\""
 	monitorInterval := "\"-monitor-interval=" + shared.MonitorInterval + "\""
 	executionType := "\"-execution-type=" + shared.Experiment + "\""
-	//adaptability := "\"-is-adaptive=" + shared.Adaptability + "\""
-	prefetchCount := "\"-prefetch-count=" + shared.PrefetchCountInitial + "\""
+	prefetchCount := "\"-prefetch-count=" + shared.InitialPC + "\""
 	setPoint := "\"-set-point=" + shared.SetPoint + "\""
 	direction := "\"-direction=" + shared.Direction + "\""
 	controller := "\"-controller-type=" + c + "\""
@@ -243,19 +246,17 @@ func createDockerFileExperiment(c, t string, pExtra map[string]string) string {
 	return fileName
 }
 
-func createDockerFileStatic() string {
+func createDockerFileStatic(fileName string) string {
 
 	// configure general "command" parameters
 	controllerType := "\"-controller-type=" + shared.None + "\""
-	//adaptability := "\"-is-adaptive=false" + "\""
 	min := "\"-min=" + shared.MinPC + "\""
 	max := "\"-max=" + shared.MaxPC + "\""
 	monitorInterval := "\"-monitor-interval=" + shared.MonitorInterval + "\""
-	executionType := "\"-execution-type=" + shared.StaticCharacterisation + "\""
-	prefetchCount := "\"-prefetch-count=" + shared.PrefetchCountInitial + "\""
+	executionType := "\"-execution-type=" + shared.InputStep + "\""
+	prefetchCount := "\"-prefetch-count=" + shared.InitialPC + "\""
 
 	// create docker file
-	fileName := shared.DockerFileStatic
 	df, err := os.Create(shared.DockerfilesDir + "\\" + fileName)
 	if err != nil {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
@@ -283,19 +284,17 @@ func createDockerFileStatic() string {
 	return fileName
 }
 
-func createDockerFileRoot() string {
+func createDockerFileRoot(fileName string) string {
 
 	// configure general "command" parameters
 	controllerType := "\"-controller-type=" + shared.BasicPid + "\""
-	//adaptability := "\"-is-adaptive=true" + "\""
 	min := "\"-min=" + shared.MinPC + "\""
 	max := "\"-max=" + shared.MaxPC + "\""
 	monitorInterval := "\"-monitor-interval=" + shared.MonitorInterval + "\""
-	executionType := "\"-execution-type=" + shared.RootLocusTraining + "\""
-	prefetchCount := "\"-prefetch-count=" + shared.PrefetchCountInitial + "\""
+	executionType := "\"-execution-type=" + shared.RootTraining + "\""
+	prefetchCount := "\"-prefetch-count=" + shared.InitialPC + "\""
 
 	// create docker file
-	fileName := shared.DockerFileRoot
 	df, err := os.Create(shared.DockerfilesDir + "\\" + fileName)
 	if err != nil {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
@@ -324,7 +323,7 @@ func createDockerFileRoot() string {
 	return fileName
 }
 
-func createDockerFileZiegler() string {
+func createDockerFileZiegler(fileName string) string {
 
 	// configure general "command" parameters
 	controllerType := "\"-controller-type=" + shared.BasicPid + "\""
@@ -332,10 +331,9 @@ func createDockerFileZiegler() string {
 	max := "\"-max=" + shared.MaxPC + "\""
 	monitorInterval := "\"-monitor-interval=" + shared.MonitorInterval + "\""
 	executionType := "\"-execution-type=" + shared.ZieglerTraining + "\""
-	prefetchCount := "\"-prefetch-count=" + shared.PrefetchCountInitial + "\""
+	prefetchCount := "\"-prefetch-count=" + shared.InitialPC + "\""
 
 	// create docker file
-	fileName := shared.DockerFileZiegler
 	df, err := os.Create(shared.DockerfilesDir + "\\" + fileName)
 	if err != nil {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
@@ -352,7 +350,6 @@ func createDockerFileZiegler() string {
 		"RUN CGO_ENABLED=0 GOOS=linux go build -o ./subscriber ./rabbitmq/subscriber/main.go\n" +
 		"ENV GOROOT=/usr/local/go/bin/\n"
 
-	//cmd := "CMD [\"./subscriber\"," + controllerType + "," + executionType + "," + adaptability + "," + monitorInterval + "," + prefetchCount + "," + max + "," + min + "]"
 	cmd := "CMD [\"./subscriber\"," + controllerType + "," + executionType + "," + monitorInterval + "," + prefetchCount + "," + max + "," + min + "]"
 
 	// include command in docker file
@@ -364,11 +361,11 @@ func createDockerFileZiegler() string {
 	return fileName
 }
 
-func createBat(list []string) {
+func createBat(list map[string]string) {
 	// define list of docker files include in bat file
 	listCommand := "set list="
-	for i := 0; i < len(list); i++ {
-		listCommand += list[i] + " "
+	for k, _ := range list {
+		listCommand += k + " "
 	}
 	listCommand += "\n"
 

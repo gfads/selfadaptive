@@ -45,7 +45,7 @@ var Kp = map[string]string{
 	BasicPi + Cohen:      "0.00414897",
 	BasicPi + Amigo:      "0.00079877",
 	BasicPid + RootLocus: "-0.00144086", // original -v1
-	BasicPid + Ziegler:   "0.00048518",
+	BasicPid + Ziegler:   "0.00031917",
 	BasicPid + Cohen:     "0.00156457",
 	BasicPid + Amigo:     "0.00101407",
 }
@@ -59,7 +59,7 @@ var Ki = map[string]string{
 	BasicPi + Cohen:      "0.01514702",
 	BasicPi + Amigo:      "0.00218342",
 	BasicPid + RootLocus: "0.00248495", // original
-	BasicPid + Ziegler:   "0.00242588",
+	BasicPid + Ziegler:   "0.00047798",
 	BasicPid + Cohen:     "0.00148113",
 	BasicPid + Amigo:     "0.00213378"}
 var Kd = map[string]string{
@@ -72,7 +72,7 @@ var Kd = map[string]string{
 	BasicPi + Cohen:      "0.0",
 	BasicPi + Amigo:      "0.0",
 	BasicPid + RootLocus: "0.00057789", // original
-	BasicPid + Ziegler:   "0.00002426",
+	BasicPid + Ziegler:   "0.00000478",
 	BasicPid + Cohen:     "0.00019962",
 	BasicPid + Amigo:     "0.00012676"}
 
@@ -80,7 +80,7 @@ const MinPC = "1"
 const MaxPC = "100"
 const MonitorInterval = "5"
 const Adaptability = "true"
-const PrefetchCountInitial = "1"
+const InitialPC = "1"
 const SetPoint = "500"
 const Direction = "1.0"
 const DeadZone = "200.0"
@@ -109,8 +109,8 @@ const PcDefaultLimitMax = 1200 // TODO ASTAR
 const StaticExecution = "Static"
 const StaticGoal = "StaticGoal"
 const Experiment = "Experiment"
-const StaticCharacterisation = "Static"
-const RootLocusTraining = "RootLocusTraining"
+const InputStep = "InputStep"
+const RootTraining = "RootTraining"
 const ZieglerTraining = "ZieglerTraining"
 const CohenTraining = "CohenTraining"
 const AMIGOTraining = "AMIGOTraining"
@@ -169,10 +169,10 @@ var TunningTypes = []string{
 }
 
 //const ExperimentFileBase = "raw-sin-36-static-"
-const ZieglerInput = "ziegler-01.csv"
+const ZieglerInput = "ziegler-04.csv"
 const RootInput = "root-01.csv"
 const RootOutput = "root-01-output.csv"
-const ExperimentInput = "experiment-36-"
+const ExperimentInput = "experiment-4"
 const ExperimentOutput = "data-all.csv"
 const TrainingInput = "training-experiment-03-75-publishers.csv"
 const TrainingOutput = "training-experiment-04-75-publishers-mean.csv"
@@ -435,4 +435,25 @@ func PadLeft(str string, length int) string {
 		str = "0" + str
 	}
 	return str
+}
+
+// recreate Dockfile dir
+
+func ConfigureDockerfileDir(dir string) {
+
+	// check if directory exist
+	if _, err := os.Stat(dir); !os.IsNotExist(err) {
+		// remove old docker files
+		err := os.RemoveAll(dir)
+		if err != nil {
+			ErrorHandler(GetFunction(), err.Error())
+		}
+	}
+
+	// recreate docker files folder
+	err := os.MkdirAll(dir, 0750)
+	if err != nil && !os.IsExist(err) {
+		ErrorHandler(GetFunction(), err.Error())
+	}
+
 }

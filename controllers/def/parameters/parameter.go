@@ -9,6 +9,7 @@ import (
 )
 
 type ExecutionParameters struct {
+	OutputFile      *string
 	Tunning         *string
 	ExecutionType   *string
 	ControllerType  *string
@@ -48,6 +49,7 @@ func (e ExecutionParameters) Load() ExecutionParameters {
 	p.Alfa = flag.Float64("alfa", 1.0, "Alfa is a float (Setpoint Weighting)")
 	p.Beta = flag.Float64("beta", 1.0, "Beta is a float (Setpoint Weighting / Two degrees of freedom)")
 	p.Tunning = flag.String("tunning", "RootLocus", "tunning-type is a string")
+	p.OutputFile = flag.String("output-file", "apague.csv", "output-file is a string")
 	flag.Parse()
 
 	return p
@@ -69,7 +71,7 @@ func (e ExecutionParameters) Show(p ExecutionParameters) {
 		"Execution Type  : " + *p.ExecutionType + "\n"
 
 	switch *p.ExecutionType {
-	case shared.StaticCharacterisation:
+	case shared.Experiment:
 	default:
 		r += "Tunning         : " + *p.Tunning + "\n" +
 			"Controller Type : " + *p.ControllerType + "\n" +

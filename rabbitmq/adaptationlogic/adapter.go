@@ -64,7 +64,7 @@ func (al AdaptationLogic) Run() {
 	switch al.ExecutionType {
 	case shared.Experiment:
 		al.RunExperiment()
-	case shared.RootLocusTraining:
+	case shared.RootTraining:
 		al.RootLocusTraining()
 	case shared.ZieglerTraining: // all non-analytical tune methods
 		//al.ZieglerTraining()
@@ -373,7 +373,7 @@ func (al AdaptationLogic) ZieglerTraining2() {
 		i := AdjustmenstInfo{PC: al.PC, Rate: rate}
 		info.Data = append(info.Data, i)
 
-		if count < 100 {
+		if count <= len(shared.InputSteps) {
 			if count < len(shared.InputSteps)/2 { // TODO
 				al.PC = shared.InputSteps[0]
 			} else {
@@ -734,10 +734,8 @@ func CalculateZieglerGains2(info TrainingInfo) TrainingInfo {
 
 	for i := 0; i < len(info.Data); i++ { // discard 2 initial input steps, i.e., 5 samples
 		if i < len(shared.InputSteps)/2 {
-			fmt.Println("1", info.Data[i])
 			sumDeltaY1 += info.Data[i].Rate
 		} else {
-			fmt.Println("2", info.Data[i])
 			sumDeltaY2 += info.Data[i].Rate
 		}
 	}
