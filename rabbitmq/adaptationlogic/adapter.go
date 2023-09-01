@@ -67,8 +67,7 @@ func (al AdaptationLogic) Run() {
 	case shared.RootTraining:
 		al.RootLocusTraining()
 	case shared.ZieglerTraining: // all non-analytical tune methods
-		//al.ZieglerTraining()
-		al.ZieglerTraining2()
+		al.ZieglerTraining()
 	//case shared.CohenTraining:
 	//al.ZieglerTraining() // TODO
 	case shared.OnLineTraining:
@@ -250,7 +249,7 @@ func (al AdaptationLogic) RootLocusTraining() {
 				al.TrainingInfo.Kd = info.Kd
 
 				fmt.Printf("\n \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
-
+				fmt.Fprintf(al.File, "\n -kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
 				if al.TrainingInfo.Kp > 0 && al.TrainingInfo.Ki > 0 {
 					fmt.Println("Bad gains...")
 				}
@@ -307,72 +306,6 @@ func (al AdaptationLogic) ZieglerTraining() {
 		i := AdjustmenstInfo{PC: al.PC, Rate: rate}
 		info.Data = append(info.Data, i)
 
-		if count < len(shared.InputSteps)-1 {
-			al.PC = shared.InputSteps[count]
-		} else { // training is over
-			info = CalculateZieglerGains(info)
-			al.TrainingInfo.Kp = info.Kp
-			al.TrainingInfo.Ki = info.Ki
-			al.TrainingInfo.Kd = info.Kd
-
-			fmt.Printf("Ziegler: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
-
-			info = CalculateCohenGains(info)
-			al.TrainingInfo.Kp = info.Kp
-			al.TrainingInfo.Ki = info.Ki
-			al.TrainingInfo.Kd = info.Kd
-
-			fmt.Printf("Cohen: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
-
-			info = CalculateAMIGOGains(info)
-			al.TrainingInfo.Kp = info.Kp
-			al.TrainingInfo.Ki = info.Ki
-			al.TrainingInfo.Kd = info.Kd
-
-			fmt.Printf("AMIGO: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
-
-			if al.TrainingInfo.Kp > 0 && al.TrainingInfo.Ki > 0 {
-				fmt.Println("Bad gains...")
-			}
-			fmt.Println("***** End of Training - Copy/paste Gains *****")
-			al.File.Close()
-			os.Exit(0)
-		}
-
-		// send pc to business
-		al.ToBusiness <- al.PC
-	}
-}
-
-func (al AdaptationLogic) ZieglerTraining2() {
-	count := 0
-	info := TrainingInfo{TypeName: al.TrainingInfo.TypeName}
-
-	// create & execute adjustment mechanism
-	//go AdjustmentMechanism(fromAdjuster, toAdjuster, al.SetPoint)
-
-	// warm up phase
-	time.Sleep(shared.WarmupTime * time.Second)
-
-	// discard first measurement
-	<-al.FromBusiness                     // receive no. of messages from business
-	al.ToBusiness <- shared.InputSteps[0] // Configure PC to execute the Ziegler Steps
-
-	// loop of adaptation logic
-	for {
-		count++
-		// receive no. of messages from business
-		n := <-al.FromBusiness
-
-		// calculate new arrival rate (msg/s)
-		rate := float64(n.ReceivedMessages) / al.MonitorInterval.Seconds()
-
-		fmt.Printf("%v;%v;%f;%f\n", n.QueueSize, al.PC, rate, 0.0)
-		fmt.Fprintf(al.File, "%v;%v;%f;%f\n", n.QueueSize, al.PC, rate, 0.0)
-
-		i := AdjustmenstInfo{PC: al.PC, Rate: rate}
-		info.Data = append(info.Data, i)
-
 		if count <= len(shared.InputSteps) {
 			if count < len(shared.InputSteps)/2 { // TODO
 				al.PC = shared.InputSteps[0]
@@ -380,14 +313,13 @@ func (al AdaptationLogic) ZieglerTraining2() {
 				al.PC = shared.InputSteps[1]
 			}
 		} else { // training is over
-			info = CalculateZieglerGains2(info)
+			info = CalculateZieglerGains(info)
 			al.TrainingInfo.Kp = info.Kp
 			al.TrainingInfo.Ki = info.Ki
 			al.TrainingInfo.Kd = info.Kd
 
 			fmt.Printf("Ziegler: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
-
-			os.Exit(0)
+			fmt.Fprintf(al.File, "Ziegler: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
 
 			info = CalculateCohenGains(info)
 			al.TrainingInfo.Kp = info.Kp
@@ -395,6 +327,7 @@ func (al AdaptationLogic) ZieglerTraining2() {
 			al.TrainingInfo.Kd = info.Kd
 
 			fmt.Printf("Cohen: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+			fmt.Fprintf(al.File, "Cohen: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
 
 			info = CalculateAMIGOGains(info)
 			al.TrainingInfo.Kp = info.Kp
@@ -402,6 +335,7 @@ func (al AdaptationLogic) ZieglerTraining2() {
 			al.TrainingInfo.Kd = info.Kd
 
 			fmt.Printf("AMIGO: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+			fmt.Fprintf(al.File, "AMIGO: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
 
 			if al.TrainingInfo.Kp > 0 && al.TrainingInfo.Ki > 0 {
 				fmt.Println("Bad gains...")
@@ -689,49 +623,6 @@ func CalculateZieglerGains(info TrainingInfo) TrainingInfo {
 	sumDeltaY1 := 0.0
 	sumDeltaY2 := 0.0
 
-	for i := 2; i < len(info.Data); i++ { // discard 2 initial input steps, i.e., 5 samples
-		if i%2 == 0 {
-			sumDeltaY1 += info.Data[i].Rate
-		} else {
-			sumDeltaY2 += info.Data[i].Rate
-		}
-	}
-
-	fmt.Println("************")
-	dataSize := float64((len(info.Data) - 2) / 2.0) // discard 2 initial input steps
-	k1 := sumDeltaY1 / dataSize
-	k2 := sumDeltaY2 / dataSize
-	K := k2 - k1
-	lambda := K * shared.Tau / shared.T // see Figure 9-2
-
-	switch info.TypeName {
-	case shared.BasicP:
-		k := 1 / lambda
-		info.Kp = k
-		info.Ki = 0.0
-		info.Kd = 0.0
-	case shared.BasicPi:
-		k := 0.9 / lambda
-		Ti := 3.0 * shared.Tau
-		info.Kp = k
-		info.Ki = k / Ti
-		info.Kd = 0.0
-	case shared.BasicPid:
-		k := 1.2 / lambda
-		Ti := 2.0 * shared.Tau
-		Td := shared.Tau / 2.0
-		info.Kp = k
-		info.Ki = k / Ti
-		info.Kd = k * Td
-	}
-	return info
-}
-
-func CalculateZieglerGains2(info TrainingInfo) TrainingInfo {
-
-	sumDeltaY1 := 0.0
-	sumDeltaY2 := 0.0
-
 	for i := 0; i < len(info.Data); i++ { // discard 2 initial input steps, i.e., 5 samples
 		if i < len(shared.InputSteps)/2 {
 			sumDeltaY1 += info.Data[i].Rate
@@ -775,8 +666,8 @@ func CalculateCohenGains(info TrainingInfo) TrainingInfo {
 	sumDeltaY1 := 0.0
 	sumDeltaY2 := 0.0
 
-	for i := 2; i < len(info.Data); i++ { // discard 2 initial measurements, i.e., 5 samples
-		if i%2 == 0 {
+	for i := 0; i < len(info.Data); i++ { // discard 2 initial input steps, i.e., 5 samples
+		if i < len(shared.InputSteps)/2 {
 			sumDeltaY1 += info.Data[i].Rate
 		} else {
 			sumDeltaY2 += info.Data[i].Rate
@@ -819,8 +710,8 @@ func CalculateAMIGOGains(info TrainingInfo) TrainingInfo {
 	sumDeltaY1 := 0.0
 	sumDeltaY2 := 0.0
 
-	for i := 2; i < len(info.Data); i++ { // discard 2 initial measurements, i.e., 5 samples
-		if i%2 == 0 {
+	for i := 0; i < len(info.Data); i++ { // discard 2 initial input steps, i.e., 5 samples
+		if i < len(shared.InputSteps)/2 {
 			sumDeltaY1 += info.Data[i].Rate
 		} else {
 			sumDeltaY2 += info.Data[i].Rate

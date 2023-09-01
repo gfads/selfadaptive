@@ -57,7 +57,7 @@ func main() {
 
 	// define and open csv file to record experiment results
 	dataFileName := *p.OutputFile
-	df, err := os.Create(shared.DockerDir + "/" + dataFileName)
+	df, err := os.Create(shared.DockerDir + "/" + dataFileName + ".csv")
 	if err != nil {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
 	}
@@ -76,7 +76,7 @@ func main() {
 		go adapter.Run()
 
 		// start consumer
-		consumer.RunAdaptive(startTimer, stopTimer, toAdapter, fromAdapter, df)
+		consumer.RunClosedLoop(startTimer, stopTimer, toAdapter, fromAdapter, df)
 	}
 }
 
@@ -161,7 +161,7 @@ func (c Subscriber) RunNonAdaptiveMonitored(startTimer, stopTimer chan bool, p p
 	}
 }
 
-func (c Subscriber) RunAdaptive(startTimer, stopTimer chan bool, toAdapter chan shared.SubscriberToAdapter, fromAdapter chan int, f *os.File) {
+func (c Subscriber) RunClosedLoop(startTimer, stopTimer chan bool, toAdapter chan shared.SubscriberToAdapter, fromAdapter chan int, f *os.File) {
 
 	count := 0
 

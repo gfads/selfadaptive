@@ -16,7 +16,6 @@ import (
 )
 
 // Configuration RabbitMQ
-//const IpPortRabbitMQ = "172.22.40.187:5672" // CIN
 const IpPortRabbitMQ = "192.168.0.20:5672" // Home Recife
 
 // Training/Experiment parameters
@@ -44,10 +43,10 @@ var Kp = map[string]string{
 	BasicPi + Ziegler:    "0.00406761",
 	BasicPi + Cohen:      "0.00414897",
 	BasicPi + Amigo:      "0.00079877",
-	BasicPid + RootLocus: "-0.00144086", // original -v1
-	BasicPid + Ziegler:   "0.00031917",
-	BasicPid + Cohen:     "0.00156457",
-	BasicPid + Amigo:     "0.00101407",
+	BasicPid + RootLocus: "-0.0012086", // original -v1
+	BasicPid + Ziegler:   "0.00026492",
+	BasicPid + Cohen:     "0.00083451",
+	BasicPid + Amigo:     "0.00054089",
 }
 var Ki = map[string]string{
 	BasicP + RootLocus:   "0.0",
@@ -58,10 +57,10 @@ var Ki = map[string]string{
 	BasicPi + Ziegler:    "0.00122028",
 	BasicPi + Cohen:      "0.01514702",
 	BasicPi + Amigo:      "0.00218342",
-	BasicPid + RootLocus: "0.00248495", // original
-	BasicPid + Ziegler:   "0.00047798",
-	BasicPid + Cohen:     "0.00148113",
-	BasicPid + Amigo:     "0.00213378"}
+	BasicPid + RootLocus: "0.00203549", // original
+	BasicPid + Ziegler:   "0.00132462",
+	BasicPid + Cohen:     "0.00790004",
+	BasicPid + Amigo:     "0.01138116"}
 var Kd = map[string]string{
 	BasicP + RootLocus:   "0.0",
 	BasicP + Ziegler:     "0.0",
@@ -71,10 +70,10 @@ var Kd = map[string]string{
 	BasicPi + Ziegler:    "0.0",
 	BasicPi + Cohen:      "0.0",
 	BasicPi + Amigo:      "0.0",
-	BasicPid + RootLocus: "0.00057789", // original
-	BasicPid + Ziegler:   "0.00000478",
-	BasicPid + Cohen:     "0.00019962",
-	BasicPid + Amigo:     "0.00012676"}
+	BasicPid + RootLocus: "0.00047337", // original
+	BasicPid + Ziegler:   "0.00001325",
+	BasicPid + Cohen:     "0.00001065",
+	BasicPid + Amigo:     "0.00000676"}
 
 const MinPC = "1"
 const MaxPC = "100"
@@ -94,6 +93,8 @@ const TimeBetweenAdjustments = 1200 // seconds
 const MaximumNrmse = 0.30
 const WarmupTime = 30 // seconds
 const TrainingAttempts = 30
+
+//const SizeOfSameLevel = 30 // used in the experiments
 const SizeOfSameLevel = 30 // used in the experiments
 
 // Astar
@@ -456,4 +457,12 @@ func ConfigureDockerfileDir(dir string) {
 		ErrorHandler(GetFunction(), err.Error())
 	}
 
+}
+
+func FileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
 }

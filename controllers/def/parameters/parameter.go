@@ -68,20 +68,16 @@ func (e ExecutionParameters) Validate(p ExecutionParameters) {
 func (e ExecutionParameters) Show(p ExecutionParameters) {
 
 	r := "************************************************ \n" +
-		"Execution Type  : " + *p.ExecutionType + "\n"
-
-	switch *p.ExecutionType {
-	case shared.Experiment:
-	default:
-		r += "Tunning         : " + *p.Tunning + "\n" +
-			"Controller Type : " + *p.ControllerType + "\n" +
-			"Monitor Interval: " + strconv.Itoa(*p.MonitorInterval) + "\n" +
-			"Goal            : " + strconv.FormatFloat(*p.SetPoint, 'E', -1, 32) + "\n" +
-			"Prefetch Count  : " + strconv.Itoa(*p.PrefetchCount) + "\n" +
-			"Direction       : " + strconv.FormatFloat(*p.Direction, 'E', -1, 32) + "\n"
-		r += "Min             : " + strconv.FormatFloat(*p.Min, 'E', -1, 32) + "\n"
-		r += "Max             : " + strconv.FormatFloat(*p.Max, 'E', -1, 32) + "\n"
-	}
+		"Output File     : " + *p.OutputFile + "\n" +
+		"Execution Type  : " + *p.ExecutionType + "\n" +
+		"Tunning         : " + *p.Tunning + "\n" +
+		"Controller Type : " + *p.ControllerType + "\n" +
+		"Monitor Interval: " + strconv.Itoa(*p.MonitorInterval) + "\n" +
+		"Goal            : " + strconv.FormatFloat(*p.SetPoint, 'f', -1, 32) + "\n" +
+		"Prefetch Count  : " + strconv.Itoa(*p.PrefetchCount) + "\n" +
+		"Direction       : " + strconv.FormatFloat(*p.Direction, 'f', -1, 32) + "\n" +
+		"Min             : " + strconv.FormatFloat(*p.Min, 'f', -1, 32) + "\n" +
+		"Max             : " + strconv.FormatFloat(*p.Max, 'f', -1, 32) + "\n"
 
 	switch *p.ControllerType {
 	case shared.None:

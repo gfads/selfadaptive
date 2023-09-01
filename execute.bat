@@ -1,51 +1,55 @@
 @echo OFF
 cls
-set et=%1
-set ct=%2
-set t=%3
-set f=%4
 
-if "%~1"=="" goto :error1
-if "%~2"=="" goto :error2
-if "%~3"=="" goto :error3
-if "%~4"=="" goto :error4
+rem remove previous rabbitmq
+docker stop some-rabbit
+docker rm some-rabbit
 
-if %et% neq Experiment (
-    if %et% neq ZieglerTraining (
-        if %et% neq RootTraining (
-              goto :error1
-           )
-    )
+rem execute new instance of rabbitmq
+docker run -d --memory=6g --cpus=5.0 --name some-rabbit -p 5672:5672 rabbitmq
+
+rem configure variables
+set et=Experiment
+set ct=BasicPID
+set t=Cohen
+set f=cohen-training-01 cohen-training-02 cohen-training-03 cohen-training-04 cohen-training-05 cohen-training-06 cohen-training-07 cohen-training-08 cohen-training-09 cohen-training-10
+
+for %%x in (%f%) do (
+    set GO111MODULE=on
+    set GOPATH=C:\Users\user\go;C:\Users\user\go\control\pkg\mod\github.com\streadway\amqp@v1.0.0;C:\Users\user\go\selfadaptive
+    set GOROOT=C:\Program Files\Go
+    set PATH=%PATH%;C:\Program Files\Docker\Docker
+
+    echo #### 1: Generate Dockerfiles/Batch file ####
+    cd C:\Users\user\go\selfadaptive\helper\gen
+    go run main.go -execution-type=%et% -controller-type=%ct% -tunning=%t% -output-file=%%x
+
+    cd C:\Users\user\go\selfadaptive
+
+    echo #### 2: Remove images ####
+    echo y| docker volume prune
+    echo y| docker image prune
+    echo y| docker container prune
+
+    echo #### 3: Execute Experiments ####
+    execute-all-experiments
 )
-goto :ok
 
-rem **** BEGIN OF OK ****
-:ok
-set GO111MODULE=on
-set GOPATH=C:\Users\user\go;C:\Users\user\go\control\pkg\mod\github.com\streadway\amqp@v1.0.0;C:\Users\user\go\selfadaptive
-set GOROOT=C:\Program Files\Go
-set PATH=%PATH%;C:\Program Files\Docker\Docker
+echo #### 4: Clear data & Stop RabbitMQ ####
+echo y| docker volume prune
+echo y| docker image prune
+echo y| docker container prune
 
-echo #### 1: Generate Dockerfiles/Batch file ####
-cd C:\Users\user\go\selfadaptive\helper\gen
-go run main.go -execution-type=%et% -controller-type=%ct% -tunning=%t% -output-file=%f%
-
-cd C:\Users\user\go\selfadaptive
-
-echo #### 2: Remove images ####
-echo y | docker volume prune
-echo y | docker image prune
-echo y | docker container prune
-
-echo #### 3: Execute Experiments ####
-execute-all-experiments
+docker stop some-rabbit
+docker rm some-rabbit
 
 echo #### 4: Generate Statistics ####
 cd C:\Users\user\go\selfadaptive\helper\stats
 rem main.exe
 
 cd C:\Users\user\go\selfadaptive
-goto :EOF
+
+rem goto :EOF
 rem **** END OF OK ****
 
 :error1

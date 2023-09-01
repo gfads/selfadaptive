@@ -121,9 +121,9 @@ func createBatFile(list map[string]string) {
 
 	batFileContent := "rem This file has been generated automatically at " + time.Now().String() + "\n" +
 		"@echo off \n" +
-		"docker stop some-rabbit \n" +
-		"docker rm some-rabbit\n" +
-		"docker run -d --memory=\"6g\" --cpus=\"5.0\" --name some-rabbit -p 5672:5672 rabbitmq\n" +
+		//	"docker stop some-rabbit \n" +
+		//	"docker rm some-rabbit\n" +
+		//	"docker run -d --memory=\"6g\" --cpus=\"5.0\" --name some-rabbit -p 5672:5672 rabbitmq\n" +
 		"timeout /t 10\n" +
 		"docker stop publisher\n" +
 		"docker rm publisher\n" +
@@ -138,11 +138,11 @@ func createBatFile(list map[string]string) {
 			"   docker build --tag subscriber .\n" +
 			"   docker run --rm --name some-subscriber --memory=\"1g\" --cpus=\"1.0\" -v " + shared.DataDir + ":" + shared.DockerDir + " subscriber\n" +
 			"   del " + shared.DockerfilesDir + "\\" + "%%x \n" +
-			"   echo y | docker volume prune \n" +
-			"   echo y | docker image prune \n" +
-			")\n" +
-			"docker stop some-rabbit \n" +
-			"docker rm some-rabbit\n"
+			"   echo y| docker volume prune \n" +
+			"   echo y| docker image prune \n" +
+			")\n"
+	//"docker stop some-rabbit \n" +
+	//"docker rm some-rabbit\n"
 
 	// create batch file
 	fileName := shared.BatchFileExperiments

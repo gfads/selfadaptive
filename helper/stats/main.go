@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
 	"main.go/shared"
 	"math"
 	"os"
@@ -19,56 +18,66 @@ type Data struct {
 	Goal        float64
 }
 
-//const rawFilter = "raw-" // TODO
-const experimentFilter = shared.ExperimentInput
-const trainingFilter = shared.TrainingInput
-
 func main() {
 
-	// open output experiemnt file
-	experimentFile, err := os.Create(shared.DataDir + "\\" + shared.ExperimentOutput)
-	if err != nil {
-		shared.ErrorHandler(shared.GetFunction(), err.Error())
-	}
-	defer experimentFile.Close()
+	//et := flag.String("execution-type", "", "execution-type is a string")
+	//inf := flag.String("input-file", "", "input-file is a string")
+	//outf := flag.String("output-file", "", "output-file is a string")
+	//flag.Parse()
 
-	// open output training file
-	trainingFile, err := os.Create(shared.DataDir + "\\" + shared.TrainingOutput)
-	if err != nil {
-		shared.ErrorHandler(shared.GetFunction(), err.Error())
-	}
-	defer trainingFile.Close()
+	inputFiles := []string{"hpa-experiment-none-1", "hpa-experiment-none-2", "hpa-experiment-none-3", "hpa-experiment-none-4", "hpa-experiment-none-5", "hpa-experiment-none-6", "hpa-experiment-none-7", "hpa-experiment-none-8", "hpa-experiment-none-9", "hpa-experiment-none-10"}
+	outf := "hpa"
 
-	// read folder of files
-	files, err := ioutil.ReadDir(shared.DataDir)
-	if err != nil {
-		shared.ErrorHandler(shared.GetFunction(), err.Error())
+	for i := 0; i < len(inputFiles); i++ {
+		et := shared.Experiment
+		//calcStatistics(*et, *inf, *outf)
+		calcStatistics(et, inputFiles[i], outf)
+	}
+}
+
+func calcStatistics(et, inf, outf string) {
+	var includeHeader bool
+	var outFile *os.File
+	var err error
+
+	// check if output file exist to place/not place file header
+	filePath := shared.DataDir + "\\" + outf + ".csv"
+	if shared.FileExists(filePath) {
+		// open output file
+		outFile, err = os.OpenFile(filePath, os.O_RDWR|os.O_APPEND, 0660)
+		if err != nil {
+			shared.ErrorHandler(shared.GetFunction(), err.Error())
+		}
+		defer outFile.Close()
+		includeHeader = false
+	} else {
+		// create output file
+		outFile, err = os.Create(filePath)
+		includeHeader = true
 	}
 
 	// generate data - raw files
-	fmt.Fprintf(experimentFile, "Controller;Tunning;RMSE;NMRSE;MAE;MAPE;SMAPE;R2;ITAE;ISE;Control Effort;CC;Goal Range \n")
-	for f := range files {
-		if strings.Contains(files[f].Name(), experimentFilter) {
-			data := readFile(files[f].Name())
-			fmt.Fprintf(experimentFile, "%v;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f\n", files[f].Name(), rmse(data), nmrse(data), mae(data), mape(data), smape(data), r2(data), itae(data), ise(data), controlEffort(data), cc(data), goalRange(data))
+	data := readFile(inf)
+
+	if et == shared.Experiment {
+		if includeHeader {
+			fmt.Fprintf(outFile, "File;Tunning;RMSE;NMRSE;MAE;MAPE;SMAPE;R2;ITAE;ISE;Control Effort;CC;Goal Range \n")
 		}
-		if strings.Contains(files[f].Name(), trainingFilter) {
-			data := readFile(files[f].Name())
-			means := calculateMeans(data)
+		fmt.Fprintf(outFile, "%v.csv;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f\n", inf, rmse(data), nmrse(data), mae(data), mape(data), smape(data), r2(data), itae(data), ise(data), controlEffort(data), cc(data), goalRange(data))
+	} else {
+		means := calculateMeans(data)
 
-			// order by keys
-			keys := make([]string, 0, len(means))
-			for k := range means {
-				keys = append(keys, k)
-			}
-			sort.Strings(keys)
+		// order by keys
+		keys := make([]string, 0, len(means))
+		for k := range means {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
 
-			for _, k := range keys {
-				fmt.Fprintf(trainingFile, "%v;%v;%.6f;%v\n", 0, k, means[k], 0)
-			}
+		for _, k := range keys {
+			fmt.Fprintf(outFile, "%v;%v;%.6f;%v\n", 0, k, means[k], 0)
 		}
 	}
-	// generate data means file - sttatic
 }
 
 func calculateMeans(d []Data) map[string]float64 {
@@ -235,13 +244,9 @@ func nmrse(d []Data) float64 {
 }
 
 func readFile(name string) []Data {
-
 	data := []Data{}
-
-	filePath := shared.DataDir + "/" + name
-
+	filePath := shared.DataDir + "\\" + name + ".csv"
 	readFile, err := os.Open(filePath)
-
 	if err != nil {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
 	}
