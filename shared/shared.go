@@ -39,7 +39,7 @@ var Kp = map[string]string{
 	BasicP + Ziegler:     "0.00596588",
 	BasicP + Cohen:       "0.00268464",
 	BasicP + Amigo:       "0.0",
-	BasicPi + RootLocus:  "0.00211325", // not used
+	BasicPi + RootLocus:  "-0.00109469", // not used
 	BasicPi + Ziegler:    "0.00406761",
 	BasicPi + Cohen:      "0.00414897",
 	BasicPi + Amigo:      "0.00079877",
@@ -53,7 +53,7 @@ var Ki = map[string]string{
 	BasicP + Ziegler:     "0.0",
 	BasicP + Cohen:       "0.0",
 	BasicP + Amigo:       "0.0",
-	BasicPi + RootLocus:  "0.00222392", // not used
+	BasicPi + RootLocus:  "0.00115424", // not used
 	BasicPi + Ziegler:    "0.00122028",
 	BasicPi + Cohen:      "0.01514702",
 	BasicPi + Amigo:      "0.00218342",

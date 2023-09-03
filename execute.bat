@@ -11,8 +11,9 @@ docker run -d --memory=6g --cpus=5.0 --name some-rabbit -p 5672:5672 rabbitmq
 rem configure variables
 set et=Experiment
 set ct=BasicPID
-set t=Cohen
-set f=cohen-training-01 cohen-training-02 cohen-training-03 cohen-training-04 cohen-training-05 cohen-training-06 cohen-training-07 cohen-training-08 cohen-training-09 cohen-training-10
+set t=Ziegler
+set b=pid-ziegler-experiment
+set f=1 2 3 4 5 6 7 8 9 10
 
 for %%x in (%f%) do (
     set GO111MODULE=on
@@ -22,7 +23,7 @@ for %%x in (%f%) do (
 
     echo #### 1: Generate Dockerfiles/Batch file ####
     cd C:\Users\user\go\selfadaptive\helper\gen
-    go run main.go -execution-type=%et% -controller-type=%ct% -tunning=%t% -output-file=%%x
+    go run main.go -execution-type=%et% -controller-type=%ct% -tunning=%t% -output-file=%b%-%%x.csv
 
     cd C:\Users\user\go\selfadaptive
 

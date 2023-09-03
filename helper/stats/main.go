@@ -25,8 +25,8 @@ func main() {
 	//outf := flag.String("output-file", "", "output-file is a string")
 	//flag.Parse()
 
-	inputFiles := []string{"hpa-experiment-none-1", "hpa-experiment-none-2", "hpa-experiment-none-3", "hpa-experiment-none-4", "hpa-experiment-none-5", "hpa-experiment-none-6", "hpa-experiment-none-7", "hpa-experiment-none-8", "hpa-experiment-none-9", "hpa-experiment-none-10"}
-	outf := "hpa"
+	inputFiles := []string{"pi-ziegler-experiment-01", "pi-ziegler-experiment-02", "pi-ziegler-experiment-03", "pi-ziegler-experiment-04", "pi-ziegler-experiment-05", "pi-ziegler-experiment-06", "pi-ziegler-experiment-07", "pi-ziegler-experiment-08", "pi-ziegler-experiment-09", "pi-ziegler-experiment-10"}
+	outf := "experiment-pi-ziegler"
 
 	for i := 0; i < len(inputFiles); i++ {
 		et := shared.Experiment
