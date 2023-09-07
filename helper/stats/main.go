@@ -24,9 +24,14 @@ func main() {
 	//inf := flag.String("input-file", "", "input-file is a string")
 	//outf := flag.String("output-file", "", "output-file is a string")
 	//flag.Parse()
+	outf := "Experiment-BasicPID-Ziegler"
+	b := "Experiment-BasicPID-Ziegler-"
+	inputFiles := []string{}
 
-	inputFiles := []string{"pi-ziegler-experiment-01", "pi-ziegler-experiment-02", "pi-ziegler-experiment-03", "pi-ziegler-experiment-04", "pi-ziegler-experiment-05", "pi-ziegler-experiment-06", "pi-ziegler-experiment-07", "pi-ziegler-experiment-08", "pi-ziegler-experiment-09", "pi-ziegler-experiment-10"}
-	outf := "experiment-pi-ziegler"
+	for i := 1; i <= 10; i++ {
+		fileName := b + strconv.Itoa(i)
+		inputFiles = append(inputFiles, fileName)
+	}
 
 	for i := 0; i < len(inputFiles); i++ {
 		et := shared.Experiment

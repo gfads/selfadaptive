@@ -12,7 +12,7 @@ rem configure variables
 set et=Experiment
 set ct=BasicPID
 set t=Ziegler
-set b=pid-ziegler-experiment
+set b=%et%-%ct%-%t%
 set f=1 2 3 4 5 6 7 8 9 10
 
 for %%x in (%f%) do (
@@ -23,7 +23,7 @@ for %%x in (%f%) do (
 
     echo #### 1: Generate Dockerfiles/Batch file ####
     cd C:\Users\user\go\selfadaptive\helper\gen
-    go run main.go -execution-type=%et% -controller-type=%ct% -tunning=%t% -output-file=%b%-%%x.csv
+    go run main.go -execution-type=%et% -controller-type=%ct% -tunning=%t% -output-file=%b%-%%x
 
     cd C:\Users\user\go\selfadaptive
 

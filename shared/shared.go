@@ -35,32 +35,32 @@ var RandomGoals = []float64{866, 1440, 1000}
 var InputSteps = []int{1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2} // for Ziegler/Cohen/AMIGO
 
 var Kp = map[string]string{
-	BasicP + RootLocus:   "0.00777594",
-	BasicP + Ziegler:     "0.00596588",
-	BasicP + Cohen:       "0.00268464",
+	BasicP + RootLocus:   "0.00448961", // -kp=0.00448961", "-ki=0.00000000", "-kd=0.00000000"
+	BasicP + Ziegler:     "0.00022294", // "-kp=0.00022294", "-ki=0.00000000", "-kd=0.00000000"
+	BasicP + Cohen:       "0.00100321", // "-kp=0.00100321", "-ki=0.00000000", "-kd=0.00000000"
 	BasicP + Amigo:       "0.0",
-	BasicPi + RootLocus:  "-0.00109469", // not used
-	BasicPi + Ziegler:    "0.00406761",
-	BasicPi + Cohen:      "0.00414897",
-	BasicPi + Amigo:      "0.00079877",
-	BasicPid + RootLocus: "-0.0012086", // original -v1
-	BasicPid + Ziegler:   "0.00026492",
-	BasicPid + Cohen:     "0.00083451",
-	BasicPid + Amigo:     "0.00054089",
+	BasicPi + RootLocus:  "-0.00111867", //-kp=-0.00111867", "-ki=0.00148840", "-kd=0.00000000"
+	BasicPi + Ziegler:    "0.00019285",  // "-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
+	BasicPi + Cohen:      "0.00196709",  // "-kp=0.00196709", "-ki=0.07181427", "-kd=0.00000000"
+	BasicPi + Amigo:      "0.00037871",  // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
+	BasicPid + RootLocus: "-0.00088937", //-kp=-0.00088937", "-ki=0.00141098", "-kd=0.00032814"
+	BasicPid + Ziegler:   "0.00026446",  // "-kp=0.00026446", "-ki=0.00132228", "-kd=0.00001322"
+	BasicPid + Cohen:     "=0.00083304", // "-kp=0.00083304", "-ki=0.00788611", "-kd=0.00001063"
+	BasicPid + Amigo:     "0.00053993",  // "-kp=0.00053993", "-ki=0.01136109", "-kd=0.00000675"
 }
 var Ki = map[string]string{
 	BasicP + RootLocus:   "0.0",
 	BasicP + Ziegler:     "0.0",
 	BasicP + Cohen:       "0.0",
 	BasicP + Amigo:       "0.0",
-	BasicPi + RootLocus:  "0.00115424", // not used
-	BasicPi + Ziegler:    "0.00122028",
-	BasicPi + Cohen:      "0.01514702",
-	BasicPi + Amigo:      "0.00218342",
-	BasicPid + RootLocus: "0.00203549", // original
-	BasicPid + Ziegler:   "0.00132462",
-	BasicPid + Cohen:     "0.00790004",
-	BasicPid + Amigo:     "0.01138116"}
+	BasicPi + RootLocus:  "0.00148840",
+	BasicPi + Ziegler:    "0.00064284", //"-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
+	BasicPi + Cohen:      "0.07181427",
+	BasicPi + Amigo:      "0.01035190", // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
+	BasicPid + RootLocus: "0.00141098",
+	BasicPid + Ziegler:   "0.00132228",
+	BasicPid + Cohen:     "0.00788611",
+	BasicPid + Amigo:     "0.01136109"}
 var Kd = map[string]string{
 	BasicP + RootLocus:   "0.0",
 	BasicP + Ziegler:     "0.0",
@@ -70,10 +70,10 @@ var Kd = map[string]string{
 	BasicPi + Ziegler:    "0.0",
 	BasicPi + Cohen:      "0.0",
 	BasicPi + Amigo:      "0.0",
-	BasicPid + RootLocus: "0.00047337", // original
-	BasicPid + Ziegler:   "0.00001325",
-	BasicPid + Cohen:     "0.00001065",
-	BasicPid + Amigo:     "0.00000676"}
+	BasicPid + RootLocus: "0.00032814",
+	BasicPid + Ziegler:   "0.00001322",
+	BasicPid + Cohen:     "0.00001063",
+	BasicPid + Amigo:     "0.00000675"}
 
 const MinPC = "1"
 const MaxPC = "100"
