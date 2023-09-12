@@ -10,8 +10,8 @@ docker run -d --memory=6g --cpus=5.0 --name some-rabbit -p 5672:5672 rabbitmq
 
 rem configure variables
 set et=Experiment
-set ct=BasicPID
-set t=Ziegler
+set ct=AsTAR
+set t=None
 set b=%et%-%ct%-%t%
 set f=1 2 3 4 5 6 7 8 9 10
 
