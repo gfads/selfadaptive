@@ -74,8 +74,21 @@ func configureDockerFile(et, ct, t, f string) map[string]string {
 	params["beta"] = shared.Beta
 	params["alfa"] = shared.Alfa
 
+	key := ""
 	// pid parameters
-	key := ct + t
+	if ct == shared.SmoothingPid ||
+		ct == shared.IncrementalFormPid ||
+		ct == shared.ErrorSquarePidFull ||
+		ct == shared.ErrorSquarePidProportional ||
+		ct == shared.DeadZonePid ||
+		ct == shared.GainScheduling ||
+		ct == shared.PIwithTwoDegreesOfFreedom ||
+		ct == shared.WindUp ||
+		ct == shared.SetpointWeighting {
+		key = shared.BasicPid + t
+	} else {
+		key = ct + t
+	}
 	v, ok := shared.Kp[key]
 	if ok {
 		params["kp"] = v
