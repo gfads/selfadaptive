@@ -1,11 +1,11 @@
-rem This file has been generated automatically at 2023-09-14 13:39:42.1952815 -0300 -03 m=+0.014782901
+rem This file has been generated automatically at 2023-09-16 09:44:32.4896315 -0300 -03 m=+0.018395301
 @echo off 
 timeout /t 10
 docker stop publisher
 docker rm publisher
 docker stop subscriber
 docker rm subscriber
-set list=Dockerfile-Experiment-IncrementalFormPID-AMIGO 
+set list=Dockerfile-Experiment-DeadZonePID-Cohen 
 
 for %%x in (%list%) do (
 echo %%x 

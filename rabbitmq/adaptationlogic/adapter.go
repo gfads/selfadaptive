@@ -40,7 +40,8 @@ type AdaptationLogic struct {
 func NewAdaptationLogic(chFromBusiness chan shared.SubscriberToAdapter, chToBusiness chan int, p parameters.ExecutionParameters, df *os.File) AdaptationLogic {
 
 	c := ops.NewController(p)
-	i := TrainingInfo{Kp: *p.Kp,
+	i := TrainingInfo{
+		Kp:       *p.Kp,
 		Ki:       *p.Ki,
 		Kd:       *p.Kd,
 		Data:     []AdjustmenstInfo{},
