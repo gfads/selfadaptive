@@ -24,8 +24,8 @@ func main() {
 	//inf := flag.String("input-file", "", "input-file is a string")
 	//outf := flag.String("output-file", "", "output-file is a string")
 	//flag.Parse()
-	outf := "Experiment-SmoothingDerivativePID-Ziegler"
-	b := "Experiment-SmoothingDerivativePID-Ziegler-"
+	outf := "Experiment-PIWithTwoDegreesOfFreedom-Ziegler"
+	b := "Experiment-PIWithTwoDegreesOfFreedom-Ziegler-"
 	inputFiles := []string{}
 
 	for i := 1; i <= 10; i++ {
