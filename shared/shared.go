@@ -29,10 +29,11 @@ const T = 0.01  // modified
 //var RandomGoal = []float64{363, 1042, 1871, 2063, 1436, 585, 318, 888, 1754, 2094, 1585, 710, 300, 744, 1621, 2098, 1722}
 //var RandomGoal = []float64{500, 1000, 750}
 //var RandomGoals = []float64{866, 1440, 866}
-var RandomGoals = []float64{866, 1440, 1000}
+//var RandomGoals = []float64{866, 1440, 1000}
+var RandomGoals = []float64{1000}
 
 //var RandomGoals = []float64{1440}
-var InputSteps = []int{1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2} // for Ziegler/Cohen/AMIGO
+var InputSteps = []int{2, 1} // for Ziegler/Cohen/AMIGO
 
 var Kp = map[string]string{
 	BasicP + RootLocus:   "0.00448961", // -kp=0.00448961", "-ki=0.00000000", "-kd=0.00000000"
@@ -86,16 +87,17 @@ const DeadZone = "200.0"
 const HysteresisBand = "200.0"
 const Alfa = "1.0"
 const Beta = "0.9"
+const ZieglerRepetitions = 2 * 10
 
 // Experiments parameters
 const TrainingSampleSize = 100
 const TimeBetweenAdjustments = 1200 // seconds
 const MaximumNrmse = 0.30
 const WarmupTime = 30 // seconds
-const TrainingAttempts = 30
+const TrainingAttempts = 100
 
-//const SizeOfSameLevel = 30 // used in the experiments
 const SizeOfSameLevel = 30 // used in the experiments
+//const SizeOfSameLevel = 100 // used in the experiments
 
 // Astar
 const SV = 2.7           // Shutoff voltage (page 17) = 2.7 V

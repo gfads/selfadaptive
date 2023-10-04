@@ -278,12 +278,9 @@ func (al AdaptationLogic) RootLocusTraining() {
 	}
 }
 
-func (al AdaptationLogic) ZieglerTraining() {
+func (al AdaptationLogic) ZieglerTrainingOld() {
 	count := 0
 	info := TrainingInfo{TypeName: al.TrainingInfo.TypeName}
-
-	// create & execute adjustment mechanism
-	//go AdjustmentMechanism(fromAdjuster, toAdjuster, al.SetPoint)
 
 	// warm up phase
 	time.Sleep(shared.WarmupTime * time.Second)
@@ -304,8 +301,8 @@ func (al AdaptationLogic) ZieglerTraining() {
 		fmt.Printf("%v;%v;%f;%f\n", n.QueueSize, al.PC, rate, 0.0)
 		fmt.Fprintf(al.File, "%v;%v;%f;%f\n", n.QueueSize, al.PC, rate, 0.0)
 
-		i := AdjustmenstInfo{PC: al.PC, Rate: rate}
-		info.Data = append(info.Data, i)
+		d := AdjustmenstInfo{PC: al.PC, Rate: rate}
+		info.Data = append(info.Data, d)
 
 		if count <= len(shared.InputSteps) {
 			if count < len(shared.InputSteps)/2 { // TODO
@@ -349,6 +346,70 @@ func (al AdaptationLogic) ZieglerTraining() {
 		// send pc to business
 		al.ToBusiness <- al.PC
 	}
+}
+
+func (al AdaptationLogic) ZieglerTraining() {
+	info := TrainingInfo{TypeName: al.TrainingInfo.TypeName}
+
+	// warm up phase
+	time.Sleep(shared.WarmupTime * time.Second)
+
+	// discard first measurement
+	<-al.FromBusiness                     // receive no. of messages from business
+	al.ToBusiness <- shared.InputSteps[0] // Configure PC to execute the Ziegler Steps
+
+	// loop of adaptation logic
+	for i := 0; i < shared.ZieglerRepetitions; i++ {
+		for j := 0; j < shared.SizeOfSameLevel; j++ {
+			// receive no. of messages from business
+			n := <-al.FromBusiness
+
+			// calculate new arrival rate (msg/s)
+			rate := float64(n.ReceivedMessages) / al.MonitorInterval.Seconds()
+
+			fmt.Printf("%v;%v;%f;%f\n", n.QueueSize, al.PC, rate, 0.0)
+			fmt.Fprintf(al.File, "%v;%v;%f;%f\n", n.QueueSize, al.PC, rate, 0.0)
+
+			d := AdjustmenstInfo{PC: al.PC, Rate: rate}
+			info.Data = append(info.Data, d)
+
+			// send pc to business
+			al.ToBusiness <- al.PC
+		}
+		if i%2 == 0 {
+			al.PC = shared.InputSteps[0]
+		} else {
+			al.PC = shared.InputSteps[1]
+		}
+	}
+
+	// training is over
+	info = CalculateZieglerGains(info)
+	al.TrainingInfo.Kp = info.Kp
+	al.TrainingInfo.Ki = info.Ki
+	al.TrainingInfo.Kd = info.Kd
+
+	fmt.Printf("Ziegler: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+	fmt.Fprintf(al.File, "Ziegler: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+
+	info = CalculateCohenGains(info)
+	al.TrainingInfo.Kp = info.Kp
+	al.TrainingInfo.Ki = info.Ki
+	al.TrainingInfo.Kd = info.Kd
+
+	fmt.Printf("Cohen: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+	fmt.Fprintf(al.File, "Cohen: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+
+	info = CalculateAMIGOGains(info)
+	al.TrainingInfo.Kp = info.Kp
+	al.TrainingInfo.Ki = info.Ki
+	al.TrainingInfo.Kd = info.Kd
+
+	fmt.Printf("AMIGO: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+	fmt.Fprintf(al.File, "AMIGO: \"-kp=%.8f\", \"-ki=%.8f\", \"-kd=%.8f\" \n", al.TrainingInfo.Kp, al.TrainingInfo.Ki, al.TrainingInfo.Kd)
+
+	al.File.Close()
+	os.Exit(0)
 }
 
 func (al AdaptationLogic) CohenTraining() {

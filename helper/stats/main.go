@@ -24,8 +24,8 @@ func main() {
 	//inf := flag.String("input-file", "", "input-file is a string")
 	//outf := flag.String("output-file", "", "output-file is a string")
 	//flag.Parse()
-	outf := "Experiment-PIWithTwoDegreesOfFreedom-Ziegler"
-	b := "Experiment-PIWithTwoDegreesOfFreedom-Ziegler-"
+	outf := "Experiment-OnOff-None"
+	b := outf + "-"
 	inputFiles := []string{}
 
 	for i := 1; i <= 10; i++ {
@@ -33,14 +33,18 @@ func main() {
 		inputFiles = append(inputFiles, fileName)
 	}
 
+	data := []Data{}
 	for i := 0; i < len(inputFiles); i++ {
-		et := shared.Experiment
-		//calcStatistics(*et, *inf, *outf)
-		calcStatistics(et, inputFiles[i], outf)
+		d := readFile(inputFiles[i])
+		for j := 0; j < len(d); j++ {
+			data = append(data, d[j])
+		}
 	}
+	et := shared.Experiment
+	calcStatistics(et, data, outf)
 }
 
-func calcStatistics(et, inf, outf string) {
+func calcStatistics(et string, data []Data, outf string) {
 	var includeHeader bool
 	var outFile *os.File
 	var err error
@@ -62,13 +66,13 @@ func calcStatistics(et, inf, outf string) {
 	}
 
 	// generate data - raw files
-	data := readFile(inf)
+	//data := readFile(inf)
 
 	if et == shared.Experiment {
 		if includeHeader {
-			fmt.Fprintf(outFile, "File;Tunning;RMSE;NMRSE;MAE;MAPE;SMAPE;R2;ITAE;ISE;Control Effort;CC;Goal Range \n")
+			fmt.Fprintf(outFile, "File;RMSE;NMRSE;MAE;MAPE;SMAPE;R2;ITAE;ISE;Control Effort;CC;Goal Range \n")
 		}
-		fmt.Fprintf(outFile, "%v.csv;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f\n", inf, rmse(data), nmrse(data), mae(data), mape(data), smape(data), r2(data), itae(data), ise(data), controlEffort(data), cc(data), goalRange(data))
+		fmt.Fprintf(outFile, "%v;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f\n", outf, rmse(data), nmrse(data), mae(data), mape(data), smape(data), r2(data), itae(data), ise(data), controlEffort(data), cc(data), goalRange(data))
 	} else {
 		means := calculateMeans(data)
 
