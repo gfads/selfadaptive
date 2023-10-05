@@ -24,7 +24,7 @@ func main() {
 	//inf := flag.String("input-file", "", "input-file is a string")
 	//outf := flag.String("output-file", "", "output-file is a string")
 	//flag.Parse()
-	outf := "Experiment-OnOff-None"
+	outf := "Experiment-IncrementalFormPID-RootLocus"
 	b := outf + "-"
 	inputFiles := []string{}
 
