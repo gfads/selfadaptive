@@ -11,8 +11,8 @@ docker run -d --memory=6g --cpus=5.0 --name some-rabbit -p 5672:5672 rabbitmq
 rem configure variables
 rem set et=Experiment
 set et=Experiment
-set ct=DeadZonePID
-set t=AMIGO
+set ct=GainScheduling
+set t=Cohen
 set b=%et%-%ct%-%t%
 set f=1 2 3 4 5 6 7 8 9 10
 
