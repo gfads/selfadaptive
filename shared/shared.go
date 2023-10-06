@@ -29,9 +29,9 @@ const T = 0.01  // modified
 //var RandomGoal = []float64{363, 1042, 1871, 2063, 1436, 585, 318, 888, 1754, 2094, 1585, 710, 300, 744, 1621, 2098, 1722}
 //var RandomGoal = []float64{500, 1000, 750}
 //var RandomGoals = []float64{866, 1440, 866}
-//var RandomGoals = []float64{866, 1440, 1000}
-var RandomGoals = []float64{1000}
+var RandomGoals = []float64{866, 1440, 1000}
 
+//var RandomGoals = []float64{1000}
 //var RandomGoals = []float64{1440}
 var InputSteps = []int{2, 1} // for Ziegler/Cohen/AMIGO
 
@@ -201,9 +201,9 @@ const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-p
 const DockerDir = "/app/data" // it is mapped into windows dir "C:\Users\user\go\selfadaptive\rabbitmq\data" (see execute-old.bat)
 
 // const DataDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/rabbitmq/data/" // macos
-const DataDir = "C:\\Users\\user\\go\\selfadaptive\\rabbitmq\\data" // macos
-const DockerfilesDir = "C:\\Users\\user\\go\\selfadaptive\\temp"    // macos
-const BatchfilesDir = "C:\\Users\\user\\go\\selfadaptive"           // macos
+const DataDir = "C:\\Users\\user\\go\\selfadaptive\\rabbitmq\\data\\fixed" // macos
+const DockerfilesDir = "C:\\Users\\user\\go\\selfadaptive\\temp"           // macos
+const BatchfilesDir = "C:\\Users\\user\\go\\selfadaptive"                  // macos
 const BatchFileExperiments = "execute-all-experiments.bat"
 
 //const SourcesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\sources"
