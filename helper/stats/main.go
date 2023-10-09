@@ -6,7 +6,6 @@ import (
 	"main.go/shared"
 	"math"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -18,74 +17,89 @@ type Data struct {
 	Goal        float64
 }
 
-func main() {
-
-	//et := flag.String("execution-type", "", "execution-type is a string")
-	//inf := flag.String("input-file", "", "input-file is a string")
-	//outf := flag.String("output-file", "", "output-file is a string")
-	//flag.Parse()
-	outf := "Experiment-BasicPI-Ziegler"
-	b := outf + "-"
-	inputFiles := []string{}
-
-	for i := 1; i <= 10; i++ {
-		fileName := b + strconv.Itoa(i)
-		inputFiles = append(inputFiles, fileName)
-	}
-
-	data := []Data{}
-	for i := 0; i < len(inputFiles); i++ {
-		d := readFile(inputFiles[i])
-		for j := 0; j < len(d); j++ {
-			data = append(data, d[j])
-		}
-	}
-	et := shared.Experiment
-	calcStatistics(et, data, outf)
+type Metrics struct {
+	RMSE  float64
+	NRMSE float64
+	MAPE  float64
+	SMAPE float64
+	ITAE  float64
+	IAE   float64
+	ISE   float64
+	CE    float64
+	R2    float64
+	GR    float64
 }
 
-func calcStatistics(et string, data []Data, outf string) {
-	var includeHeader bool
+func main() {
+	allData := map[string]Metrics{}
+	rad := "Experiment"
+	controllers := []string{
+		shared.BasicOnoff, shared.HysteresisOnoff, shared.DeadZoneOnoff,
+		shared.AsTAR, shared.HPA, shared.BasicP,
+		shared.BasicPi, shared.BasicPid, shared.DeadZonePid,
+		shared.SetpointWeighting, shared.PIwithTwoDegreesOfFreedom, shared.IncrementalFormPid,
+		shared.GainScheduling, shared.ErrorSquarePidFull, shared.ErrorSquarePidProportional,
+		shared.SmoothingPid}
+	outFile := "all-fixed-summary.csv"
+
+	for c := 0; c < len(controllers); c++ {
+		tuners := []string{}
+		if shared.IsTuned(controllers[c]) {
+			tuners = shared.TunningTypes
+		} else {
+			tuners = []string{shared.None}
+		}
+		for t := 0; t < len(tuners); t++ {
+			// read input files of a given controller
+			data := []Data{}
+			for i := 1; i < 11; i++ { // TODO 11
+				fileName := rad + "-" + controllers[c] + "-" + tuners[t] + "-" + strconv.Itoa(i)
+				d := readFile(fileName)
+				for j := 0; j < len(d); j++ {
+					data = append(data, d[j])
+				}
+			}
+
+			// calculate metrics
+			allData[controllers[c]] = calcMetrics(data)
+			//fmt.Println(">>> ", controllers[c], len(data))
+		}
+	}
+	saveMetrics(outFile, allData)
+	fmt.Println("Stats Finished!!!")
+}
+
+func calcMetrics(d []Data) Metrics {
+	r := Metrics{}
+	r.RMSE = rmse(d)
+	r.NRMSE = nmrse(d)
+	r.MAPE = mape(d)
+	r.SMAPE = smape(d)
+	r.ITAE = itae(d)
+	r.IAE = iae(d)
+	r.ISE = ise(d)
+	r.CE = controlEffort(d)
+	r.R2 = r2(d)
+	r.GR = goalRange(d)
+
+	return r
+}
+
+func saveMetrics(fileName string, allData map[string]Metrics) {
 	var outFile *os.File
 	var err error
 
-	// check if output file exist to place/not place file header
-	filePath := shared.DataDir + "\\" + outf + ".csv"
-	if shared.FileExists(filePath) {
-		// open output file
-		outFile, err = os.OpenFile(filePath, os.O_RDWR|os.O_APPEND, 0660)
-		if err != nil {
-			shared.ErrorHandler(shared.GetFunction(), err.Error())
-		}
-		defer outFile.Close()
-		includeHeader = false
-	} else {
-		// create output file
-		outFile, err = os.Create(filePath)
-		includeHeader = true
+	filePath := shared.DataDir + "\\" + fileName
+	outFile, err = os.Create(filePath)
+	if err != nil {
+		shared.ErrorHandler(shared.GetFunction(), err.Error())
 	}
-
-	// generate data - raw files
-	//data := readFile(inf)
-
-	if et == shared.Experiment {
-		if includeHeader {
-			fmt.Fprintf(outFile, "File;RMSE;NMRSE;MAE;MAPE;SMAPE;R2;ITAE;ISE;Control Effort;CC;Goal Range \n")
-		}
-		fmt.Fprintf(outFile, "%v;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f\n", outf, rmse(data), nmrse(data), mae(data), mape(data), smape(data), r2(data), itae(data), ise(data), controlEffort(data), cc(data), goalRange(data))
-	} else {
-		means := calculateMeans(data)
-
-		// order by keys
-		keys := make([]string, 0, len(means))
-		for k := range means {
-			keys = append(keys, k)
-		}
-		sort.Strings(keys)
-
-		for _, k := range keys {
-			fmt.Fprintf(outFile, "%v;%v;%.6f;%v\n", 0, k, means[k], 0)
-		}
+	fmt.Fprintf(outFile, "Controller;RMSE;NMRSE;MAPE;SMAPE;ITAE;IAE;ISE;Control Effort;R2;Goal Range \n")
+	for k := range allData {
+		fmt.Fprintf(outFile, "%v;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f\n", k,
+			allData[k].RMSE, allData[k].NRMSE, allData[k].MAPE, allData[k].SMAPE,
+			allData[k].ITAE, allData[k].IAE, allData[k].ISE, allData[k].CE,
+			allData[k].R2, allData[k].GR)
 	}
 }
 
@@ -150,7 +164,7 @@ func controlEffort(d []Data) float64 {
 
 	// calculate mean
 	for i := 0; i < n; i++ {
-		r += math.Pow(float64(d[i].PC), 2.0)
+		r += float64(d[i].PC)
 	}
 	return r
 }
@@ -170,6 +184,7 @@ func r2(d []Data) float64 {
 		rss += math.Pow(d[i].Rate-d[i].Goal, 2.0)
 		tss += math.Pow(d[i].Rate-mean, 2.0)
 	}
+
 	r := 1 - (rss / tss)
 	return r
 }
@@ -178,7 +193,7 @@ func smape(d []Data) float64 {
 	s := 0.0
 	n := len(d)
 	for i := 0; i < n; i++ {
-		s += math.Abs(d[i].Rate-d[i].Goal) / ((d[i].Rate + d[i].Goal) / 2.0)
+		s += 2 * math.Abs(d[i].Rate-d[i].Goal) / (d[i].Rate + d[i].Goal)
 	}
 	r := s / float64(n) * 100.0
 	return r
@@ -187,8 +202,11 @@ func smape(d []Data) float64 {
 func itae(d []Data) float64 {
 	r := 0.0
 	n := len(d)
+	t, _ := strconv.Atoi(shared.MonitorInterval)
 	for i := 0; i < n; i++ {
-		r += math.Abs(d[i].Rate - d[i].Goal)
+		r += math.Abs(d[i].Rate-d[i].Goal) * float64(t)
+		temp, _ := strconv.Atoi(shared.MonitorInterval)
+		t += temp
 	}
 	return r
 }
@@ -198,6 +216,15 @@ func ise(d []Data) float64 {
 	n := len(d)
 	for i := 0; i < n; i++ {
 		r += math.Pow(math.Abs(d[i].Rate-d[i].Goal), 2.0)
+	}
+	return r
+}
+
+func iae(d []Data) float64 {
+	r := 0.0
+	n := len(d)
+	for i := 0; i < n; i++ {
+		r += math.Abs(d[i].Rate - d[i].Goal)
 	}
 	return r
 }

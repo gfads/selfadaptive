@@ -29,9 +29,10 @@ const T = 0.01  // modified
 //var RandomGoal = []float64{363, 1042, 1871, 2063, 1436, 585, 318, 888, 1754, 2094, 1585, 710, 300, 744, 1621, 2098, 1722}
 //var RandomGoal = []float64{500, 1000, 750}
 //var RandomGoals = []float64{866, 1440, 866}
-var RandomGoals = []float64{866, 1440, 1000}
+//var RandomGoals = []float64{866, 1440, 1000}
 
-//var RandomGoals = []float64{1000}
+var RandomGoals = []float64{1000}
+
 //var RandomGoals = []float64{1440}
 var InputSteps = []int{2, 1} // for Ziegler/Cohen/AMIGO
 
@@ -144,31 +145,15 @@ const PIwithTwoDegreesOfFreedom = "PIWithTwoDegreesOfFreedom"
 const WindUp = "WindUp"
 const SetpointWeighting = "SetpointWeighting"
 
-var ControllerTypes = []string{
-	//BasicP,
-	//BasicPi,
-	BasicPid,
-	//SmoothingPid,
-	//IncrementalFormPid,
-	//ErrorSquarePidFull,
-	//ErrorSquarePidProportional,
-	//DeadZonePid,
-	//GainScheduling,
-	//PIwithTwoDegreesOfFreedom,
-	//WindUp,
-	//SetpointWeighting,
-	//AsTAR,
-	//HPA,
-	//BasicOnoff,
-	//DeadZoneOnoff,
-	//HysteresisOnoff
-}
+var Controllers = []string{AsTAR, HPA, BasicOnoff, DeadZoneOnoff, HysteresisOnoff,
+	BasicP, BasicPi, BasicPid, SmoothingPid, IncrementalFormPid, ErrorSquarePidProportional, ErrorSquarePidFull,
+	DeadZonePid, GainScheduling, PIwithTwoDegreesOfFreedom, SetpointWeighting}
 
 var TunningTypes = []string{
-	//RootLocus,
+	RootLocus,
 	Ziegler,
-	//Cohen,
-	//Amigo,
+	Cohen,
+	Amigo,
 }
 
 //const ExperimentFileBase = "raw-sin-36-static-"
@@ -467,4 +452,12 @@ func FileExists(filename string) bool {
 		return false
 	}
 	return !info.IsDir()
+}
+
+func IsTuned(c string) bool {
+	r := true
+	if c == BasicOnoff || c == HysteresisOnoff || c == DeadZoneOnoff || c == HPA || c == AsTAR {
+		r = false
+	}
+	return r
 }

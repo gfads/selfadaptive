@@ -62,7 +62,7 @@ func main() {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
 	}
 
-	// rreate & start timer
+	// create & start timer
 	t := mytimer.NewMyTimer(*p.MonitorInterval, startTimer, stopTimer)
 	go t.RunMyTimer()
 
