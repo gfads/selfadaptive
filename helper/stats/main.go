@@ -40,7 +40,7 @@ func main() {
 		shared.SetpointWeighting, shared.PIwithTwoDegreesOfFreedom, shared.IncrementalFormPid,
 		shared.GainScheduling, shared.ErrorSquarePidFull, shared.ErrorSquarePidProportional,
 		shared.SmoothingPid}
-	outFile := "all-fixed-summary.csv"
+	outFile := "all-variable-summary.csv"
 
 	for c := 0; c < len(controllers); c++ {
 		tuners := []string{}
@@ -59,10 +59,8 @@ func main() {
 					data = append(data, d[j])
 				}
 			}
-
 			// calculate metrics
-			allData[controllers[c]] = calcMetrics(data)
-			//fmt.Println(">>> ", controllers[c], len(data))
+			allData[controllers[c]+"-"+tuners[t]] = calcMetrics(data)
 		}
 	}
 	saveMetrics(outFile, allData)
@@ -170,22 +168,29 @@ func controlEffort(d []Data) float64 {
 }
 
 func r2(d []Data) float64 {
-	tss := 0.0
-	rss := 0.0
 	n := len(d)
-	temp := 0.0
+	sXY := 0.0
+	sX := 0.0
+	sY := 0.0
+	sX2 := 0.0
+	sY2 := 0.0
 
-	// calculate mean
 	for i := 0; i < n; i++ {
-		temp += d[i].Rate
-	}
-	mean := temp / float64(n)
-	for i := 0; i < n; i++ {
-		rss += math.Pow(d[i].Rate-d[i].Goal, 2.0)
-		tss += math.Pow(d[i].Rate-mean, 2.0)
+		sXY += d[i].Rate * d[i].Goal
+		sX += d[i].Rate
+		sY += d[i].Goal
+		sX2 += math.Pow(d[i].Rate, 2.0)
+		sY2 += math.Pow(d[i].Goal, 2.0)
 	}
 
-	r := 1 - (rss / tss)
+	//fmt.Printf("%.10f %.10f %.10f\n ", float64(n)*sXY, sX*sY, float64(n))
+	num := sXY*float64(n) - sX*sY
+	exp1 := float64(n)*sX2 - sX*sX
+	exp2 := float64(n)*sY2 - sY*sY
+	den := math.Sqrt(exp1 * exp2)
+
+	r := math.Pow(num/den, 2.0)
+
 	return r
 }
 

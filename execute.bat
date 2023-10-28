@@ -10,11 +10,12 @@ docker run -d --memory=6g --cpus=5.0 --name some-rabbit -p 5672:5672 rabbitmq
 
 rem configure variables
 rem set et=Experiment
-set et=Experiment
-set ct=BasicPI
-set t=AMIGO
+set et=ExperimentalDesign
+set ct=BasicPID
+set t=RootLocus
 set b=%et%-%ct%-%t%
-set f=1 2 3 4 5 6 7 8 9 10
+rem set f=1 2 3 4 5 6 7 8 9 10
+set f=1
 
 for %%x in (%f%) do (
     set GO111MODULE=on

@@ -63,6 +63,8 @@ func NewAdaptationLogic(chFromBusiness chan shared.SubscriberToAdapter, chToBusi
 func (al AdaptationLogic) Run() {
 
 	switch al.ExecutionType {
+	case shared.ExperimentalDesign:
+		al.RunExperimentalDesign()
 	case shared.Experiment:
 		al.RunExperiment()
 	case shared.RootTraining:
@@ -78,6 +80,56 @@ func (al AdaptationLogic) Run() {
 	default:
 		fmt.Println("Execution type ´", al.ExecutionType, "´ is invalid")
 		os.Exit(0)
+	}
+}
+
+func (al AdaptationLogic) RunExperimentalDesign() {
+	count := 0
+	info := TrainingInfo{TypeName: al.TrainingInfo.TypeName}
+
+	// warm up phase
+	time.Sleep(shared.WarmupTime * time.Second)
+
+	// discard first measurement
+	<-al.FromBusiness // receive no. of messages from business
+	al.ToBusiness <- al.PC
+
+	// loop of adaptation logic
+	for {
+
+		n := <-al.FromBusiness // receive no. of messages from business
+
+		// calculate new arrival rate (msg/s)
+		rate := float64(n.ReceivedMessages) / al.MonitorInterval.Seconds()
+
+		if count > 30 {
+			count = 0
+			// calculate mean
+			meanPc, meanRate := calculateMeans(info)
+
+			fmt.Printf("%v;%v;%.6f;%.6f\n", n.QueueSize, meanPc, meanRate, 0.0)
+			fmt.Fprintf(al.File, "%v;%v;%.6f;%.6f\n", 0.0, meanPc, meanRate, 0.0)
+
+			// reset info
+			info = TrainingInfo{TypeName: al.TrainingInfo.TypeName}
+
+			// update pc
+			al.PC += 1
+
+			// check end of experiment pc > 1000
+			if al.PC > 100 {
+				os.Exit(0) // end of experiment
+			}
+		} else {
+			count++
+
+			//fmt.Printf("%v;%.6f\n", al.PC, rate)
+			// store training pc and rate
+			info.Data = append(info.Data, AdjustmenstInfo{PC: al.PC, Rate: rate})
+		}
+
+		// send pc to business
+		al.ToBusiness <- al.PC
 	}
 }
 
@@ -825,4 +877,17 @@ func CalculateNRMSE(info TrainingInfo) float64 {
 
 	fmt.Println("NMRSE:: ", nmrse, rmse, maxRate, minRate, len(info.Data))
 	return nmrse
+}
+
+func calculateMeans(d TrainingInfo) (int, float64) {
+	sPc := 0
+	sRate := 0.0
+	for i := 0; i < len(d.Data); i++ {
+		sPc += d.Data[i].PC
+		sRate += d.Data[i].Rate
+	}
+	meanPC := sPc / len(d.Data)
+	meanRate := sRate / float64(len(d.Data))
+
+	return meanPC, meanRate
 }
