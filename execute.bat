@@ -2,17 +2,26 @@
 cls
 
 rem remove previous rabbitmq
-docker stop some-rabbit
-docker rm some-rabbit
+docker stop myrabbit
+docker rm myrabbit
 
 rem execute new instance of rabbitmq
-docker run -d --memory=6g --cpus=5.0 --name some-rabbit -p 5672:5672 rabbitmq
+rem docker run -d --memory=6g --cpus=5.0 --name myrabbit -p 5672:5672 rabbitmq
+docker run -d --memory=6g --cpus=5.0 --name myrabbit -p 5672:5672 rabbitmq
+
+rem Placed here to fix the error "\Common inesperado" TODO
+rem PATH=C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Go\bin;C:\Program Files\Git\cmd;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\MATLAB\R2023b\bin;C:\Users\user\AppData\Local\Microsoft\WindowsApps;C:\Program Files\JetBrains\GoLand 2022.1.2\bin;;C:\Users\user\go\bin;C:\MinGW\bin;C:\Users\user\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin;C:\Program Files\Docker\Docker
+set PATH=C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Go\bin;C:\Program Files\Git\cmd;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\MATLAB\R2023b\bin;C:\Users\user\AppData\Local\Microsoft\WindowsApps;C:\Program Files\JetBrains\GoLand 2022.1.2\bin;;C:\Users\user\go\bin;C:\MinGW\bin;C:\Users\user\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin;C:\Program Files\Docker\Docker
+set PATH=%PATH%;C:\Program Files\Docker\Docker
 
 rem configure variables
 rem set et=Experiment
+rem set et=OpenLoop
 set et=ExperimentalDesign
+rem set et=Experiment
 set ct=BasicPID
 set t=RootLocus
+rem set t=None
 set b=%et%-%ct%-%t%
 rem set f=1 2 3 4 5 6 7 8 9 10
 set f=1
@@ -43,8 +52,8 @@ echo y| docker volume prune
 echo y| docker image prune
 echo y| docker container prune
 
-docker stop some-rabbit
-docker rm some-rabbit
+docker stop myrabbit
+docker rm myrabbit
 
 echo #### 4: Generate Statistics ####
 cd C:\Users\user\go\selfadaptive\helper\stats

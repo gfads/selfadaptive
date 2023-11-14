@@ -29,14 +29,16 @@ const T = 0.01  // modified
 //var RandomGoal = []float64{363, 1042, 1871, 2063, 1436, 585, 318, 888, 1754, 2094, 1585, 710, 300, 744, 1621, 2098, 1722}
 //var RandomGoal = []float64{500, 1000, 750}
 //var RandomGoals = []float64{866, 1440, 866}
-//var RandomGoals = []float64{866, 1440, 1000}
+var RandomGoals = []float64{866, 1440, 1000}
+
 //var RandomGoals = []float64{1000}
 
-var RandomGoals = []float64{1000}
+//var RandomGoals = []float64{1000}
 
 //var RandomGoals = []float64{1440}
-var InputSteps = []int{2, 1} // for Ziegler/Cohen/AMIGO
-
+//var InputSteps = []int{2, 1} // for Ziegler/Cohen/AMIGO
+//var InputSteps = []int{4, 1, 11, 33, 60, 84, 98, 98, 84, 60, 33, 11, 1, 5, 22, 48, 74, 93, 100, 92, 72, 45, 20, 3, 1, 13, 35, 62, 86, 99, 97, 82, 57, 31, 9, 1, 6, 24, 50, 76, 94, 100, 91, 69, 43, 18, 3, 1, 14, 38, 65, 87, 99, 97, 80, 55, 28, 8, 1, 7, 26, 52, 78, 95, 100, 89, 67, 40, 16, 2, 2, 16, 40, 67, 89, 100, 96, 79, 53, 26, 7, 1, 8, 28, 54, 80, 96, 99, 88, 65, 38, 15, 1, 2, 17, 42, 69, 90, 100, 95, 77, 51}
+var InputSteps = []int{1, 1, 1, 3, 5, 7, 11, 14, 18, 23, 27, 32, 38, 43, 48, 54, 59, 65, 70, 75, 79, 84, 87, 91, 94, 96, 98, 99, 100, 100, 99, 98, 97, 94, 92, 88, 84, 80, 76, 71, 66, 61, 55, 50, 44, 39, 34, 28, 24, 19, 15, 11, 8, 5, 3, 2, 1, 1, 1, 1, 2, 4, 7, 10, 13, 17, 21, 26, 31, 36, 41, 47, 52, 58, 63, 68, 73, 78, 82, 86, 90, 93, 95, 97, 99, 100, 100, 100, 99, 97, 95, 92, 89, 86, 82, 77, 72, 67, 62, 57, 51, 46, 40, 35, 30, 25, 20, 16, 12, 9, 6, 4, 2, 1, 1, 1, 1, 2, 4, 6, 9, 12, 16, 20, 24, 29, 34, 40, 45, 51, 56, 61, 67, 72, 77, 81, 85, 89, 92, 95, 97, 99, 100, 100, 100, 99, 98, 96, 93, 90, 87, 83, 79, 74, 69, 64, 58, 53, 47, 42, 37, 31, 26, 22, 17, 13, 10, 7, 4, 2, 1, 1, 1, 1, 1, 3, 5, 8, 11, 15, 19, 23, 28, 33, 38, 44, 49, 54, 60, 65, 70, 75, 80, 84, 88, 91, 94, 96, 98, 99, 100, 100, 99, 98, 96, 94, 91, 88, 84, 80, 75, 70, 65, 60, 55, 49, 44, 38, 33, 28, 23, 19, 15, 11, 8, 5, 3, 1, 1, 1, 1, 1, 2, 4, 7, 10, 13, 17, 22, 26, 31, 37, 42, 47, 53, 58, 64, 69, 74, 78, 83, 87, 90, 93, 96, 98, 99, 100, 100, 100, 99, 97, 95, 92, 89, 85, 81, 77, 72, 67, 62, 56, 51, 45, 40, 35, 29, 25, 20, 16, 12, 9, 6, 4, 2, 1, 1, 1, 1, 2, 4, 6, 9, 12, 16, 20, 25, 30, 35}
 var Kp = map[string]string{
 	BasicP + RootLocus:   "0.00448961", // -kp=0.00448961", "-ki=0.00000000", "-kd=0.00000000"
 	BasicP + Ziegler:     "0.00022294", // "-kp=0.00022294", "-ki=0.00000000", "-kd=0.00000000"
@@ -56,7 +58,7 @@ var Ki = map[string]string{
 	BasicP + Ziegler:     "0.0",
 	BasicP + Cohen:       "0.0",
 	BasicP + Amigo:       "0.0",
-	BasicPi + RootLocus:  "0.00148840",
+	BasicPi + RootLocus:  "0.000153",
 	BasicPi + Ziegler:    "0.00064284", //"-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
 	BasicPi + Cohen:      "0.07181427",
 	BasicPi + Amigo:      "0.01035190", // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
@@ -74,7 +76,7 @@ var Kd = map[string]string{
 	BasicPi + Cohen:      "0.0",
 	BasicPi + Amigo:      "0.0",
 	BasicPid + RootLocus: "0.00032814",
-	BasicPid + Ziegler:   "0.00001322",
+	BasicPid + Ziegler:   "0.00831",
 	BasicPid + Cohen:     "0.00001063",
 	BasicPid + Amigo:     "0.00000675"}
 
@@ -177,10 +179,10 @@ const None = "None"
 const MinOnoff = 10
 const MaxOnoff = 600
 
-const MonitorTime = 10 // seconds
+//const MonitorTime = 30 // seconds
 const NumberOfColors = 7
 const ColorReset = "\033[0m"
-const DeltaTime = 1 // see page 103
+const DeltaTime = 5 // see page 103
 
 // Base Directories
 const SourcesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-plugin/envrnment/plugins/source"
@@ -188,9 +190,9 @@ const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-p
 const DockerDir = "/app/data" // it is mapped into windows dir "C:\Users\user\go\selfadaptive\rabbitmq\data" (see execute-old.bat)
 
 // const DataDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/rabbitmq/data/" // macos
-const DataDir = "C:\\Users\\user\\go\\selfadaptive\\rabbitmq\\data" // macos
-const DockerfilesDir = "C:\\Users\\user\\go\\selfadaptive\\temp"    // macos
-const BatchfilesDir = "C:\\Users\\user\\go\\selfadaptive"           // macos
+const DataDir = "C:\\Users\\user\\go\\selfadaptive\\rabbitmq\\data\\november2023" // macos
+const DockerfilesDir = "C:\\Users\\user\\go\\selfadaptive\\temp"                  // macos
+const BatchfilesDir = "C:\\Users\\user\\go\\selfadaptive"                         // macos
 const BatchFileExperiments = "execute-all-experiments.bat"
 
 //const SourcesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\sources"

@@ -13,4 +13,5 @@ type ToPlannerChan struct {
 type SubscriberToAdapter struct {
 	QueueSize        int
 	ReceivedMessages int
+	D                float64
 }

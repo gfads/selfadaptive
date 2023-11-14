@@ -95,14 +95,14 @@ func (al AdaptationLogic) RunExperimentalDesign() {
 	al.ToBusiness <- al.PC
 
 	// loop of adaptation logic
+	idx := 0
 	for {
-
 		n := <-al.FromBusiness // receive no. of messages from business
 
 		// calculate new arrival rate (msg/s)
-		rate := float64(n.ReceivedMessages) / al.MonitorInterval.Seconds()
+		rate := float64(n.ReceivedMessages) / n.D
 
-		if count > 30 {
+		if count > shared.SizeOfSameLevel {
 			count = 0
 			// calculate mean
 			meanPc, meanRate := calculateMeans(info)
@@ -114,10 +114,11 @@ func (al AdaptationLogic) RunExperimentalDesign() {
 			info = TrainingInfo{TypeName: al.TrainingInfo.TypeName}
 
 			// update pc
-			al.PC += 1
+			idx++
+			al.PC = shared.InputSteps[idx]
 
-			// check end of experiment pc > 1000
-			if al.PC > 100 {
+			// check end of experiment
+			if idx > len(shared.InputSteps) {
 				os.Exit(0) // end of experiment
 			}
 		} else {
@@ -149,7 +150,7 @@ func (al AdaptationLogic) RunExperiment() {
 			count++
 
 			// calculate new arrival rate (msg/s)
-			rate := float64(n.ReceivedMessages) / al.MonitorInterval.Seconds()
+			rate := float64(n.ReceivedMessages) / n.D
 
 			// catch pc and its yielded rate
 			fmt.Fprintf(al.File, "%d;%d;%f;%f\n", n.QueueSize, al.PC, rate, shared.RandomGoals[currentGoalIdx])

@@ -9,6 +9,7 @@ import (
 	"main.go/shared"
 	_ "net/http/pprof"
 	"os"
+	"time"
 )
 
 type Subscriber struct {
@@ -21,6 +22,7 @@ type Subscriber struct {
 }
 
 func main() {
+
 	// load parameters
 	e := parameters.ExecutionParameters{}
 	p := e.Load()
@@ -84,6 +86,10 @@ func (c Subscriber) RunOpenLoop(startTimer, stopTimer chan bool, p parameters.Ex
 	count := 0
 	nSameLevel := 0
 	c.PC = *p.PrefetchCount
+
+	var t1, t2 time.Time
+
+	count = 0 // initialise no. of received messages
 	for d := range c.Msgs {
 		err := d.Ack(false) // send ack to broker
 		if err != nil {
@@ -92,13 +98,17 @@ func (c Subscriber) RunOpenLoop(startTimer, stopTimer chan bool, p parameters.Ex
 		count++ // increment number of received messages
 		select {
 		case <-startTimer: // start monitor timer
-			// initialise no. of receive messages
-			count = 0
+			t1 = time.Now()
 		case <-stopTimer: // stop monitor timer
+			t2 = time.Now()
 			nSameLevel++
-			rate := float64(count) / float64(*p.MonitorInterval)
-			fmt.Fprintf(df, "%d;%d;%f;%f\n", 0, c.PC, rate, 0.0) // queue size; pc;rate;goal
-			fmt.Printf("%d;%d;%f;%f\n", 0, c.PC, rate, 0.0)
+			rate1 := float64(count) / float64(*p.MonitorInterval)
+			rate2 := float64(count) / float64(t2.Sub(t1).Seconds())
+			count = 0 // re-initialise no. of received messages
+
+			fmt.Printf("%v %v \n", rate1, rate2)
+			//fmt.Fprintf(df, "%d;%d;%f;%f\n", 0, c.PC, rate, 0.0) // queue size; pc;rate;goal
+			//fmt.Printf("%d;%d;%f;%f\n", 0, c.PC, rate, 0.0)
 			if nSameLevel > shared.SizeOfSameLevel {
 				c.PC++
 				nSameLevel = 0
@@ -164,6 +174,7 @@ func (c Subscriber) RunNonAdaptiveMonitored(startTimer, stopTimer chan bool, p p
 func (c Subscriber) RunClosedLoop(startTimer, stopTimer chan bool, toAdapter chan shared.SubscriberToAdapter, fromAdapter chan int, f *os.File) {
 
 	count := 0
+	var t1, t2 time.Time
 
 	for d := range c.Msgs {
 		err := d.Ack(false) // send ack to broker
@@ -173,9 +184,9 @@ func (c Subscriber) RunClosedLoop(startTimer, stopTimer chan bool, toAdapter cha
 		count++ // increment number of received messages
 		select {
 		case <-startTimer: // start monitor timer
-			// resume no. of received messages
-			count = 0
+			t1 = time.Now()
 		case <-stopTimer: // stop monitor timer
+			t2 = time.Now()
 			// inspect queue
 			q, err1 := c.Ch.QueueInspect("rpc_queue")
 			if err1 != nil {
@@ -183,7 +194,10 @@ func (c Subscriber) RunClosedLoop(startTimer, stopTimer chan bool, toAdapter cha
 			}
 
 			// send no. of received messages to adaptation logic
-			toAdapter <- shared.SubscriberToAdapter{ReceivedMessages: count, QueueSize: q.Messages}
+			toAdapter <- shared.SubscriberToAdapter{ReceivedMessages: count, QueueSize: q.Messages, D: t2.Sub(t1).Seconds()}
+
+			// re-initialise message counter
+			count = 0
 
 			// receive new pc from adaptation logic
 			c.PC = <-fromAdapter
