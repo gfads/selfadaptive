@@ -1,1 +1,11 @@
-c1;matlab1;Kp = 0.00806, Ki = 0.000493, Kd = 0.0171;
+c1.csv;state model;matlab1;Kp = 0.00806, Ki = 0.000493, Kd = 0.0171
+c2-hpa.csv;hpa
+c3.csv;transfer-function;tf2poles1zero;matlab3;Kp = 0.0269, Ki = 0.000712, Kd = 0.0628
+c4.csv;transfer-function;tf1poles0zero;matlab4;Kp = -0.0349, Ki = -0.00363, Kd = -0.0679
+c5.csv;transfer-function;tf3poles2zero;matlab5;Kp = 0.000826, Ki = 0.000165, Kd = 0.00103
+c6.csv;transfer-function;tf4poles3zero;Kp = 0.0267, Ki = 2.96e-05, Kd = 0.0665
+c7.csv;transfer-function;tf5poles4zero;Kp = 0.00334, Ki = 8.76e-06, Kd = 0.0083
+c8.csv;transfer-function;tf3poles3zero;Kp = 0.0219, Ki = 0.000421, Kd = 0.186
+c9.csv;transfer-function;tf5poles4zero;Kp = -0.00163, Ki = -1.17e-08, Kd = -0.00407
+c10.csv;transfer-function;tf5poles4zeroRefined;Kp = 0.000437, Ki = 8.74e-05, Kd = 0.000546
+c11.csv;transfer-function;tf6poles4zero;Kp = 0.00352, Ki = 0.000379, Kd = 0.00644
