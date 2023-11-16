@@ -9,3 +9,6 @@ c8.csv;transfer-function;tf3poles3zero;Kp = 0.0219, Ki = 0.000421, Kd = 0.186
 c9.csv;transfer-function;tf5poles4zero;Kp = -0.00163, Ki = -1.17e-08, Kd = -0.00407
 c10.csv;transfer-function;tf5poles4zeroRefined;Kp = 0.000437, Ki = 8.74e-05, Kd = 0.000546
 c11.csv;transfer-function;tf6poles4zero;Kp = 0.00352, Ki = 0.000379, Kd = 0.00644
+c12.csv;iv;iv641-c12;Kp = -0.0111, Ki = -1.29e-05, Kd = -2.4
+c13.csv;transfer-function;tf7poles6zero;Kp = 0.000405, Ki = 8.11e-05, Kd = 0.000507
+c14.csv;manual-root-locus;;-kp=-0.00088937", "-ki=0.00141098", "-kd=0.00032814"

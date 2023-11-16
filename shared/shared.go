@@ -48,7 +48,7 @@ var Kp = map[string]string{
 	BasicPi + Ziegler:    "0.00019285",  // "-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
 	BasicPi + Cohen:      "0.00196709",  // "-kp=0.00196709", "-ki=0.07181427", "-kd=0.00000000"
 	BasicPi + Amigo:      "0.00037871",  // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
-	BasicPid + RootLocus: "0.00806",     //-kp=-0.00088937", "-ki=0.00141098", "-kd=0.00032814"
+	BasicPid + RootLocus: "0.0267",      //-kp=-0.00088937", "-ki=0.00141098", "-kd=0.00032814"
 	BasicPid + Ziegler:   "0.00026446",  // "-kp=0.00026446", "-ki=0.00132228", "-kd=0.00001322"
 	BasicPid + Cohen:     "0.00083304",  // "-kp=0.00083304", "-ki=0.00788611", "-kd=0.00001063"
 	BasicPid + Amigo:     "0.00053993",  // "-kp=0.00053993", "-ki=0.01136109", "-kd=0.00000675"
@@ -62,7 +62,7 @@ var Ki = map[string]string{
 	BasicPi + Ziegler:    "0.00064284", //"-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
 	BasicPi + Cohen:      "0.07181427",
 	BasicPi + Amigo:      "0.01035190", // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
-	BasicPid + RootLocus: "0.000493",
+	BasicPid + RootLocus: "2.96e-05",
 	BasicPid + Ziegler:   "0.00132228",
 	BasicPid + Cohen:     "0.00788611",
 	BasicPid + Amigo:     "0.01136109"}
@@ -75,7 +75,7 @@ var Kd = map[string]string{
 	BasicPi + Ziegler:    "0.0",
 	BasicPi + Cohen:      "0.0",
 	BasicPi + Amigo:      "0.0",
-	BasicPid + RootLocus: "0.0171",
+	BasicPid + RootLocus: "0.0665",
 	BasicPid + Ziegler:   "0.00831",
 	BasicPid + Cohen:     "0.00001063",
 	BasicPid + Amigo:     "0.00000675"}
@@ -100,7 +100,7 @@ const MaximumNrmse = 0.30
 const WarmupTime = 30 // seconds
 const TrainingAttempts = 100
 
-const SizeOfSameLevel = 60 // used in the experiments
+const SizeOfSameLevel = 100 // used in the experiments
 //const SizeOfSameLevel = 100 // used in the experiments
 
 // Astar
