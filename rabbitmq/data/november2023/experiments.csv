@@ -11,4 +11,8 @@ c10.csv;transfer-function;tf5poles4zeroRefined;Kp = 0.000437, Ki = 8.74e-05, Kd 
 c11.csv;transfer-function;tf6poles4zero;Kp = 0.00352, Ki = 0.000379, Kd = 0.00644
 c12.csv;iv;iv641-c12;Kp = -0.0111, Ki = -1.29e-05, Kd = -2.4
 c13.csv;transfer-function;tf7poles6zero;Kp = 0.000405, Ki = 8.11e-05, Kd = 0.000507
-c14.csv;manual-root-locus;;-kp=-0.00088937", "-ki=0.00141098", "-kd=0.00032814"
+c14-root.csv;manual-root-locus;;-kp=-0.00088937", "-ki=0.00141098", "-kd=0.00032814"
+c15.csv;transfer-function;tf1poles0zero;Tracking reference;Response Time (5.0);Transient Behaviour (0.45);kp=0.015641, ki=0.0062563, kd=0.0
+c16.csv;transfer-function;tf3poles2zero;Tracking reference;Response Time (5.0);Transient Behaviour (0.45);kp=0.0041247, ki=0.00074741, kd=0.0
+c17.csv;transfer-function;tf3poles2zero;Balanced;Response Time (303.85);Transient Behaviour (0.6); kp=0.00041312 ki=0.00016525, kd=0.0
+c18.csv;transfer-function;tf5poles4zeroRefined;Balanced;Response TIme (5008.19); Transient Behaviour(0.6); Kp = 1.825841182263492e-05, Ki = 7.303364729053967e-06, Kd = 0.0

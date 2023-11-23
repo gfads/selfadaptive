@@ -1,4 +1,4 @@
-rem This file has been generated automatically at 2023-11-15 20:54:30.2296249 -0300 -03 m=+0.017300301
+rem This file has been generated automatically at 2023-11-23 07:54:29.2741253 -0300 -03 m=+0.018373601
 @echo off 
 timeout /t 10
 docker stop publisher
