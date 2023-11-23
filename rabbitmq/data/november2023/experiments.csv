@@ -16,3 +16,6 @@ c15.csv;transfer-function;tf1poles0zero;Tracking reference;Response Time (5.0);T
 c16.csv;transfer-function;tf3poles2zero;Tracking reference;Response Time (5.0);Transient Behaviour (0.45);kp=0.0041247, ki=0.00074741, kd=0.0
 c17.csv;transfer-function;tf3poles2zero;Balanced;Response Time (303.85);Transient Behaviour (0.6); kp=0.00041312 ki=0.00016525, kd=0.0
 c18.csv;transfer-function;tf5poles4zeroRefined;Balanced;Response TIme (5008.19); Transient Behaviour(0.6); Kp = 1.825841182263492e-05, Ki = 7.303364729053967e-06, Kd = 0.0
+c19.csv;transfer-function;tf3poles2zero;Balanced;Backward Euler; Response Time (303.85);Transient Behaviour (0.6); kp=-0.00041312, Ki=0.00016525, kd=0.0
+c20.csv;transfer-function;tf1poles0zero;Balanced;Backward Euler;Response Time (303.85);Transient Behaviour (0.6);kp=-0.00060587,ki=0.00012117,kd=0.00075734
+[REPETICAO c20 com PC INitial=3] c21.csv;transfer-function;tf1poles0zero;Balanced;Backward Euler;Response Time (303.85);Transient Behaviour (0.6);kp=-0.00060587,ki=0.00012117,kd=0.00075734
