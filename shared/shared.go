@@ -49,7 +49,7 @@ var Kp = map[string]string{
 	BasicPi + Ziegler:    "0.00019285",  // "-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
 	BasicPi + Cohen:      "0.00196709",  // "-kp=0.00196709", "-ki=0.07181427", "-kd=0.00000000"
 	BasicPi + Amigo:      "0.00037871",  // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
-	BasicPid + RootLocus: "-0.00060587", //-kp=-0.00088937", "-ki=0.00141098", "-kd=0.00032814"
+	BasicPid + RootLocus: "-0.00088937", //-kp=-0.00088937", "-ki=0.00141098", "-kd=0.00032814"
 	BasicPid + Ziegler:   "0.00026446",  // "-kp=0.00026446", "-ki=0.00132228", "-kd=0.00001322"
 	BasicPid + Cohen:     "0.00083304",  // "-kp=0.00083304", "-ki=0.00788611", "-kd=0.00001063"
 	BasicPid + Amigo:     "0.00053993",  // "-kp=0.00053993", "-ki=0.01136109", "-kd=0.00000675"
@@ -63,7 +63,7 @@ var Ki = map[string]string{
 	BasicPi + Ziegler:    "0.00064284", //"-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
 	BasicPi + Cohen:      "0.07181427",
 	BasicPi + Amigo:      "0.01035190", // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
-	BasicPid + RootLocus: "0.00012117",
+	BasicPid + RootLocus: "0.00141098",
 	BasicPid + Ziegler:   "0.00132228",
 	BasicPid + Cohen:     "0.00788611",
 	BasicPid + Amigo:     "0.01136109"}
@@ -76,7 +76,7 @@ var Kd = map[string]string{
 	BasicPi + Ziegler:    "0.0",
 	BasicPi + Cohen:      "0.0",
 	BasicPi + Amigo:      "0.0",
-	BasicPid + RootLocus: "0.00075734",
+	BasicPid + RootLocus: "0.00032814",
 	BasicPid + Ziegler:   "0.00831",
 	BasicPid + Cohen:     "0.00001063",
 	BasicPid + Amigo:     "0.00000675"}
@@ -85,7 +85,7 @@ const MinPC = "1"
 const MaxPC = "100"
 const MonitorInterval = "5"
 const Adaptability = "true"
-const InitialPC = "3"
+const InitialPC = "1"
 const SetPoint = "500"
 const Direction = "1.0"
 const DeadZone = "200.0"
