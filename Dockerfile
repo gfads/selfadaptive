@@ -1,4 +1,4 @@
-# This file has been generated automatically at 2023-11-24 17:06:03.3335908 -0300 -03 m=+0.003133401
+# This file has been generated automatically at 2023-12-02 09:56:15.0450407 -0300 -03 m=+0.003544601
 FROM golang:1.19
 WORKDIR /app
 COPY go.mod go.sum ./
@@ -6,4 +6,4 @@ RUN go mod download
 COPY ./ ./ 
 RUN CGO_ENABLED=0 GOOS=linux go build -o ./subscriber ./rabbitmq/subscriber/main.go
 ENV GOROOT=/usr/local/go/bin/
-CMD ["./subscriber","-kd=0.00032814","-execution-type=Experiment","-output-file=Experiment-BasicPID-RootLocus-1","-set-point=500","-ki=0.00141098","-dead-zone=200.0","-hysteresis-band=200.0","-kp=-0.00088937","-tunning=RootLocus","-min=1","-prefetch-count=1","-direction=1.0","-controller-type=BasicPID","-max=100","-alfa=1.0","-monitor-interval=5","-beta=0.9"]
+CMD ["./subscriber","-min=1","-kp=-0.001395650713279","-ki=1.165570481688410e-05","-tunning=RootLocus","-direction=1.0","-dead-zone=200.0","-alfa=1.0","-monitor-interval=5","-hysteresis-band=200.0","-execution-type=Experiment","-output-file=Experiment-BasicPID-RootLocus-1","-max=100","-prefetch-count=1","-set-point=500","-beta=0.9","-kd=7.284815510552564e-05","-controller-type=BasicPID"]
