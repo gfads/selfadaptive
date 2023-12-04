@@ -71,6 +71,8 @@ func main() {
 	// create adapter
 	adapter := adaptationlogic.NewAdaptationLogic(toAdapter, fromAdapter, p, df)
 
+	consumer.Warmup()
+
 	if *p.ExecutionType == shared.OpenLoop {
 		consumer.RunOpenLoop(startTimer, stopTimer, p, df)
 	} else {
@@ -131,6 +133,19 @@ func (c Subscriber) RunOpenLoop(startTimer, stopTimer chan bool, p parameters.Ex
 		default:
 		}
 	}
+}
+
+func (c Subscriber) Warmup() {
+
+	fmt.Println("Begin of Warming up...")
+	for i := 0; i < 10000; i++ {
+		d := <-c.Msgs
+		err := d.Ack(false) // send ack to broker
+		if err != nil {
+			shared.ErrorHandler(shared.GetFunction(), err.Error())
+		}
+	}
+	fmt.Println("End of Warming up...")
 }
 
 func (c Subscriber) RunNonAdaptive() {

@@ -45,7 +45,7 @@ var Kp = map[string]string{
 	BasicP + Ziegler:     "0.00022294", // "-kp=0.00022294", "-ki=0.00000000", "-kd=0.00000000"
 	BasicP + Cohen:       "0.00100321", // "-kp=0.00100321", "-ki=0.00000000", "-kd=0.00000000"
 	BasicP + Amigo:       "0.0",
-	BasicPi + RootLocus:  "-5.827852408442051e-05", //-kp=-0.00111867", "-ki=0.00148840", "-kd=0.00000000"
+	BasicPi + RootLocus:  "-6.065252841686694e-04", //-kp=-0.00111867", "-ki=0.00148840", "-kd=0.00000000"
 	BasicPi + Ziegler:    "0.00019285",             // "-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
 	BasicPi + Cohen:      "0.00196709",             // "-kp=0.00196709", "-ki=0.07181427", "-kd=0.00000000"
 	BasicPi + Amigo:      "0.00037871",             // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
@@ -63,7 +63,7 @@ var Ki = map[string]string{
 	BasicPi + Ziegler:    "0.00064284", //"-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
 	BasicPi + Cohen:      "0.07181427",
 	BasicPi + Amigo:      "0.01035190", // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
-	BasicPid + RootLocus: "1.165570481688410e-05",
+	BasicPid + RootLocus: "2.791301426557981e-04",
 	BasicPid + Ziegler:   "0.00132228",
 	BasicPid + Cohen:     "0.00788611",
 	BasicPid + Amigo:     "0.01136109"}
@@ -76,7 +76,7 @@ var Kd = map[string]string{
 	BasicPi + Ziegler:    "0.0",
 	BasicPi + Cohen:      "0.0",
 	BasicPi + Amigo:      "0.0",
-	BasicPid + RootLocus: "7.284815510552564e-05",
+	BasicPid + RootLocus: "0.001744563391599",
 	BasicPid + Ziegler:   "0.00831",
 	BasicPid + Cohen:     "0.00001063",
 	BasicPid + Amigo:     "0.00000675"}

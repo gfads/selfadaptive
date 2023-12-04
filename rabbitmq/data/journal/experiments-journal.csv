@@ -6,6 +6,7 @@ ctf2p1zR;pid;tf2p1zR;Backward Euler;Balanced;Response time automatic;Transient B
 ctf1p0z;pid;tf1p0z;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -0.036964403609271, 0.007392880721854, 0.046205504511589
 n4s3;Best fit in Matlab;State model;0.008055502855871, 4.926335688830458e-04, 0.017059797334159
 ctf1p0zPI;PI;tf1p0zPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -3.028934135950828e-04, 1.211573654380331e-04, 0.0
+hpa;
 ctf2p0zPI;PI;tf1p0zPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -3.032215854920922e-04, 1.212886341968369e-04, 0
 ctf2p1zRPI;PI;ctf2p1zRPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic;-3.032215854920922e-04, 1.212886341968369e-04, 0
 ctf3p2zRPI;PI;ctf3p2zRPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -3.954416490962114e-04, 1.581766596384846e-04, 0
@@ -13,6 +14,8 @@ ctf5p4zRPI;PI;ctf5p4zRPI;Backward Euler;Balanced;Response time automatic;Transie
 ctf6p5zPI;PI;tf1p0zPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic;-4.332867629729273e-04, 1.733147051891709e-04, 0
 ctf7p6zPI;PI;tf1p0zPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic;-9.134610269917492e-04, 3.653844107966996e-04, 0
 mytuning;PID
+
 ctf87;training75-25;PID;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -0.001395650713279, 2.791301426557981e-04, 0.001744563391599
 
 ctf76;training75-25;PID;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -5.827852408442051e-05, 1.165570481688410e-05, 7.284815510552564e-05
+ctf10;manual;training75-25;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -0.005834164126809, 0.001166832825362, 0.007292705158511
