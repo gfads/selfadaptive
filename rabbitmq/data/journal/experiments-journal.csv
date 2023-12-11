@@ -1,21 +1,28 @@
-ctf7p6z.csv;pid;tf7p6z;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic;kp=-4.225194752044427e-04, ki=8.450389504088855e-05, kd=5.281493440055530e-04
-ctf5p4zR;pid;tf5p4zR;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic;-4.416293813350552e-04, 8.832587626701105e-05, 5.520367266688189e-04
-ctf6p5z;pid;tf5p4z;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic;-0.001039177171811, 2.078354343622115e-04, 0.001298971464764
-ctf3p2zR;pid;tf3p2zR;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic;-7.909903848070910e-04, 1.581980769614182e-04, 9.887379810088637e-04
-ctf2p1zR;pid;tf2p1zR;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -6.065252841686694e-04, 1.213050568337339e-04, 7.581566052108363e-04
-ctf1p0z;pid;tf1p0z;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -0.036964403609271, 0.007392880721854, 0.046205504511589
-n4s3;Best fit in Matlab;State model;0.008055502855871, 4.926335688830458e-04, 0.017059797334159
-ctf1p0zPI;PI;tf1p0zPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -3.028934135950828e-04, 1.211573654380331e-04, 0.0
+mytuning;ramp;PID
+tf3p2zRPI;PI;tf3p2zRPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -3.954416490962114e-04, 1.581766596384846e-04, 0
 hpa;
-ctf2p0zPI;PI;tf1p0zPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -3.032215854920922e-04, 1.212886341968369e-04, 0
-ctf2p1zRPI;PI;ctf2p1zRPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic;-3.032215854920922e-04, 1.212886341968369e-04, 0
-ctf3p2zRPI;PI;ctf3p2zRPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -3.954416490962114e-04, 1.581766596384846e-04, 0
-ctf5p4zRPI;PI;ctf5p4zRPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic;-1.862379093711059e-04, 7.449516374844236e-05, 0
-ctf6p5zPI;PI;tf1p0zPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic;-4.332867629729273e-04, 1.733147051891709e-04, 0
-ctf7p6zPI;PI;tf1p0zPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic;-9.134610269917492e-04, 3.653844107966996e-04, 0
-mytuning;PID
+mytuning;sine;PID
+tf3p2zR;pid;tf3p2zR;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic;-7.909903848070910e-04, 1.581980769614182e-04, 9.887379810088637e-04
+tf7p6z.csv;pid;tf7p6z;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic;kp=-4.225194752044427e-04, ki=8.450389504088855e-05, kd=5.281493440055530e-04
+tf5p4zR;pid;tf5p4zR;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic;-4.416293813350552e-04, 8.832587626701105e-05, 5.520367266688189e-04
+tf6p5z;pid;tf5p4z;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic;-0.001039177171811, 2.078354343622115e-04, 0.001298971464764
+tf2p1zR;pid;tf2p1zR;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -6.065252841686694e-04, 1.213050568337339e-04, 7.581566052108363e-04
+tf1p0z;pid;tf1p0z;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -0.036964403609271, 0.007392880721854, 0.046205504511589
+n4s3;Best fit in Matlab;State model;0.008055502855871, 4.926335688830458e-04, 0.017059797334159
+tf1p0zPI;PI;tf1p0zPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -3.028934135950828e-04, 1.211573654380331e-04, 0.0
+tf2p0zPI;PI;tf1p0zPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -3.032215854920922e-04, 1.212886341968369e-04, 0
+tf2p1zRPI;PI;tf2p1zRPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic;-3.032215854920922e-04, 1.212886341968369e-04, 0
 
-ctf87;training75-25;PID;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -0.001395650713279, 2.791301426557981e-04, 0.001744563391599
+tf5p4zRPI;PI;tf5p4zRPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic;-1.862379093711059e-04, 7.449516374844236e-05, 0
+tf6p5zPI;PI;tf1p0zPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic;-4.332867629729273e-04, 1.733147051891709e-04, 0
+tf7p6zPI;PI;tf1p0zPI;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic;-9.134610269917492e-04, 3.653844107966996e-04, 0
+tf87;training75-25;PID;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -0.001395650713279, 2.791301426557981e-04, 0.001744563391599
+tf76;training75-25;PID;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -5.827852408442051e-05, 1.165570481688410e-05, 7.284815510552564e-05
+tf10;manual;training75-25;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -0.005834164126809, 0.001166832825362, 0.007292705158511
 
-ctf76;training75-25;PID;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -5.827852408442051e-05, 1.165570481688410e-05, 7.284815510552564e-05
-ctf10;manual;training75-25;Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; Backward Euler;Balanced;Response time automatic;Transient Behaviour automatic; -0.005834164126809, 0.001166832825362, 0.007292705158511
+RAMP
+tf10sample10PID; 3.864752027135596e-10, 1.045817600755456e-12, -9.727243667886226e-10
+carxqsPID; -3.477520259782652e-10, 6.955040 519565302e-11, 4.346900324728313e-10
+ctf21training100validating100; -2.131827899927377e-05, 8.527311599709509e-06, 0
+
+ctf10training100validating100;-0.002896751493921, 0.001158700597569, 0.0

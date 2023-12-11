@@ -15,8 +15,7 @@ set PATH=C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\Syst
 set PATH=%PATH%;C:\Program Files\Docker\Docker
 
 rem configure variables
-rem set et=Experiment
-rem set et=OpenLoop
+rem For ExperimentalDesign (ramp/sine training), use ct=BasicPID and t=None
 rem set et=ExperimentalDesign
 set et=Experiment
 set ct=BasicPID
