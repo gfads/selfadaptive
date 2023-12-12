@@ -16,8 +16,9 @@ import (
 )
 
 // Configuration RabbitMQ
-const IpPortRabbitMQ = "192.168.0.20:5672" // Home Recife
-//const IpPortRabbitMQ = "192.168.1.147" // Home Jacare
+//const IpPortRabbitMQ = "192.168.0.20:5672" // Home Recife
+//const IpPortRabbitMQ = "192.168.1.147:5672" // Home Jacare
+const IpPortRabbitMQ = "172.22.45.81:5672" // CIn-UFPE
 
 // Training/Experiment parameters
 const L = 1.0
@@ -59,14 +60,14 @@ var Kp = map[string]string{
 	BasicP + Ziegler:     "0.00022294", // "-kp=0.00022294", "-ki=0.00000000", "-kd=0.00000000"
 	BasicP + Cohen:       "0.00100321", // "-kp=0.00100321", "-ki=0.00000000", "-kd=0.00000000"
 	BasicP + Amigo:       "0.0",
-	BasicPi + RootLocus:  "0.718169503896682",  //-kp=-0.00111867", "-ki=0.00148840", "-kd=0.00000000"
-	BasicPi + Ziegler:    "0.00019285",         // "-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
-	BasicPi + Cohen:      "0.00196709",         // "-kp=0.00196709", "-ki=0.07181427", "-kd=0.00000000"
-	BasicPi + Amigo:      "0.00037871",         // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
-	BasicPid + RootLocus: "-0.002896751493921", //-kp=-0.00088937", "-ki=0.00141098", "-kd=0.00032814"
-	BasicPid + Ziegler:   "0.00026446",         // "-kp=0.00026446", "-ki=0.00132228", "-kd=0.00001322"
-	BasicPid + Cohen:     "0.00083304",         // "-kp=0.00083304", "-ki=0.00788611", "-kd=0.00001063"
-	BasicPid + Amigo:     "0.00053993",         // "-kp=0.00053993", "-ki=0.01136109", "-kd=0.00000675"
+	BasicPi + RootLocus:  "0.718169503896682",      //-kp=-0.00111867", "-ki=0.00148840", "-kd=0.00000000"
+	BasicPi + Ziegler:    "0.00019285",             // "-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
+	BasicPi + Cohen:      "0.00196709",             // "-kp=0.00196709", "-ki=0.07181427", "-kd=0.00000000"
+	BasicPi + Amigo:      "0.00037871",             // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
+	BasicPid + RootLocus: "-9.763052804675233e-05", //-kp=-0.00088937", "-ki=0.00141098", "-kd=0.00032814"
+	BasicPid + Ziegler:   "0.00026446",             // "-kp=0.00026446", "-ki=0.00132228", "-kd=0.00001322"
+	BasicPid + Cohen:     "0.00083304",             // "-kp=0.00083304", "-ki=0.00788611", "-kd=0.00001063"
+	BasicPid + Amigo:     "0.00053993",             // "-kp=0.00053993", "-ki=0.01136109", "-kd=0.00000675"
 }
 var Ki = map[string]string{
 	BasicP + RootLocus:   "0.0",
@@ -77,7 +78,7 @@ var Ki = map[string]string{
 	BasicPi + Ziegler:    "0.00064284", //"-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
 	BasicPi + Cohen:      "0.07181427",
 	BasicPi + Amigo:      "0.01035190", // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
-	BasicPid + RootLocus: "0.001158700597569",
+	BasicPid + RootLocus: "3.905221121870094e-05",
 	BasicPid + Ziegler:   "0.00132228",
 	BasicPid + Cohen:     "0.00788611",
 	BasicPid + Amigo:     "0.01136109"}
