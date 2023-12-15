@@ -2,6 +2,7 @@ package adaptationlogic
 
 import (
 	"fmt"
+	"github.com/montanaflynn/stats"
 	"main.go/controllers/def/ops"
 	"main.go/controllers/def/parameters"
 	"main.go/shared"
@@ -285,6 +286,11 @@ func (al AdaptationLogic) RootLocusTraining() {
 	<-al.FromBusiness // receive no. of messages from business
 	al.ToBusiness <- al.PC
 
+	rates := []float64{}
+	pcs := []float64{}
+	correlation := 1.0
+	err := error(nil)
+
 	// loop of adaptation logic
 	for {
 
@@ -293,9 +299,22 @@ func (al AdaptationLogic) RootLocusTraining() {
 		// calculate new arrival rate (msg/s)
 		rate := float64(n.ReceivedMessages) / al.MonitorInterval.Seconds()
 
-		l := len(info.Data)
+		// store measured data
+		rates = append(rates, rate)
+		pcs = append(pcs, float64(al.PC))
 
-		if l >= 1 && rate < (1.1*info.Data[l-1].Rate) { // TODO remove 1.10
+		l := len(info.Data)
+		if l > 2 { // mimimum of 3 values
+			correlation, err = stats.Correlation(pcs, rates)
+			if err != nil {
+				shared.ErrorHandler("Correlation error", shared.GetFunction())
+				return
+			}
+		}
+		//if l >= 1 && rate < (1.1*info.Data[l-1].Rate) { // TODO remove 1.10
+		//if l >= 1 && rate < ((1+1.0/float64(al.PC+1))*info.Data[l-1].Rate) { // TODO remove
+		//fmt.Println("Correlation index= ", correlation, "Sampling size= ", len(rates), rates)
+		if l > 2 && correlation < 0.995 {
 			if l > shared.TrainingSampleSize || tAttempts >= shared.TrainingAttempts { // training is over
 				info = CalculateRootLocusGains(info)
 				al.TrainingInfo.Kp = info.Kp
@@ -314,8 +333,13 @@ func (al AdaptationLogic) RootLocusTraining() {
 			} else { // redo the training && keep already collected data
 				//fmt.Println("Training attempts=", tAttempts, len(info.Data), rate, al.PC)
 				tAttempts++
+
+				// remove last data used to calculate correlation
+				pcs = pcs[:len(pcs)-1]
+				rates = rates[:len(rates)-1]
 			}
 		} else { // continue the training
+			tAttempts = 0
 			fmt.Printf("%v;%v;%f;%f\n", n.QueueSize, al.PC, rate, 0.0)
 			fmt.Fprintf(al.File, "%v;%v;%f;%f\n", n.QueueSize, al.PC, rate, 0.0)
 
@@ -336,7 +360,7 @@ func (al AdaptationLogic) ZieglerTrainingOld() {
 	info := TrainingInfo{TypeName: al.TrainingInfo.TypeName}
 
 	// warm up phase
-	time.Sleep(shared.WarmupTime * time.Second)
+	//time.Sleep(shared.WarmupTime * time.Second)
 
 	// discard first measurement
 	<-al.FromBusiness                     // receive no. of messages from business
@@ -405,7 +429,7 @@ func (al AdaptationLogic) ZieglerTraining() {
 	info := TrainingInfo{TypeName: al.TrainingInfo.TypeName}
 
 	// warm up phase
-	time.Sleep(shared.WarmupTime * time.Second)
+	//time.Sleep(shared.WarmupTime * time.Second)
 
 	// discard first measurement
 	<-al.FromBusiness                     // receive no. of messages from business
@@ -476,7 +500,7 @@ func (al AdaptationLogic) CohenTraining() {
 	//go AdjustmentMechanism(fromAdjuster, toAdjuster, al.SetPoint)
 
 	// warm up phase
-	time.Sleep(shared.WarmupTime * time.Second)
+	//time.Sleep(shared.WarmupTime * time.Second)
 
 	// discard first measurement
 	<-al.FromBusiness       // receive no. of messages from business
@@ -534,7 +558,7 @@ func (al AdaptationLogic) RunOnlineTraining() {
 	go AdjustmentMechanism(fromAdjuster, toAdjuster, al.SetPoint)
 
 	// warm up phase
-	time.Sleep(shared.WarmupTime * time.Second)
+	//time.Sleep(shared.WarmupTime * time.Second)
 
 	// discard first measurement
 	<-al.FromBusiness // receive no. of messages from business
@@ -707,7 +731,7 @@ func CalculateRootLocusGains(info TrainingInfo) TrainingInfo {
 	ki := 0.0
 	kd := 0.0
 
-	//fmt.Printf("a=%.8f b=%.8f\n", a, b)
+	fmt.Printf("a=%.8f b=%.8f\n", a, b)
 
 	switch info.TypeName {
 	case shared.BasicP:

@@ -18,11 +18,12 @@ rem configure variables
 rem For ExperimentalDesign (ramp/sine training), use ct=BasicPID and t=None
 rem set et=ExperimentalDesign
 set et=Experiment
+rem set et=RootTraining
 set ct=BasicPID
 rem set ct=HPA
 set t=RootLocus
 rem set t=None
-set b=%et%-%ct%-%t%
+set b=%et%-%ct%-%t
 rem set f=1 2 3 4 5 6 7 8 9 10
 set f=1
 

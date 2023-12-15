@@ -16,9 +16,9 @@ import (
 )
 
 // Configuration RabbitMQ
-//const IpPortRabbitMQ = "192.168.0.20:5672" // Home Recife
+const IpPortRabbitMQ = "192.168.0.20:5672" // Home Recife
 //const IpPortRabbitMQ = "192.168.1.147:5672" // Home Jacare
-const IpPortRabbitMQ = "172.22.45.81:5672" // CIn-UFPE
+//const IpPortRabbitMQ = "172.22.45.81:5672" // CIn-UFPE
 
 // Training/Experiment parameters
 const L = 1.0
@@ -64,7 +64,7 @@ var Kp = map[string]string{
 	BasicPi + Ziegler:    "0.00019285",             // "-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
 	BasicPi + Cohen:      "0.00196709",             // "-kp=0.00196709", "-ki=0.07181427", "-kd=0.00000000"
 	BasicPi + Amigo:      "0.00037871",             // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
-	BasicPid + RootLocus: "-9.763052804675233e-05", //-kp=-0.00088937", "-ki=0.00141098", "-kd=0.00032814"
+	BasicPid + RootLocus: "-1.121356400433011e-04", // -0.00174506", "-ki=0.00423043", "-kd=0.00098382" (15/12/2023)
 	BasicPid + Ziegler:   "0.00026446",             // "-kp=0.00026446", "-ki=0.00132228", "-kd=0.00001322"
 	BasicPid + Cohen:     "0.00083304",             // "-kp=0.00083304", "-ki=0.00788611", "-kd=0.00001063"
 	BasicPid + Amigo:     "0.00053993",             // "-kp=0.00053993", "-ki=0.01136109", "-kd=0.00000675"
@@ -78,7 +78,7 @@ var Ki = map[string]string{
 	BasicPi + Ziegler:    "0.00064284", //"-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
 	BasicPi + Cohen:      "0.07181427",
 	BasicPi + Amigo:      "0.01035190", // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
-	BasicPid + RootLocus: "3.905221121870094e-05",
+	BasicPid + RootLocus: "4.485425601732042e-05",
 	BasicPid + Ziegler:   "0.00132228",
 	BasicPid + Cohen:     "0.00788611",
 	BasicPid + Amigo:     "0.01136109"}
@@ -114,7 +114,7 @@ const TrainingSampleSize = 100
 const TimeBetweenAdjustments = 1200 // seconds
 const MaximumNrmse = 0.30
 const WarmupTime = 30 // seconds
-const TrainingAttempts = 100
+const TrainingAttempts = 30
 
 const SizeOfSameLevel = 50 // used in the experiments
 //const SizeOfSameLevel = 50 // used in the experiments
