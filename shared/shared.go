@@ -23,10 +23,10 @@ const IpPortRabbitMQ = "192.168.0.20:5672" // Home Recife
 // Training/Experiment parameters
 const L = 1.0
 
-//const Tau = 1.0  // original
-//const T = 0.1 // original
-const Tau = 0.1 // modified
-const T = 0.01  // modified
+const Tau = 1.0 // original
+const T = 0.1   // original
+//const Tau = 0.1 // modified
+//const T = 0.01  // modified
 
 //var RandomGoal = []float64{363, 1042, 1871, 2063, 1436, 585, 318, 888, 1754, 2094, 1585, 710, 300, 744, 1621, 2098, 1722}
 //var RandomGoal = []float64{500, 1000, 750}
@@ -44,6 +44,8 @@ var RandomGoals = []float64{800, 2400, 1600, 800, 2400, 1600}
 
 //var RandomGoals = []float64{1440}
 //var InputSteps = []int{2, 1} // for Ziegler/Cohen/AMIGO
+var InputStepsZiegler = []int{2, 1} // for Ziegler/Cohen/AMIGO
+
 //var InputSteps = []int{4, 1, 11, 33, 60, 84, 98, 98, 84, 60, 33, 11, 1, 5, 22, 48, 74, 93, 100, 92, 72, 45, 20, 3, 1, 13, 35, 62, 86, 99, 97, 82, 57, 31, 9, 1, 6, 24, 50, 76, 94, 100, 91, 69, 43, 18, 3, 1, 14, 38, 65, 87, 99, 97, 80, 55, 28, 8, 1, 7, 26, 52, 78, 95, 100, 89, 67, 40, 16, 2, 2, 16, 40, 67, 89, 100, 96, 79, 53, 26, 7, 1, 8, 28, 54, 80, 96, 99, 88, 65, 38, 15, 1, 2, 17, 42, 69, 90, 100, 95, 77, 51}
 
 // sin wave
@@ -60,14 +62,14 @@ var Kp = map[string]string{
 	BasicP + Ziegler:     "0.00022294", // "-kp=0.00022294", "-ki=0.00000000", "-kd=0.00000000"
 	BasicP + Cohen:       "0.00100321", // "-kp=0.00100321", "-ki=0.00000000", "-kd=0.00000000"
 	BasicP + Amigo:       "0.0",
-	BasicPi + RootLocus:  "0.718169503896682",  //-kp=-0.00111867", "-ki=0.00148840", "-kd=0.00000000"
-	BasicPi + Ziegler:    "0.00019285",         // "-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
-	BasicPi + Cohen:      "0.00196709",         // "-kp=0.00196709", "-ki=0.07181427", "-kd=0.00000000"
-	BasicPi + Amigo:      "0.00037871",         // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
-	BasicPid + RootLocus: "-0.001663871790467", // -0.00174506", "-ki=0.00423043", "-kd=0.00098382" (15/12/2023)
-	BasicPid + Ziegler:   "0.00026446",         // "-kp=0.00026446", "-ki=0.00132228", "-kd=0.00001322"
-	BasicPid + Cohen:     "0.00083304",         // "-kp=0.00083304", "-ki=0.00788611", "-kd=0.00001063"
-	BasicPid + Amigo:     "0.00053993",         // "-kp=0.00053993", "-ki=0.01136109", "-kd=0.00000675"
+	BasicPi + RootLocus:  "0.718169503896682", //-kp=-0.00111867", "-ki=0.00148840", "-kd=0.00000000"
+	BasicPi + Ziegler:    "0.00017245",        // "-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
+	BasicPi + Cohen:      "0.00196709",        // "-kp=0.00196709", "-ki=0.07181427", "-kd=0.00000000"
+	BasicPi + Amigo:      "0.00037871",        // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
+	BasicPid + RootLocus: "0.00029493",        // -0.00174506", "-ki=0.00423043", "-kd=0.00098382" (15/12/2023)
+	BasicPid + Ziegler:   "0.00026446",        // "-kp=0.00026446", "-ki=0.00132228", "-kd=0.00001322"
+	BasicPid + Cohen:     "0.00083304",        // "-kp=0.00083304", "-ki=0.00788611", "-kd=0.00001063"
+	BasicPid + Amigo:     "0.00053993",        // "-kp=0.00053993", "-ki=0.01136109", "-kd=0.00000675"
 }
 var Ki = map[string]string{
 	BasicP + RootLocus:   "0.0",
@@ -75,10 +77,10 @@ var Ki = map[string]string{
 	BasicP + Cohen:       "0.0",
 	BasicP + Amigo:       "0.0",
 	BasicPi + RootLocus:  "0.000153",
-	BasicPi + Ziegler:    "0.00064284", //"-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
+	BasicPi + Ziegler:    "0.00057482", //"-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
 	BasicPi + Cohen:      "0.07181427",
 	BasicPi + Amigo:      "0.01035190", // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
-	BasicPid + RootLocus: "3.327743580934682e-04",
+	BasicPid + RootLocus: "0.00080617",
 	BasicPid + Ziegler:   "0.00132228",
 	BasicPid + Cohen:     "0.00788611",
 	BasicPid + Amigo:     "0.01136109"}
@@ -91,7 +93,7 @@ var Kd = map[string]string{
 	BasicPi + Ziegler:    "0.0",
 	BasicPi + Cohen:      "0.0",
 	BasicPi + Amigo:      "0.0",
-	BasicPid + RootLocus: "0.002079839738084",
+	BasicPid + RootLocus: "0.0000",
 	BasicPid + Ziegler:   "0.00831",
 	BasicPid + Cohen:     "0.00001063",
 	BasicPid + Amigo:     "0.00000675"}
@@ -107,6 +109,8 @@ const DeadZone = "200.0"
 const HysteresisBand = "200.0"
 const Alfa = "1.0"
 const Beta = "0.9"
+
+//const ZieglerRepetitions = 2 * 10
 const ZieglerRepetitions = 2 * 10
 
 // Experiments parameters
@@ -116,7 +120,8 @@ const MaximumNrmse = 0.30
 const WarmupTime = 30 // seconds
 const TrainingAttempts = 30
 
-const SizeOfSameLevel = 50 // used in the experiments
+const SizeOfSameLevel = 50        // used in the experiments
+const SizeOfSameLevelZiegler = 30 // used in the experiments
 //const SizeOfSameLevel = 50 // used in the experiments
 //const SizeOfSameLevel = 100 // used in the experiments
 

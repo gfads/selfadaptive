@@ -437,7 +437,7 @@ func (al AdaptationLogic) ZieglerTraining() {
 
 	// loop of adaptation logic
 	for i := 0; i < shared.ZieglerRepetitions; i++ {
-		for j := 0; j < shared.SizeOfSameLevel; j++ {
+		for j := 0; j < shared.SizeOfSameLevelZiegler; j++ {
 			// receive no. of messages from business
 			n := <-al.FromBusiness
 
@@ -454,9 +454,9 @@ func (al AdaptationLogic) ZieglerTraining() {
 			al.ToBusiness <- al.PC
 		}
 		if i%2 == 0 {
-			al.PC = shared.InputSteps[0]
+			al.PC = shared.InputStepsZiegler[0]
 		} else {
-			al.PC = shared.InputSteps[1]
+			al.PC = shared.InputStepsZiegler[1]
 		}
 	}
 
