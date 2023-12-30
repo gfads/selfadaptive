@@ -36,8 +36,8 @@ const T = 0.1   // original
 //var RandomGoals = []float64{833, 2500, 1667, 5000, 3333, 4167}
 //var RandomGoals = []float64{800, 1600, 2400, 3200, 4000, 4800}
 //var RandomGoals = []float64{800, 2400, 1600}
-var RandomGoals = []float64{800, 2400, 1600, 800, 2400, 1600}
-
+var RandomGoals = []float64{800, 2400, 1600, 800, 2400, 1600} // variable final
+//var RandomGoals = []float64{2400} // fixed final
 //var RandomGoals = []float64{1000}
 
 //var RandomGoals = []float64{1000}
@@ -66,7 +66,7 @@ var Kp = map[string]string{
 	BasicPi + Ziegler:    "0.00017245",        // "-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
 	BasicPi + Cohen:      "0.00196709",        // "-kp=0.00196709", "-ki=0.07181427", "-kd=0.00000000"
 	BasicPi + Amigo:      "0.00037871",        // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
-	BasicPid + RootLocus: "0.00029493",        // -0.00174506", "-ki=0.00423043", "-kd=0.00098382" (15/12/2023)
+	BasicPid + RootLocus: "-0.00174506",       // -0.00174506", "-ki=0.00423043", "-kd=0.00098382" (15/12/2023)
 	BasicPid + Ziegler:   "0.00026446",        // "-kp=0.00026446", "-ki=0.00132228", "-kd=0.00001322"
 	BasicPid + Cohen:     "0.00083304",        // "-kp=0.00083304", "-ki=0.00788611", "-kd=0.00001063"
 	BasicPid + Amigo:     "0.00053993",        // "-kp=0.00053993", "-ki=0.01136109", "-kd=0.00000675"
@@ -80,7 +80,7 @@ var Ki = map[string]string{
 	BasicPi + Ziegler:    "0.00057482", //"-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
 	BasicPi + Cohen:      "0.07181427",
 	BasicPi + Amigo:      "0.01035190", // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
-	BasicPid + RootLocus: "0.00080617",
+	BasicPid + RootLocus: "0.00423043",
 	BasicPid + Ziegler:   "0.00132228",
 	BasicPid + Cohen:     "0.00788611",
 	BasicPid + Amigo:     "0.01136109"}
@@ -93,7 +93,7 @@ var Kd = map[string]string{
 	BasicPi + Ziegler:    "0.0",
 	BasicPi + Cohen:      "0.0",
 	BasicPi + Amigo:      "0.0",
-	BasicPid + RootLocus: "0.0000",
+	BasicPid + RootLocus: "0.00098382",
 	BasicPid + Ziegler:   "0.00831",
 	BasicPid + Cohen:     "0.00001063",
 	BasicPid + Amigo:     "0.00000675"}

@@ -31,18 +31,18 @@ func (c *Controller) Initialise(p ...float64) {
 	}
 
 	// hard coded gain scheduling table P // TODO
-	c.GainTable[0][0] = 0.1 // kp[0] // P
-	c.GainTable[0][1] = 0.0 // ki[1]
-	c.GainTable[0][2] = 0.0 // kd[2]
+	c.GainTable[0][0] = 0.00041533 // kp[0] // P
+	c.GainTable[0][1] = 0.00087393 // ki[1]
+	c.GainTable[0][2] = 0.00005192 // kd[2]
 
 	//c.GainTable[1][0] = -9600 // kp[0] // PID
 	//c.GainTable[1][1] = 0.5   // ki[1]
 	//c.GainTable[1][2] = 0.01  // kd[2]
 
 	// Root Locus
-	c.GainTable[1][0] = -0.00144086 // kp[0] // PI
-	c.GainTable[1][1] = 0.00248495  // ki[1]
-	c.GainTable[1][2] = 0.00057789  // kd[2]
+	c.GainTable[1][0] = 0.00041533 * 2.00 // kp[0]
+	c.GainTable[1][1] = 0.00087393        // ki[1]
+	c.GainTable[1][2] = 0.00005192        // kd[2]
 
 	kp := c.GainTable[0][0]
 	ki := c.GainTable[0][1]
@@ -75,7 +75,8 @@ func (c *Controller) Update(p ...float64) float64 {
 	// decide about the gain - based on the plant output
 	//if y < c.Info.GainTrigger { // Full
 	// decide about the gain - based on the error
-	if y < r*0.1 { // Full
+	//if y < r*0.6 { // Full
+	if err > 0 && err > r*0.25 { // Full
 		c.Info.Kp = c.GainTable[0][0]
 		c.Info.Ki = c.GainTable[0][1]
 		c.Info.Kd = c.GainTable[0][2]

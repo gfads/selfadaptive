@@ -32,36 +32,28 @@ type Metrics struct {
 
 func main() {
 	allData := map[string]Metrics{}
-	rad := "Experiment"
-	controllers := []string{
-		shared.BasicOnoff, shared.HysteresisOnoff, shared.DeadZoneOnoff,
-		shared.AsTAR, shared.HPA, shared.BasicP,
-		shared.BasicPi, shared.BasicPid, shared.DeadZonePid,
-		shared.SetpointWeighting, shared.PIwithTwoDegreesOfFreedom, shared.IncrementalFormPid,
-		shared.GainScheduling, shared.ErrorSquarePidFull, shared.ErrorSquarePidProportional,
-		shared.SmoothingPid}
-	outFile := "all-variable-summary.csv"
+	/*controllers := []string{"hpa-fixed", "mypi-fixed", "mypid-fixed",
+	"pitf10faster-fixed", "pidtf10faster-fixed", "pitf21faster-fixed", "pidtf21faster-fixed",
+	"piziegler-fixed", "pidziegler-fixed", "picohen-fixed", "pidcohen-fixed", "piamigo-fixed",
+	"pidamigo-fixed", "gain-fixed", "astar-fixed",
+	"piddeadzone-fixed","pidsmoothing-fized","pidincrementalform-fixed"}
+	*/
+	controllers := []string{"hpa-variable", "mypi-variable", "mypid-variable",
+		"pitf10faster-variable", "pidtf10faster-variable", "pitf21faster-variable", "pidtf21faster-variable",
+		"piziegler-variable", "pidziegler-variable", "picohen-variable", "pidcohen-variable", "piamigo-variable",
+		"pidamigo-variable", "gain-variable", "astar-variable",
+		"piddeadzone-variable", "pidsmoothing-variable", "pidincrementalform-variable"} //outFile := "all-variable-summary.csv"
+	outFile := "all-fixed-summary.csv"
 
 	for c := 0; c < len(controllers); c++ {
-		tuners := []string{}
-		if shared.IsTuned(controllers[c]) {
-			tuners = shared.TunningTypes
-		} else {
-			tuners = []string{shared.None}
+		data := []Data{}
+		fileName := controllers[c]
+		d := readFile(fileName)
+		for j := 0; j < len(d); j++ {
+			data = append(data, d[j])
 		}
-		for t := 0; t < len(tuners); t++ {
-			// read input files of a given controller
-			data := []Data{}
-			for i := 1; i < 11; i++ { // TODO 11
-				fileName := rad + "-" + controllers[c] + "-" + tuners[t] + "-" + strconv.Itoa(i)
-				d := readFile(fileName)
-				for j := 0; j < len(d); j++ {
-					data = append(data, d[j])
-				}
-			}
-			// calculate metrics
-			allData[controllers[c]+"-"+tuners[t]] = calcMetrics(data)
-		}
+		// calculate metrics
+		allData[controllers[c]] = calcMetrics(data)
 	}
 	saveMetrics(outFile, allData)
 	fmt.Println("Stats Finished!!!")

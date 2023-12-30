@@ -21,9 +21,53 @@ func (c *Controller) Initialise(p ...float64) {
 	c.Info.Min = p[0]
 	c.Info.Max = p[1]
 	c.Info.HysteresisBand = p[2]
+	c.Info.PC = 1 // TODO
 }
 
 func (c *Controller) Update(p ...float64) float64 {
+	u := 0.0
+	setpoint := p[0]
+	y := p[1] // measured arrival rate
+
+	if y < (setpoint - c.Info.HysteresisBand) { // The system is bellow the goal  TODO
+		if y > c.Info.PreviousRate {
+			u = c.Info.PreviousOut + 1
+			//fmt.Printf("Accelerating+ [%.4f][%.4f][%.4f][%.4f]\n", y, setpoint, c.Info.PreviousOut, u)
+		} else {
+			u = c.Info.PreviousOut * 2
+			//fmt.Printf("Reducing-- [%.4f][%.4f][%.4f][%.4f]\n", y, setpoint, c.Info.PreviousOut, u)
+		}
+		//} else if y > (setpoint + c.Info.HysteresisBand) { // The system is above the goal TODO
+	} else if y > (setpoint + c.Info.HysteresisBand) { // The system is above the goal
+		if y < c.Info.PreviousRate {
+			u = c.Info.PreviousOut - 1
+			//fmt.Printf("Reducing- [%.4f][%.4f][%.4f][%.4f]\n", y, setpoint, c.Info.PreviousOut, u)
+		} else {
+			u = c.Info.PreviousOut / 2
+			//fmt.Printf("Accelerating++ [%.4f][%.4f][%.4f][%.4f]\n", y, setpoint, c.Info.PreviousOut, u)
+		}
+	} else { // The system is at Optimum state, no action required
+		u = c.Info.PreviousOut
+		//fmt.Printf("Optimum Level \n")
+	}
+
+	// final check of rnew
+	if u < c.Info.Min {
+		u = c.Info.Min
+	}
+	if u > c.Info.Max {
+		u = c.Info.Max
+	}
+
+	//fmt.Printf("[Rate=%.4f -> %.4f], [PC=%.4f -> %.4f]\n", c.Info.PreviousRate, y, c.Info.PreviousOut, u)
+
+	c.Info.PreviousOut = u
+	c.Info.PreviousRate = y
+
+	return u
+}
+
+func (c *Controller) UpdateOld(p ...float64) float64 {
 	u := 0.0
 	setpoint := p[0]
 	y := p[1] // measured arrival rate
