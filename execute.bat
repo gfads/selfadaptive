@@ -21,6 +21,7 @@ set et=Experiment
 rem set et=RootTraining
 rem set et=ZieglerTraining
 set ct=ErrorSquarePIDFull
+rem set ct=ErrorSquarePIDProportional
 rem set ct=BasicPID
 rem set ct=GainScheduling
 rem set ct=HPA

@@ -54,7 +54,7 @@ func configureDockerFile(et, ct, t, f string) map[string]string {
 		"COPY go.mod go.sum ./\n" +
 		"RUN go mod download \n" +
 		"COPY ./ ./ \n" +
-		"RUN CGO_ENABLED=0 GOOS=linux go build -o ./subscriber ./rabbitmq/subscriber/main.go\n" +
+		"RUN CGO_ENABLED=0 GOOS=linux go build -o ./subscriber ./rabbitmq/subscriber/cli.go\n" +
 		"ENV GOROOT=/usr/local/go/bin/\n"
 
 	// command general parameters

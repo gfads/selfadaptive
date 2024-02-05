@@ -32,17 +32,20 @@ type Metrics struct {
 
 func main() {
 	allData := map[string]Metrics{}
-	/*controllers := []string{"hpa-fixed", "mypi-fixed", "mypid-fixed",
-	"pitf10faster-fixed", "pidtf10faster-fixed", "pitf21faster-fixed", "pidtf21faster-fixed",
-	"piziegler-fixed", "pidziegler-fixed", "picohen-fixed", "pidcohen-fixed", "piamigo-fixed",
-	"pidamigo-fixed", "gain-fixed", "astar-fixed",
-	"piddeadzone-fixed","pidsmoothing-fized","pidincrementalform-fixed"}
-	*/
-	controllers := []string{"hpa-variable", "mypi-variable", "mypid-variable",
-		"pitf10faster-variable", "pidtf10faster-variable", "pitf21faster-variable", "pidtf21faster-variable",
-		"piziegler-variable", "pidziegler-variable", "picohen-variable", "pidcohen-variable", "piamigo-variable",
-		"pidamigo-variable", "gain-variable", "astar-variable",
-		"piddeadzone-variable", "pidsmoothing-variable", "pidincrementalform-variable"} //outFile := "all-variable-summary.csv"
+	controllers := []string{"c1-fixed", "c2-fixed", "c3-fixed",
+		"c4-fixed", "c5-fixed", "c6-fixed", "c7-fixed",
+		"c8-fixed", "c9-fixed", "c10-fixed", "c11-fixed", "c12-fixed",
+		"c13-fixed", "c14-fixed", "c15-fixed",
+		"c16-fixed", "c17-fixed", "c18-fixed",
+		"c19-fixed", "c20-fixed"}
+
+	/*controllers := []string{"c1-variable", "c2-variable", "c3-variable",
+	"c4-variable", "c5-variable", "c6-variable", "c7-variable",
+	"c8-variable", "c9-variable", "c10-variable", "c11-variable", "c12-variable",
+	"c13-variable", "c14-variable", "c15-variable",
+	"c16-variable", "c17-variable", "c18-variable",
+	"c19-variable", "c20-variable"}*/
+	//outFile := "all-variable-summary.csv"
 	outFile := "all-fixed-summary.csv"
 
 	for c := 0; c < len(controllers); c++ {
@@ -53,7 +56,14 @@ func main() {
 			data = append(data, d[j])
 		}
 		// calculate metrics
-		allData[controllers[c]] = calcMetrics(data)
+		key := ""
+		if strings.Index(fileName, "-fixed") > 0 {
+			key = strings.Replace(fileName, "-fixed", "", 99)
+		} else {
+			key = strings.Replace(fileName, "-variable", "", 99)
+		}
+		key = strings.Replace(key, "c", "C", 99)
+		allData[key] = calcMetrics(data)
 	}
 	saveMetrics(outFile, allData)
 	fmt.Println("Stats Finished!!!")
@@ -84,12 +94,24 @@ func saveMetrics(fileName string, allData map[string]Metrics) {
 	if err != nil {
 		shared.ErrorHandler(shared.GetFunction(), err.Error())
 	}
-	fmt.Fprintf(outFile, "Controller;RMSE;NMRSE;MAPE;SMAPE;ITAE;IAE;ISE;Control Effort;R2;Goal Range \n")
+	//fmt.Fprintf(outFile, "Controller;RMSE;NMRSE;MAPE;SMAPE;ITAE;IAE;ISE;Control Effort;R2;Goal Range \n")
+
+	fmt.Fprintf(outFile, "Controller&RMSE&NMRSE&Control Effort&Goal Range\n")
 	for k := range allData {
+		/* Excel - csv
 		fmt.Fprintf(outFile, "%v;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f\n", k,
 			allData[k].RMSE, allData[k].NRMSE, allData[k].MAPE, allData[k].SMAPE,
 			allData[k].ITAE, allData[k].IAE, allData[k].ISE, allData[k].CE,
+			allData[k].R2, allData[k].GR)*/
+		// Latex
+		/*fmt.Fprintf(outFile, "%v&%.3f&%.3f&%.3f&%.3f&%.3f&%.3f&%.3f&%.3f&%.3f&%.3f \\\\ \n", k,
+			allData[k].RMSE, allData[k].NRMSE, allData[k].MAPE, allData[k].SMAPE,
+			allData[k].ITAE, allData[k].IAE, allData[k].ISE, allData[k].CE,
 			allData[k].R2, allData[k].GR)
+		fmt.Fprintf(outFile, "\\hline \n")*/
+		fmt.Fprintf(outFile, "%v&%.3f&%.3f&%.0f&%.2f \\\\ \n", k,
+			allData[k].RMSE, allData[k].NRMSE, allData[k].CE, allData[k].GR)
+		fmt.Fprintf(outFile, "\\hline \n")
 	}
 }
 
@@ -261,7 +283,7 @@ func nmrse(d []Data) float64 {
 	n := len(d)
 
 	// find max and min
-	max := 0.0
+	/*max := 0.0
 	min := 10000000.0
 	for i := 0; i < n; i++ {
 		if d[i].Rate < min {
@@ -270,9 +292,15 @@ func nmrse(d []Data) float64 {
 		if d[i].Rate > max {
 			max = d[i].Rate
 		}
-	}
-	r := rmse(d) / (max - min)
+	}*/
 
+	s := 0.0
+	for i := 0; i < n; i++ {
+		s += d[i].Rate
+	}
+	m := s / float64(n)
+	//r := rmse(d) / (max - min)
+	r := rmse(d) / m
 	return r
 }
 

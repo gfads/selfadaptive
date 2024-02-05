@@ -11,18 +11,20 @@ C9;picohen: "-kp=0.00153191", "-ki=0.00559267", "-kd=0.00000000"
 C10;pidcohen; "-kp=0.00064080", "-ki=0.00060662", "-kd=0.00008176"
 C11;piamigo: "-kp=0.00029493", "-ki=0.00080617", "-kd=0.00000000"
 C12;pidamigo; "-kp=0.00041533", "-ki=0.00087393", "-kd=0.00005192"
-C13;gain-1(AMIGO);"-kp=0.00041533", "-ki=0.00087393", "-kd=0.00005192"
-C13;gain-2(AMIGO);"-kp=0.00041533" * 2.0, "-ki=0.00087393", "-kd=0.00005192"
-C14;astar;Hysteresis-band=50
-C15; hpa;
-C16;piddeadzone-fixed;-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
-C16;piddeadzone-variable;-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
-C17;pidsmoothing-fixed (my pid gains);-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
-C17;pidsmoothing-variable (my pid gains);-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
-C18; pidincrementalform-variable;"-kp=-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
-C18; pidincrementalform-fixed;"-kp=-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
-
-C19;piderrorsquarefull-variable;"-kp=-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
+C13;piddeadzone-fixed;-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
+C13;piddeadzone-variable;-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
+C14;pidsmoothing-fixed (my pid gains);-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
+C14;pidsmoothing-variable (my pid gains);-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
+C15; pidincrementalform-variable;"-kp=-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
+C15; pidincrementalform-fixed;"-kp=-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
+C16;piderrorsquarefull-variable;"-kp=-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
+C16;piderrorsquarefull-fixed;"-kp=-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
+C17;piderrorsquareproportional-variable;"-kp=-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
+C17;piderrorsquareproportional-fixed;"-kp=-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
+C18;gain-1(AMIGO);"-kp=0.00041533", "-ki=0.00087393", "-kd=0.00005192"
+C18;gain-2(AMIGO);"-kp=0.00041533" * 2.0, "-ki=0.00087393", "-kd=0.00005192"
+C19;astar;Hysteresis-band=50
+C20; hpa;
 
 [DISCARDED]
 
