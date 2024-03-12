@@ -109,6 +109,5 @@ func NewController(p parameters.ExecutionParameters) IController {
 		fmt.Println(shared.GetFunction(), "Error: Controller type ´", *p.ControllerType, "´ is unknown!")
 		os.Exit(0)
 	}
-
 	return *new(IController)
 }

@@ -19,12 +19,12 @@ ax1.tick_params(axis='y', labelcolor=color)
 ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 
 color = 'blue'
-ax2.set_ylabel('rate(msg/s)', color=color)  # we already handled the x-label with ax1
+ax2.set_ylabel('y(msg/s)', color=color)  # we already handled the x-label with ax1
 ax2.scatter(t, data2, color=color,marker=".")
 ax2.tick_params(axis='y', labelcolor=color)
 
 fig.tight_layout()  # otherwise the right y-label is slightly clipped
 
-fig.savefig("/content/drive/MyDrive/research/publications/journals/2023-jpdc/fig-ramp-training.pdf")
+fig.savefig("/content/drive/MyDrive/research/publications/journals/2024-jpdc/fig-ramp-training.pdf")
 
 plt.show()

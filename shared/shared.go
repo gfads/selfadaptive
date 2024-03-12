@@ -201,7 +201,7 @@ const None = "None"
 const MinOnoff = 10
 const MaxOnoff = 600
 
-//const MonitorTime = 30 // seconds
+const MonitorTime = 1 // seconds
 const NumberOfColors = 7
 const ColorReset = "\033[0m"
 const DeltaTime = 5 // see page 103

@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
+	"main.go/controllers/hpa"
 	"math/rand"
-	"selfadaptive/controllers/onoff"
 	"time"
 )
 
+var Setpoint int = 500
+
 func main() {
 
-	ch := make(chan time.Duration)
+	ch := make(chan int)
 
 	go ManagedSystem(ch)
 	go ManagingSystem(ch)
@@ -17,28 +19,33 @@ func main() {
 	fmt.Scanln()
 }
 
-func ManagingSystem(ch chan time.Duration) {
-	c := onoff.OnOff{}
+func ManagingSystem(ch chan int) {
+	//c := onoffbasic.Controller{}
+	//c.Initialise(-1, 100, 1000)
+	//c := basicpid.Controller{}
+	//c.Initialise(-1, 100, 1000, 2, 1, 0)
+	c := hpa.Controller{}
+	c.Initialise(-1, 100, 1000, 100)
 
 	for {
-		t := <-ch
-		ch <- c.Update(t, 590*time.Millisecond)
+		y := <-ch
+		ch <- int(c.Update(float64(Setpoint), float64(y)))
 		time.Sleep(5000 * time.Millisecond)
 	}
 }
 
-func ManagedSystem(ch chan time.Duration) {
-
-	t := time.Millisecond * time.Duration(rand.Intn(1000))
+func ManagedSystem(ch chan int) {
+	var u int
 
 	for {
+		y := rand.Intn(1000)
 		select {
-		case ch <- t:
-			t = <-ch
-			//fmt.Println(t.Milliseconds())
+		case ch <- y:
+			u = <-ch
+			//fmt.Println(u)
 		default:
 		}
 		fmt.Print("+")
-		time.Sleep(t)
+		time.Sleep(time.Millisecond * time.Duration(u))
 	}
 }

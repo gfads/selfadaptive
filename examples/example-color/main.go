@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"main.go/shared"
 	"math/rand"
-	"selfadaptive/shared"
 	"time"
 )
 

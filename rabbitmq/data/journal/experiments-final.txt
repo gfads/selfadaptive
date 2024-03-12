@@ -17,14 +17,14 @@ C14;pidsmoothing-fixed (my pid gains);-0.00174506", "-ki=0.00423043", "-kd=0.000
 C14;pidsmoothing-variable (my pid gains);-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
 C15; pidincrementalform-variable;"-kp=-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
 C15; pidincrementalform-fixed;"-kp=-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
-C16;piderrorsquarefull-variable;"-kp=-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
-C16;piderrorsquarefull-fixed;"-kp=-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
-C17;piderrorsquareproportional-variable;"-kp=-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
-C17;piderrorsquareproportional-fixed;"-kp=-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
-C18;gain-1(AMIGO);"-kp=0.00041533", "-ki=0.00087393", "-kd=0.00005192"
-C18;gain-2(AMIGO);"-kp=0.00041533" * 2.0, "-ki=0.00087393", "-kd=0.00005192"
-C19;astar;Hysteresis-band=50
-C20; hpa;
+[REMOVED]CXX;piderrorsquarefull-variable;"-kp=-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
+[REMOVED]CXX;piderrorsquarefull-fixed;"-kp=-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
+[REMOVED]CYY;piderrorsquareproportional-variable;"-kp=-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
+[REMOVED]CYY;piderrorsquareproportional-fixed;"-kp=-0.00174506", "-ki=0.00423043", "-kd=0.00098382"
+C16;gain-1(AMIGO);"-kp=0.00041533", "-ki=0.00087393", "-kd=0.00005192"
+C16;gain-2(AMIGO);"-kp=0.00041533" * 2.0, "-ki=0.00087393", "-kd=0.00005192"
+C17;astar;Hysteresis-band=50
+C18; hpa;
 
 [DISCARDED]
 

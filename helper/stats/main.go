@@ -36,17 +36,16 @@ func main() {
 		"c4-fixed", "c5-fixed", "c6-fixed", "c7-fixed",
 		"c8-fixed", "c9-fixed", "c10-fixed", "c11-fixed", "c12-fixed",
 		"c13-fixed", "c14-fixed", "c15-fixed",
-		"c16-fixed", "c17-fixed", "c18-fixed",
-		"c19-fixed", "c20-fixed"}
+		"c16-fixed", "c17-fixed", "c18-fixed"}
 
 	/*controllers := []string{"c1-variable", "c2-variable", "c3-variable",
 	"c4-variable", "c5-variable", "c6-variable", "c7-variable",
 	"c8-variable", "c9-variable", "c10-variable", "c11-variable", "c12-variable",
 	"c13-variable", "c14-variable", "c15-variable",
-	"c16-variable", "c17-variable", "c18-variable",
-	"c19-variable", "c20-variable"}*/
-	//outFile := "all-variable-summary.csv"
+	"c16-variable", "c17-variable", "c18-variable"}
+	*/
 	outFile := "all-fixed-summary.csv"
+	//outFile := "all-variable-summary.csv"
 
 	for c := 0; c < len(controllers); c++ {
 		data := []Data{}
@@ -96,7 +95,10 @@ func saveMetrics(fileName string, allData map[string]Metrics) {
 	}
 	//fmt.Fprintf(outFile, "Controller;RMSE;NMRSE;MAPE;SMAPE;ITAE;IAE;ISE;Control Effort;R2;Goal Range \n")
 
-	fmt.Fprintf(outFile, "Controller&RMSE&NMRSE&Control Effort&Goal Range\n")
+	// LATEX
+	//fmt.Fprintf(outFile, "Controller & RMSE & NMRSE & ITAE & Goal Range\n")
+	// EXCEL
+	fmt.Fprintf(outFile, "Controller ; RMSE ; NMRSE ; ITAE ; Goal Range\n")
 	for k := range allData {
 		/* Excel - csv
 		fmt.Fprintf(outFile, "%v;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f;%.6f\n", k,
@@ -109,9 +111,11 @@ func saveMetrics(fileName string, allData map[string]Metrics) {
 			allData[k].ITAE, allData[k].IAE, allData[k].ISE, allData[k].CE,
 			allData[k].R2, allData[k].GR)
 		fmt.Fprintf(outFile, "\\hline \n")*/
-		fmt.Fprintf(outFile, "%v&%.3f&%.3f&%.0f&%.2f \\\\ \n", k,
-			allData[k].RMSE, allData[k].NRMSE, allData[k].CE, allData[k].GR)
-		fmt.Fprintf(outFile, "\\hline \n")
+		// LATEX
+		//fmt.Fprintf(outFile, "%v&%.3f&%.3f&%.0f&%.2f \\\\ \n", k, allData[k].RMSE, allData[k].NRMSE, allData[k].ITAE, allData[k].GR)
+		//fmt.Fprintf(outFile, "\\hline \n")
+		// EXCEL
+		fmt.Fprintf(outFile, "%v;%.3f;%.3f;%.0f;%.2f \n", k, allData[k].RMSE, allData[k].NRMSE, allData[k].ITAE, allData[k].GR)
 	}
 }
 
