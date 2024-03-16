@@ -153,6 +153,7 @@ const DockerFileZiegler = "Dockerfile-ziegler"
 
 // Controller type names
 
+const Fuzzy = "Fuzzy"
 const AsTAR = "AsTAR"
 const HPA = "HPA"
 const BasicOnoff = "OnOff"
