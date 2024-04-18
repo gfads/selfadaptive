@@ -8,7 +8,7 @@ package mnged
 
 import (
 	"fmt"
-	"selfadaptive/shared"
+	"main.go/shared"
 )
 
 type ManagedElement struct {

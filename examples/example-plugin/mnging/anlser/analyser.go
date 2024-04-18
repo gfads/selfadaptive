@@ -10,7 +10,7 @@ Date: 19/03/2023
 package anlser
 
 import (
-	"selfadaptive/shared"
+	"main.go/shared"
 )
 
 type Analyser struct{}

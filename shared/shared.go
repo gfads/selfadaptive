@@ -37,7 +37,7 @@ const T = 0.1   // original
 //var RandomGoals = []float64{800, 1600, 2400, 3200, 4000, 4800}
 //var RandomGoals = []float64{800, 2400, 1600}
 //var RandomGoals = []float64{800, 2400, 1600, 800, 2400, 1600} // variable final
-var RandomGoals = []float64{2400} // fixed final
+var RandomGoals = []float64{800, 2400, 1600, 800, 2400, 1600} // fixed final
 //var RandomGoals = []float64{1000}
 
 //var RandomGoals = []float64{1000}
@@ -120,7 +120,7 @@ const MaximumNrmse = 0.30
 const WarmupTime = 30 // seconds
 const TrainingAttempts = 30
 
-const SizeOfSameLevel = 300       // used in the experiments
+const SizeOfSameLevel = 3         // used in the experiments
 const SizeOfSameLevelZiegler = 30 // used in the experiments
 //const SizeOfSameLevel = 50 // used in the experiments
 //const SizeOfSameLevel = 100 // used in the experiments

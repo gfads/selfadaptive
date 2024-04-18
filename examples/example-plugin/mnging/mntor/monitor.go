@@ -1,9 +1,9 @@
 package mntor
 
 import (
-	"selfadaptive/examples/example-plugin/envrnment"
-	"selfadaptive/examples/example-plugin/mnging/knwldge"
-	"selfadaptive/shared"
+	"main.go/examples/example-plugin/envrnment"
+	"main.go/examples/example-plugin/mnging/knwldge"
+	"main.go/shared"
 	"strconv"
 	"time"
 )

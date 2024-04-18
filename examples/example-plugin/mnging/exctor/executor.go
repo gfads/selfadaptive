@@ -7,8 +7,8 @@ Date: 28/02/2023
 package exctor
 
 import (
-	"selfadaptive/examples/example-plugin/mnging/knwldge"
-	"selfadaptive/shared"
+	"main.go/examples/example-plugin/mnging/knwldge"
+	"main.go/shared"
 )
 
 type Executor struct{}

@@ -8,10 +8,10 @@ package main
 
 import (
 	"fmt"
-	"selfadaptive/examples/example-plugin/envrnment"
-	"selfadaptive/examples/example-plugin/mnged"
-	"selfadaptive/examples/example-plugin/mnging"
-	"selfadaptive/shared"
+	"main.go/examples/example-plugin/envrnment"
+	"main.go/examples/example-plugin/mnged"
+	"main.go/examples/example-plugin/mnging"
+	"main.go/shared"
 )
 
 func main() {

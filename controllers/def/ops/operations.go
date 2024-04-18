@@ -10,6 +10,7 @@ import (
 	"fmt"
 	algorithm "main.go/controllers/astar"
 	"main.go/controllers/def/parameters"
+	"main.go/controllers/fuzzy"
 	gainscheduling "main.go/controllers/gain"
 	"main.go/controllers/hpa"
 	onoffbasic "main.go/controllers/onoff/basic"
@@ -104,6 +105,10 @@ func NewController(p parameters.ExecutionParameters) IController {
 	case shared.SetpointWeighting:
 		c := setpointweighting.Controller{}
 		c.Initialise(*p.Direction, *p.Min, *p.Max, *p.Kp, *p.Ki, *p.Kd, *p.Alfa, *p.Beta)
+		return &c
+	case shared.Fuzzy:
+		c := fuzzy.Controller{}
+		c.Initialise()
 		return &c
 	default:
 		fmt.Println(shared.GetFunction(), "Error: Controller type ´", *p.ControllerType, "´ is unknown!")

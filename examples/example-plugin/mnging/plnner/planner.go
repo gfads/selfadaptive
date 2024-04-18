@@ -5,7 +5,7 @@ Date: 28/02/2023
 *********************************************************************************/
 package plnner
 
-import "selfadaptive/shared"
+import "main.go/shared"
 
 type Planner struct{}
 

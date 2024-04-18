@@ -1,12 +1,12 @@
 package mnging
 
 import (
-	"selfadaptive/examples/example-plugin/envrnment"
-	"selfadaptive/examples/example-plugin/mnging/anlser"
-	"selfadaptive/examples/example-plugin/mnging/exctor"
-	"selfadaptive/examples/example-plugin/mnging/mntor"
-	"selfadaptive/examples/example-plugin/mnging/plnner"
-	"selfadaptive/shared"
+	"main.go/examples/example-plugin/envrnment"
+	"main.go/examples/example-plugin/mnging/anlser"
+	"main.go/examples/example-plugin/mnging/exctor"
+	"main.go/examples/example-plugin/mnging/mntor"
+	"main.go/examples/example-plugin/mnging/plnner"
+	"main.go/shared"
 )
 
 type ManagingSystem struct {
