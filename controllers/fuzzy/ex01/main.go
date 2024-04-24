@@ -10,6 +10,13 @@ func triangularMF(x float64, a float64, b float64, c float64) float64 {
 	return math.Max(0, math.Min((x-a)/(b-a), (c-x)/(c-b)))
 }
 
+func gaussianMF(x float64, m float64, d float64) float64 {
+	temp := -math.Pow(x-m, 2.0) / 2.0 * math.Pow(d, 2.0)
+	r := math.Exp(temp)
+
+	return r
+}
+
 // Rectangular membership function
 func rectangularMF(x float64, a float64, b float64) float64 {
 	if x >= a && x <= b {
@@ -42,19 +49,11 @@ func piMF(x float64, a float64, b float64, c float64, d float64) float64 {
 	}
 }
 
-// Trapezoidal membership function
 func trapezoidalMF(x float64, a float64, b float64, c float64, d float64) float64 {
-	if x < a || x > d {
-		return 0
-	} else if x >= b && x <= c {
-		return 1
-	} else if x >= a && x < b {
-		return (x - a) / (b - a)
-	} else if x > c && x <= d {
-		return (d - x) / (d - c)
-	} else {
-		return 1
-	}
+	min1 := math.Min(x-a/b-a, 1.0)
+	r := math.Max(math.Min(min1, d-x/d-c), 0.0)
+
+	return r
 }
 
 // Define fuzzy rules
@@ -79,4 +78,8 @@ func main() {
 	input := 7.8
 	output := fuzzyRules(input)
 	fmt.Printf("Input: %f, Output: %f\n", input, output)
+
+	for i := 0; i > -120; i -= 1 {
+		fmt.Printf("%v %.2f\n", i, gaussianMF(float64(i), -100.0, -0.1))
+	}
 }

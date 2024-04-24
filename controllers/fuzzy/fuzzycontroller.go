@@ -10,6 +10,20 @@ type Controller struct {
 	Info info.Controller
 }
 
+const EXTREMELYPOSITIVE = "EP"
+const LARGEPOSITIVE = "LP" // Large Positive
+const SMALLPOSITIVE = "SP" // Small Positive
+const ZERO = "ZE"          // Zero
+const SMALLNEGATIVE = "SN" // Smal Negative
+const LARGENEGATIVE = "LN" // Large Negative
+const EXTREMELYNEGATIVE = "EN"
+
+const LARGEINCREASE = "LI"  // Large Positive
+const SMALLINCREASE = "SI"  // Small Positive
+const MAINTAIN = "MAINTAIN" // Zero
+const SMALLDECREASE = "SD"  // Small Negative
+const LARGEDECREASE = "LD"  // Large Negative
+
 func (c *Controller) Initialise(p ...float64) {
 
 	/*
@@ -25,129 +39,127 @@ func (c *Controller) Initialise(p ...float64) {
 	//c.Info.OutputSet.Width = p[3]
 }
 
-// Define membership functions
-func triangularMF(x float64, a float64, b float64, c float64) float64 {
-	return math.Max(0, math.Min((math.Min((x-a)/(b-a), (c-x)/(c-b))), 1))
-}
+func centroidDeffuzification(mx, output []float64) float64 {
 
-func maxMembershipDefuzzification(heaterIncrease float64, heaterMaintain float64, heaterDecrease float64) float64 {
-	max := math.Max(heaterIncrease, math.Max(heaterMaintain, heaterDecrease))
+	numerator := 0.0
+	denominator := 0.0
 
-	switch max {
-	case heaterIncrease:
-		return 10
-	case heaterMaintain:
-		return 5
-	default:
-		return 0
+	for i := 0; i < len(mx); i++ {
+		numerator = numerator + mx[i]*output[i]
+		denominator = denominator + mx[i]
 	}
-}
-
-func weightedAverageDefuzzification(heaterIncrease float64, heaterMaintain float64, heaterDecrease float64) float64 {
-	weightedSum := (heaterIncrease*10 + heaterMaintain*5 + heaterDecrease*0)
-	sum := heaterIncrease + heaterMaintain + heaterDecrease
-
-	if sum == 0 {
-		return 0
-	}
-
-	return weightedSum / sum
-}
-
-// Trapezoidal membership function
-func trapezoidalMF(x float64, a float64, b float64, c float64, d float64) float64 {
-	if x < a || x > d {
-		return 0
-	} else if x >= b && x <= c {
-		return 1
-	} else if x >= a && x < b {
-		return (x - a) / (b - a)
-	} else if x > c && x <= d {
-		return (d - x) / (d - c)
-	} else {
-		return 1
-	}
-}
-
-// Pi-shaped membership function
-func piMF(x float64, a float64, b float64, c float64, d float64) float64 {
-	if x < a || x > d {
-		return 0
-	} else if x >= a && x <= b {
-		return (x - a) / (b - a)
-	} else if x >= c && x <= d {
-		return (d - x) / (d - c)
-	} else {
-		return 1
-	}
-}
-
-// Fuzzification: Fuzzy input mapping
-func fuzzification(goal, rate float64) (float64, float64, float64, float64, float64, float64, float64) {
-
-	bl := triangularMF(rate, goal*0.0, goal*0.25, 0.50*goal)
-	ml := triangularMF(rate, goal*0.25, goal*0.50, 0.75*goal)
-	sl := triangularMF(rate, goal*0.50, goal*0.75, goal)
-	moderate := triangularMF(rate, goal*0.75, goal, goal*1.25)
-	sh := triangularMF(rate, goal, goal*1.25, goal*1.50)
-	mh := triangularMF(rate, goal*1.25, goal*1.50, goal*1.75)
-	bh := triangularMF(rate, goal*1.50, goal*1.75, goal*2.0)
-
-	/*bl := rampMF(rate, goal*0.10, 0.50*goal)
-	ml := rampMF(rate, goal*0.25, 0.75*goal)
-	sl := rampMF(rate, goal*0.50, goal)
-	moderate := rampMF(rate, goal*0.75, goal*1.25)
-	sh := rampMF(rate, goal, goal*1.50)
-	mh := rampMF(rate, goal*1.25, goal*1.75)
-	bh := rampMF(rate, goal*1.50, goal*2.0)
-	*/
-	/*
-		bl := piMF(rate, goal*0.10, goal*0.20, goal*0.30, 0.40*goal)
-		ml := piMF(rate, goal*0.30, goal*0.40, goal*0.50, 0.60*goal)
-		sl := piMF(rate, goal*0.50, goal*0.60, goal*0.70, goal*0.80)
-		moderate := piMF(rate, goal*0.70, goal*0.80, goal*0.90, goal)
-		sh := piMF(rate, goal*0.90, goal, goal*1.10, goal*1.20)
-		mh := piMF(rate, goal*1.10, goal*1.20, goal*1.30, goal*1.40)
-		bh := piMF(rate, goal*1.30, goal*1.40, goal*1.50, goal*1.60)
-	*/
-	/*
-		bl := trapezoidalMF(rate, goal*0.10, goal*0.25, goal*0.35, 0.5*goal)
-		ml := trapezoidalMF(rate, goal*0.25, goal*0.50, goal*0.60, 0.75*goal)
-		sl := trapezoidalMF(rate, goal*0.50, goal*0.75, goal*0.85, goal)
-		moderate := trapezoidalMF(rate, goal*0.75, goal, goal*1.10, goal*1.25)
-		sh := trapezoidalMF(rate, goal, goal*1.25, goal*1.35, goal*1.50)
-		mh := trapezoidalMF(rate, goal*1.25, goal*1.50, goal*1.60, goal*1.75)
-		bh := trapezoidalMF(rate, goal*1.50, goal*1.75, goal*1.85, goal*2.0)
-	*/
-	return bl, ml, sl, moderate, sh, mh, bh
-}
-
-func centroidDefuzzification(pcbl, pcml, pcsl, pcmoderate, pcsh, pcmh, pcbh float64) float64 {
-	r := 0.0
-	//numerator := pcbl*4.0 + pcml*3.0 + pcsl*2.0 + pcmoderate + pcsh/2.0 + pcmh/4.0 + pcbh/8.0 //initial
-	numerator := pcbl*4 + pcml*3 + pcsl*2 + pcmoderate + pcsh/2.0 + pcmh/4.0 + pcbh/6.0
-	denominator := pcbl + pcml + pcsl + pcmoderate + pcsh + pcmh + pcbh
-
-	//fmt.Println("Deffuzification: ", numerator, denominator)
+	u := 0.0
 	if denominator == 0 {
-		r = 1.0 // minumum PC
+		u = 1
 	} else {
-		r = numerator / denominator
+		u = numerator / denominator
 	}
-
-	if math.Round(r) == 0 {
-		r = 1
-	}
-
-	return math.Round(r)
+	return u
 }
 
-func fuzzyRules(fr1 float64, fr2 float64, fr3 float64) (float64, float64, float64) {
-	fpc1 := fr1
-	fpc2 := fr2
-	fpc3 := fr3
+func applyRules(e map[string]float64) ([]float64, []float64) {
 
-	return fpc1, fpc2, fpc3
+	mx := []float64{}
+	output := []float64{}
+
+	// Rule 1:  IF e = LARGEPOSITIVE THEN output = LARGEINCREASE
+	eR := e[LARGEPOSITIVE]
+	//dR := d[ZE]
+	//m1 := math.Min(eR, dR)
+	m1 := eR
+	o1 := getMaxOutput(LARGEINCREASE)
+	mx = append(mx, m1)
+	output = append(output, o1)
+
+	// Rule 2:  IF e = SMALLPOSITIVE THEN output = SMALLINCREASE
+	eR = e[SMALLPOSITIVE]
+	//dR = d[SP]
+	//m2 := math.Min(eR, dR)
+	m2 := eR
+	o2 := getMaxOutput(SMALLINCREASE)
+	mx = append(mx, m2)
+	output = append(output, o2)
+
+	// Rule 3:  IF e = ZE THEN output = MAINTAIN
+	eR = e[ZERO]
+	//dR = d[SN]
+	//m3 := math.Min(eR, dR)
+	m3 := eR
+	o3 := getMaxOutput(MAINTAIN)
+	mx = append(mx, m3)
+	output = append(output, o3)
+
+	// Rule 4:  IF e = SN THEN output = SMALLPC
+	eR = e[SMALLNEGATIVE]
+	//dR = d[LP]
+	//m4 := math.Max(eR, dR)
+	m4 := eR
+	o4 := getMaxOutput(SMALLDECREASE)
+	mx = append(mx, m4)
+	output = append(output, o4)
+
+	// Rule 5:  IF e = LN THEN output = LARGEPC
+	eR = e[LARGENEGATIVE]
+	//dR = d[LP]
+	//m4 := math.Max(eR, dR)
+	m5 := eR
+	o5 := getMaxOutput(LARGEDECREASE)
+	mx = append(mx, m5)
+	output = append(output, o5)
+
+	// Rule 6:  IF e = EXTREMELYPOSITIVE THEN output = LARGEINCREASE
+	eR = e[EXTREMELYPOSITIVE]
+	//dR = d[LP]
+	//m4 := math.Max(eR, dR)
+	m6 := eR
+	o6 := getMaxOutput(LARGEINCREASE)
+	mx = append(mx, m6)
+	output = append(output, o6)
+
+	// Rule 7:  IF e = EXTREMELYNEGATIVE THEN output = LARGEDECREASE
+	eR = e[EXTREMELYNEGATIVE]
+	//dR = d[LP]
+	//m4 := math.Max(eR, dR)
+	m7 := eR
+	o7 := getMaxOutput(LARGEDECREASE)
+	mx = append(mx, m7)
+	output = append(output, o7)
+
+	return mx, output
+}
+
+func fuzzyficationInput(x float64) map[string]float64 {
+
+	r := map[string]float64{}
+	/*
+		r[EXTREMELYPOSITIVE] = triangularMF(x, 1250, 5000, 10000)
+		r[LARGEPOSITIVE] = triangularMF(x, 500, 1250, 2000)          //500,750,1000
+		r[SMALLPOSITIVE] = triangularMF(x, 0, 625, 1250)             // 0, 500,1000
+		r[ZERO] = triangularMF(x, -500, 0, 500)                      // -500,0,500
+		r[SMALLNEGATIVE] = triangularMF(x, -1250, -625, 0)           //-1000,-500,0
+		r[LARGENEGATIVE] = triangularMF(x, -2000, -1250, -500)       // -1000,-750,-500
+		r[EXTREMELYNEGATIVE] = triangularMF(x, -1250, -5000, -10000) // -1000,-750,-500
+	*/
+
+	r[EXTREMELYPOSITIVE] = gaussianMF(x, 5000.0, 0.01)
+	r[LARGEPOSITIVE] = gaussianMF(x, 1250.0, 0.01)      //500,750,1000
+	r[SMALLPOSITIVE] = gaussianMF(x, 625.0, 0.01)       // 0, 500,1000
+	r[ZERO] = gaussianMF(x, 0.0, 0.01)                  // -500,0,500
+	r[SMALLNEGATIVE] = gaussianMF(x, -625.0, 0.01)      //-1000,-500,0
+	r[LARGENEGATIVE] = gaussianMF(x, -1250.0, 0.01)     // -1000,-750,-500
+	r[EXTREMELYNEGATIVE] = gaussianMF(x, -5000.0, 0.01) // -1000,-750,-500
+
+	/*
+		r[EXTREMELYPOSITIVE] = piMF(x, 1250, 2500, 5000, 10000)
+		r[LARGEPOSITIVE] = piMF(x, 500, 250, 1750, 2000)            //500,750,1000
+		r[SMALLPOSITIVE] = piMF(x, 0, 250, 1000, 1250)              // 0, 500,1000
+		r[ZERO] = piMF(x, -500, -250, 250, 500)                     // -500,0,500
+		r[SMALLNEGATIVE] = piMF(x, -1250, -1000, -250, 0)           //-1000,-500,0
+		r[LARGENEGATIVE] = piMF(x, -2000, -1750, -250, -500)        // -1000,-750,-500
+		r[EXTREMELYNEGATIVE] = piMF(x, -10000, -5000, -2500, -1250) // -1000,-750,-500
+	*/
+	//fmt.Println(r[LP], r[SP], r[ZE], r[SN], r[LN])
+	return r
 }
 
 func (c *Controller) Update(p ...float64) float64 {
@@ -155,28 +167,23 @@ func (c *Controller) Update(p ...float64) float64 {
 	rate := p[1]
 
 	// Fuzzification
-	bl, ml, sl, moderate, sh, mh, bh := fuzzification(goal, rate)
+	// fuzzyfication
+	e := goal - rate
 
-	//fmt.Printf("%.2f [%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f] \n", rate, bl, ml, sl, moderate, sh, mh, bh)
+	fuzzifiedSetError := fuzzyficationInput(e)
+	//fuzzifiedSetDelta := fuzzyficationInput(d)
 
-	// Fuzzy Rules
-	pcbl := bl
-	pcml := ml
-	pcsl := sl
-	pcmoderate := moderate
-	pcsh := sh
-	pcmh := mh
-	pcbh := bh
+	// apply rules
+	mx, output := applyRules(fuzzifiedSetError)
 
-	//outputFuzzy := fuzzyRules(inputFuzzy)
+	// Deffuzification
+	u := centroidDeffuzification(mx, output)
 
-	// Defuzzification
-	u := centroidDefuzzification(pcbl, pcml, pcsl, pcmoderate, pcsh, pcmh, pcbh)
+	//fmt.Printf("Fuzzy Controller: %.2f\n", u)
 	return u
 }
 
-func (c *Controller) SetGains(p ...float64) {
-}
+func (c *Controller) SetGains(p ...float64) {}
 
 func rampMF(x float64, a float64, b float64) float64 {
 	if x <= a {
@@ -186,4 +193,90 @@ func rampMF(x float64, a float64, b float64) float64 {
 	} else {
 		return (x - a) / (b - a)
 	}
+}
+
+func gaussianMF(x float64, m float64, d float64) float64 {
+	temp := -math.Pow(x-m, 2.0) / 2.0 * math.Pow(d, 2.0)
+	r := math.Exp(temp)
+
+	return r
+}
+
+func piMF(x float64, a float64, b float64, c float64, d float64) float64 {
+	r := 0.0
+
+	if x <= a {
+		r = 0.0
+	}
+	if a <= x && x <= ((a+b)/2.0) {
+		r = 2 * math.Pow((x-a)/(b-a), 2.0)
+	}
+	if b <= x && x <= c {
+		r = 1
+	}
+	if c <= x && x <= ((c+d)/2.0) {
+		r = 1 - 2*math.Pow((x-c)/(d-c), 2.0)
+	}
+	if (c+d)/2 <= x && x <= d {
+		r = 2 * math.Pow((x-d)/(d-c), 2.0)
+	}
+	if x >= d {
+		r = 0
+	}
+
+	return r
+}
+
+func triangularMF(x float64, a float64, b float64, c float64) float64 {
+	return math.Max(0, math.Min((x-a)/(b-a), (c-x)/(c-b)))
+}
+
+// Trapezoidal membership function
+func trapezoidalMF(x float64, a float64, b float64, c float64, d float64) float64 {
+	min1 := math.Min(x-a/b-a, 1)
+	r := math.Max(math.Min(min1, d-x/d-c), 0)
+
+	return r
+}
+
+func fuzzyficationOutput(n float64) map[string]float64 {
+
+	r := map[string]float64{}
+
+	r[LARGEINCREASE] = gaussianMF(n, 2.0, 0.01)
+	r[SMALLINCREASE] = gaussianMF(n, 1.0, 0.01)
+	r[MAINTAIN] = gaussianMF(n, 0.0, 0.01)
+	r[SMALLDECREASE] = gaussianMF(n, -1.0, 0.01)
+	r[LARGEDECREASE] = gaussianMF(n, -2.0, 0.01)
+
+	/*
+		r[LARGEINCREASE] = triangularMF(n, 2.0, 3.0, 4.0)
+		r[SMALLINCREASE] = triangularMF(n, 1.0, 2.0, 3.0)
+		r[MAINTAIN] = triangularMF(n, 1.0, 0.0, -1.0)
+		r[SMALLDECREASE] = triangularMF(n, -1.0, -2.0, -3.0)
+		r[LARGEDECREASE] = triangularMF(n, -2.0, -3.0, -4.0)
+	*/
+	/*
+		r[LARGEINCREASE] = trapezoidalMF(n, 2.0, 2.5, 3.5, 4.0)
+		r[SMALLINCREASE] = trapezoidalMF(n, 1.0, 1.5, 2.5, 3.0)
+		r[MAINTAIN] = trapezoidalMF(n, -1.0, -0.5, 0.5, 1.0)
+		r[SMALLDECREASE] = trapezoidalMF(n, -3.0, -2.5, -1.5, -1.0)
+		r[LARGEDECREASE] = trapezoidalMF(n, -4.0, -3.5, -2.5, -3.0)
+	*/
+	return r
+}
+
+func getMaxOutput(s string) float64 {
+	r := 0.0
+	max := -10000.0
+
+	for i := -4.0; i <= 5.0; i += 1.0 {
+		v := fuzzyficationOutput(i)
+		//fmt.Println(i, "->", v[ONEPC], v[SMALLPC], v[MEDIUMPC], v[LARGEPC], v[VERYLARGEPC])
+		if v[s] > max {
+			max = v[s]
+			r = i
+		}
+	}
+	return r
 }

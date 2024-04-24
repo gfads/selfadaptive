@@ -31,7 +31,8 @@ func main() {
 	e.Validate(p) // TODO
 
 	// show parameters
-	e.Show(p)
+	//e.Show(p)
+	fmt.Println(p)
 
 	// create new consumer
 	var consumer = NewConsumer(*p.ExecutionType, *p.PrefetchCount)
@@ -188,7 +189,6 @@ func (c Subscriber) RunNonAdaptiveMonitored(startTimer, stopTimer chan bool, p p
 }
 
 func (c Subscriber) RunClosedLoop(startTimer, stopTimer chan bool, toAdapter chan shared.SubscriberToAdapter, fromAdapter chan int, f *os.File) {
-
 	count := 0
 	var t1, t2 time.Time
 
@@ -215,8 +215,8 @@ func (c Subscriber) RunClosedLoop(startTimer, stopTimer chan bool, toAdapter cha
 			// re-initialise message counter
 			count = 0
 
-			// receive new pc from adaptation logic
-			c.PC = <-fromAdapter
+			// receive new update to pc from adaptation logic
+			c.PC = <-fromAdapter // non-fuzzy controller
 
 			// configure new pc
 			err := c.Ch.Qos(

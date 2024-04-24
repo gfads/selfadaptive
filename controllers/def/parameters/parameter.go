@@ -49,7 +49,7 @@ func (e ExecutionParameters) Load() ExecutionParameters {
 	p.Alfa = flag.Float64("alfa", 1.0, "Alfa is a float (Setpoint Weighting)")
 	p.Beta = flag.Float64("beta", 1.0, "Beta is a float (Setpoint Weighting / Two degrees of freedom)")
 	p.Tunning = flag.String("tunning", "RootLocus", "tunning-type is a string")
-	p.OutputFile = flag.String("output-file", "apague1.csv", "output-file is a string")
+	p.OutputFile = flag.String("output-file", "apague", "output-file is a string")
 	//flag.Parse()
 
 	return p

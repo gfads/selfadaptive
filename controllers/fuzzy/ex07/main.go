@@ -3,199 +3,158 @@ package main
 import (
 	"fmt"
 	"math"
-	"os"
 )
 
-const LP = "LP"
-const SP = "SP"
-const ZE = "ZE"
-const SN = "SN"
-const LN = "LN"
-
-type X struct {
-	Name   string
-	Input  float64
-	Output float64
-}
+const LP = "LP" // Large Positive
+const SP = "SP" // Small Positive
+const ZE = "ZE" // Zero
+const SN = "SN" // Smal Negative
+const LN = "LN" // Large Negative
 
 func main() {
-	//FuzzySet := []string{LP, SP, ZE, SN, LN}
+	//fuzzySet := []string{LP, SP, ZE, SN, LN}
 
-	// rules
-	error := 0.25
-	delta := 0.50
+	errorExamples := []float64{0.9}
+	deltaExamples := []float64{0.50}
 
-	// fuzzyfication
-	table2 := []X{}
-	table2 = append(table2, X{LP, fuzzyfication(LP, error), fuzzyfication(LP, delta)})
-	table2 = append(table2, X{SP, fuzzyfication(SP, error), fuzzyfication(SP, delta)})
-	table2 = append(table2, X{ZE, fuzzyfication(ZE, error), fuzzyfication(ZE, delta)})
-	table2 = append(table2, X{SN, fuzzyfication(SN, error), fuzzyfication(SN, delta)})
-	table2 = append(table2, X{LN, fuzzyfication(LN, error), fuzzyfication(LN, delta)})
+	for i := 0; i < len(errorExamples); i++ {
+		e := errorExamples[i]
+		d := deltaExamples[i]
 
-	// apply rules
-	fmt.Println(table2)
+		// fuzzyfication
+		fuzzifiedSetError := fuzzyfication(e)
+		fuzzifiedSetDelta := fuzzyfication(d)
 
-	mx := []float64{}
-	outputs := []float64{}
+		// apply rules
+		mx, output := applyRules(fuzzifiedSetError, fuzzifiedSetDelta)
 
-	// Rule 1:  IF e = ZE AND delta = ZE THEN output = ZE
-	eR := getOutputError(table2, ZE)
-	dR := getOutputDelta(table2, ZE)
-	m1 := math.Min(eR, dR)
-	o1 := 0.0
-	mx = append(mx, m1)
-	outputs = append(outputs, o1)
+		// Deffuzification
+		u := centroidDeffuzification(mx, output)
+		fmt.Printf("Error: %.2f Delta=%.2f u = %.2f \n", e, d, u)
+	}
+}
 
-	// Rule 2:  IF e = ZE AND delta = SP THEN output = SN
-	eR = getOutputError(table2, ZE)
-	dR = getOutputDelta(table2, SP)
-	m2 := math.Min(eR, dR)
-	o2 := -0.5
-	mx = append(mx, m2)
-	outputs = append(outputs, o2)
+func centroidDeffuzification(mx, output []float64) float64 {
 
-	// Rule 3:  IF e = SN AND delta = SN THEN output = LP
-	eR = getOutputError(table2, SN)
-	dR = getOutputDelta(table2, SN)
-	m3 := math.Min(eR, dR)
-	o3 := 1.0
-	mx = append(mx, m3)
-	outputs = append(outputs, o3)
-
-	// Rule 4:  IF e = LP OR  delta = LP THEN output = LN
-	eR = getOutputError(table2, LP)
-	dR = getOutputDelta(table2, LP)
-	m4 := math.Max(eR, dR)
-	o4 := -1.0
-	mx = append(mx, m4)
-	outputs = append(outputs, o4)
-
-	// Centroid calculation
 	numerator := 0.0
 	denominator := 0.0
+
 	for i := 0; i < len(mx); i++ {
-		numerator += mx[i] * outputs[i]
-		denominator += mx[i]
+		numerator = numerator + mx[i]*output[i]
+		denominator = denominator + mx[i]
 	}
-	u := numerator / denominator
-
-	fmt.Printf("u = %.2f", u)
+	u := 0.0
+	if denominator == 0 {
+		u = 1
+	} else {
+		u = numerator / denominator
+	}
+	return u
 }
 
-func fuzzyfication(s string, f float64) float64 {
-	table := []X{}
+func applyRules(e map[string]float64, d map[string]float64) ([]float64, []float64) {
 
-	table = append(table, X{Name: LP, Input: -1, Output: 0})
-	table = append(table, X{Name: LP, Input: -0.75, Output: 0})
-	table = append(table, X{Name: LP, Input: -0.5, Output: 0})
-	table = append(table, X{Name: LP, Input: -0.25, Output: 0})
-	table = append(table, X{Name: LP, Input: 0.0, Output: 0})
-	table = append(table, X{Name: LP, Input: 0.25, Output: 0})
-	table = append(table, X{Name: LP, Input: 0.5, Output: 0.3})
-	table = append(table, X{Name: LP, Input: 0.75, Output: 0.7})
-	table = append(table, X{Name: LP, Input: 1, Output: 1.0})
+	mx := []float64{}
+	output := []float64{}
 
-	table = append(table, X{Name: SP, Input: -1, Output: 0})
-	table = append(table, X{Name: SP, Input: -0.75, Output: 0})
-	table = append(table, X{Name: SP, Input: -0.5, Output: 0})
-	table = append(table, X{Name: SP, Input: -0.25, Output: 0})
-	table = append(table, X{Name: SP, Input: 0.0, Output: 0.3})
-	table = append(table, X{Name: SP, Input: 0.25, Output: 0.7})
-	table = append(table, X{Name: SP, Input: 0.5, Output: 1.0})
-	table = append(table, X{Name: SP, Input: 0.75, Output: 0.7})
-	table = append(table, X{Name: SP, Input: 1, Output: 0.3})
+	// Rule 1:  IF e = ZE AND delta = ZE THEN output = ZE
+	eR := e[ZE]
+	dR := d[ZE]
+	m1 := math.Min(eR, dR)
+	o1 := getMax(ZE)
+	mx = append(mx, m1)
+	output = append(output, o1)
 
-	table = append(table, X{Name: ZE, Input: -1, Output: 0})
-	table = append(table, X{Name: ZE, Input: -0.75, Output: 0})
-	table = append(table, X{Name: ZE, Input: -0.5, Output: 0.3})
-	table = append(table, X{Name: ZE, Input: -0.25, Output: 0.7})
-	table = append(table, X{Name: ZE, Input: 0.0, Output: 1.0})
-	table = append(table, X{Name: ZE, Input: 0.25, Output: 0.7})
-	table = append(table, X{Name: ZE, Input: 0.5, Output: 0.3})
-	table = append(table, X{Name: ZE, Input: 0.75, Output: 0.0})
-	table = append(table, X{Name: ZE, Input: 1, Output: 0.0})
+	// Rule 2:  IF e = ZE AND delta = SP THEN output = SN
+	eR = e[ZE]
+	dR = d[SP]
+	m2 := math.Min(eR, dR)
+	o2 := getMax(SN)
+	mx = append(mx, m2)
+	output = append(output, o2)
 
-	table = append(table, X{Name: SN, Input: -1, Output: 0.3})
-	table = append(table, X{Name: SN, Input: -0.75, Output: 0.7})
-	table = append(table, X{Name: SN, Input: -0.5, Output: 1.0})
-	table = append(table, X{Name: SN, Input: -0.25, Output: 0.7})
-	table = append(table, X{Name: SN, Input: 0.0, Output: 0.3})
-	table = append(table, X{Name: SN, Input: 0.25, Output: 0.0})
-	table = append(table, X{Name: SN, Input: 0.5, Output: 0.0})
-	table = append(table, X{Name: SN, Input: 0.75, Output: 0.0})
-	table = append(table, X{Name: SN, Input: 1, Output: 0.0})
+	// Rule 3:  IF e = SN AND delta = SN THEN output = LP
+	eR = e[SN]
+	dR = d[SN]
+	m3 := math.Min(eR, dR)
+	o3 := getMax(LP)
+	mx = append(mx, m3)
+	output = append(output, o3)
 
-	table = append(table, X{Name: LN, Input: -1, Output: 1.0})
-	table = append(table, X{Name: LN, Input: -0.75, Output: 0.7})
-	table = append(table, X{Name: LN, Input: -0.5, Output: 0.3})
-	table = append(table, X{Name: LN, Input: -0.25, Output: 0.0})
-	table = append(table, X{Name: LN, Input: 0.0, Output: 0.0})
-	table = append(table, X{Name: LN, Input: 0.25, Output: 0.0})
-	table = append(table, X{Name: LN, Input: 0.5, Output: 0.0})
-	table = append(table, X{Name: LN, Input: 0.75, Output: 0.0})
-	table = append(table, X{Name: LN, Input: 1, Output: 0.0})
+	// Rule 4:  IF e = LP OR  delta = LP THEN output = LN
+	eR = e[LP]
+	dR = d[LP]
+	m4 := math.Max(eR, dR)
+	o4 := getMax(LN)
+	mx = append(mx, m4)
+	output = append(output, o4)
 
-	output := getOutput(table, s, f)
-
-	return output
+	return mx, output
 }
 
-func getOutput(table []X, s string, f float64) float64 {
-	found := false
+func fuzzyfication(n float64) map[string]float64 {
+
+	r := map[string]float64{}
+
+	r[LP] = triangularMF(n, 0.5, 0.75, 1.0)
+	r[SP] = triangularMF(n, 0.0, 0.5, 1.0)
+	r[ZE] = triangularMF(n, -0.5, 0.0, 0.5)
+	r[SN] = triangularMF(n, -1.0, -0.5, 0.0)
+	r[LN] = triangularMF(n, -1.0, -0.75, -0.5)
+	return r
+}
+
+func getMax(s string) float64 {
 	r := 0.0
+	max := -1000.0
 
-	for i := 0; i < len(table); i++ {
-		if table[i].Name == s && table[i].Input == f {
-			found = true
-			r = table[i].Output
-			break
+	for i := -1.0; i <= 1.0; i += 0.25 {
+		v := fuzzyfication(i)
+		if v[s] > max {
+			max = v[s]
+			r = i
 		}
-	}
-	if !found {
-		fmt.Println("Error:: SOmething is wrong with the table")
-		os.Exit(0)
 	}
 	return r
 }
 
-func getOutputError(table []X, s string) float64 {
-	found := false
-	r1 := 0.0
-
-	for i := 0; i < len(table); i++ {
-		if table[i].Name == s {
-			found = true
-			r1 = table[i].Input // error
-			break
-		}
-	}
-	if !found {
-		fmt.Println("Error:: Something is wrong with the table")
-		os.Exit(0)
-	}
-	return r1
+func triangularMF(x float64, a float64, b float64, c float64) float64 {
+	return math.Max(0, math.Min((x-a)/(b-a), (c-x)/(c-b)))
 }
 
-func getOutputDelta(table []X, s string) float64 {
-	found := false
-	r1 := 0.0
-
-	for i := 0; i < len(table); i++ {
-		if table[i].Name == s {
-			found = true
-			r1 = table[i].Output // error
-			break
-		}
+func rampMF(x float64, a float64, b float64) float64 {
+	if x <= a {
+		return 0
+	} else if x >= b {
+		return 1
+	} else {
+		return (x - a) / (b - a)
 	}
-	if !found {
-		fmt.Println("Error:: Something is wrong with the table")
-		os.Exit(0)
-	}
-	return r1
 }
 
-func deffuzification(x [9]float64) {
+func piMF(x float64, a float64, b float64, c float64, d float64) float64 {
+	if x < a || x > d {
+		return 0
+	} else if x >= a && x <= b {
+		return (x - a) / (b - a)
+	} else if x >= c && x <= d {
+		return (d - x) / (d - c)
+	} else {
+		return 1
+	}
+}
 
-	//	SUM( I = 1 TO 4 OF ( mu(I) * output(I) ) ) / SUM( I = 1 TO 4 OF mu(I) )
+// Trapezoidal membership function
+func trapezoidalMF(x float64, a float64, b float64, c float64, d float64) float64 {
+	if x < a || x > d {
+		return 0
+	} else if x >= b && x <= c {
+		return 1
+	} else if x >= a && x < b {
+		return (x - a) / (b - a)
+	} else if x > c && x <= d {
+		return (d - x) / (d - c)
+	} else {
+		return 1
+	}
 }

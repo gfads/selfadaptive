@@ -158,10 +158,16 @@ func (al AdaptationLogic) RunExperiment() {
 			fmt.Printf("%d;%d;%f;%f\n", n.QueueSize, al.PC, rate, shared.RandomGoals[currentGoalIdx])
 
 			// invoke controller to calculate new pc
-			pc := int(math.Round(al.Controller.Update(shared.RandomGoals[currentGoalIdx], rate)))
+			//pc := int(math.Round(al.Controller.Update(shared.RandomGoals[currentGoalIdx], rate)))
+
+			// invoke controller to calculate the pc update - fuzzy controller (NEW)
+			update := int(math.Round(al.Controller.Update(shared.RandomGoals[currentGoalIdx], rate)))
 
 			// update pc at adaptation mechanism
-			al.PC = pc
+			al.PC = al.PC + update
+			if al.PC <= 0 {
+				al.PC = 1
+			}
 
 			// send new pc to business
 			al.ToBusiness <- al.PC
