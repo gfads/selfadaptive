@@ -226,6 +226,26 @@ const NoWorry = "Do not take care"
 const AlwaysUpdated = "Always Updated"
 const BestEffort = "Best Effort"
 
+// Fuzzy Logic
+type OutputX struct {
+	Mx  []float64
+	Out []float64
+}
+
+const EXTREMELYPOSITIVE = "EP"
+const LARGEPOSITIVE = "LP" // Large Positive
+const SMALLPOSITIVE = "SP" // Small Positive
+const ZERO = "ZE"          // Zero
+const SMALLNEGATIVE = "SN" // Smal Negative
+const LARGENEGATIVE = "LN" // Large Negative
+const EXTREMELYNEGATIVE = "EN"
+
+const LARGEINCREASE = "LI"  // Large Positive
+const SMALLINCREASE = "SI"  // Small Positive
+const MAINTAIN = "MAINTAIN" // Zero
+const SMALLDECREASE = "SD"  // Small Negative
+const LARGEDECREASE = "LD"  // Large Negative
+
 // Environments security level
 var EnvironmentSecurityLevels = []string{Secure, Suspicious, Unsecure}
 
