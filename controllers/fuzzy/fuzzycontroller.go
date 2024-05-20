@@ -80,8 +80,8 @@ func applyRules(e map[string]float64) shared.OutputX {
 	o.Mx = append(o.Mx, e[shared.EXTREMELYNEGATIVE])
 	o.Out = append(o.Out, getMaxOutput(shared.LARGEDECREASE))
 
-	fmt.Printf("[%.2f %.2f %.2f %.2f %.2f %.2f %.2f]\n", o.Mx[0], o.Mx[1], o.Mx[2], o.Mx[3], o.Mx[4], o.Mx[5], o.Mx[6])
-	fmt.Printf("[%.2f %.2f %.2f %.2f %.2f %.2f %.2f]\n", o.Out[0], o.Out[1], o.Out[2], o.Out[3], o.Out[4], o.Out[5], o.Out[6])
+	//fmt.Printf("[%.2f %.2f %.2f %.2f %.2f %.2f %.2f]\n", o.Mx[0], o.Mx[1], o.Mx[2], o.Mx[3], o.Mx[4], o.Mx[5], o.Mx[6])
+	//fmt.Printf("[%.2f %.2f %.2f %.2f %.2f %.2f %.2f]\n", o.Out[0], o.Out[1], o.Out[2], o.Out[3], o.Out[4], o.Out[5], o.Out[6])
 	return o
 }
 func fuzzyInput(x float64, mf string) map[string]float64 {
@@ -120,15 +120,16 @@ func fuzzyInput(x float64, mf string) map[string]float64 {
 		os.Exit(0)
 	}
 
-	fmt.Printf("Error = %.2f FuzzifiedError [%.2f %.2f %.2f %.2f %.2f %.2f %.2f]\n", x,
-		r[shared.EXTREMELYNEGATIVE],
-		r[shared.LARGENEGATIVE],
-		r[shared.SMALLNEGATIVE],
-		r[shared.ZERO],
-		r[shared.SMALLPOSITIVE],
-		r[shared.LARGEPOSITIVE],
-		r[shared.EXTREMELYPOSITIVE])
-
+	/*
+		fmt.Printf("Error = %.2f FuzzifiedError [%.2f %.2f %.2f %.2f %.2f %.2f %.2f]\n", x,
+			r[shared.EXTREMELYNEGATIVE],
+			r[shared.LARGENEGATIVE],
+			r[shared.SMALLNEGATIVE],
+			r[shared.ZERO],
+			r[shared.SMALLPOSITIVE],
+			r[shared.LARGEPOSITIVE],
+			r[shared.EXTREMELYPOSITIVE])
+	*/
 	return r
 }
 func fuzzyOutput(n float64, mf string) map[string]float64 {

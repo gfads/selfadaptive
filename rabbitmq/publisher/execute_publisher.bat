@@ -1,9 +1,10 @@
+rem @echo off
+
 rem docker stop some-rabbit
 rem docker rm some-rabbit
 rem docker run -d --memory="6g" --cpus="3.0" --name some-rabbit -p 5672:5672 rabbitmq
 rem timeout /t 15
 
-@echo off
 set GO111MODULE=on
 set GOPATH=C:\Users\user\go;C:\Users\user\go\control\pkg\mod\github.com\streadway\amqp@v1.0.0;C:\Users\user\go\selfadaptive
 set GOROOT=C:\Program Files\Go
@@ -14,7 +15,8 @@ rem compile publisher
 c:
 cd C:\Users\user\go\selfadaptive\rabbitmq\publisher
 go build -o client.exe main.go
-for
+
+rem go run main.go -message-size=256 -sample-size=20000 -mean-request-time=25 -std-dev-mean-request-time=2 -number-of-clients=100
 go run main.go -message-size=256 -sample-size=20000 -mean-request-time=25 -std-dev-mean-request-time=2 -number-of-clients=100
 cd C:\Users\user\go\selfadaptive\rabbitmq\publisher
 

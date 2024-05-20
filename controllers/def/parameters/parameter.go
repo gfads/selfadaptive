@@ -48,9 +48,9 @@ func (e ExecutionParameters) Load() ExecutionParameters {
 	p.GainTrigger = flag.Float64("gain-trigger", 1.0, "gain trigger is a float")
 	p.Alfa = flag.Float64("alfa", 1.0, "Alfa is a float (Setpoint Weighting)")
 	p.Beta = flag.Float64("beta", 1.0, "Beta is a float (Setpoint Weighting / Two degrees of freedom)")
-	p.Tunning = flag.String("tunning", "RootLocus", "tunning-type is a string")
+	p.Tunning = flag.String("tunning", "None", "tunning-type is a string")
 	p.OutputFile = flag.String("output-file", "apague", "output-file is a string")
-	//flag.Parse()
+	flag.Parse()
 
 	return p
 }

@@ -212,9 +212,9 @@ const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-p
 const DockerDir = "/app/data" // it is mapped into windows dir "C:\Users\user\go\selfadaptive\rabbitmq\data" (see execute-old.bat)
 
 // const DataDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/rabbitmq/data/" // macos
-const DataDir = "C:\\Users\\user\\go\\selfadaptive\\rabbitmq\\data\\journal" // macos
-const DockerfilesDir = "C:\\Users\\user\\go\\selfadaptive\\temp"             // macos
-const BatchfilesDir = "C:\\Users\\user\\go\\selfadaptive"                    // macos
+const DataDir = "C:\\Users\\user\\go\\selfadaptive\\rabbitmq\\data\\middleware-2024" // macos
+const DockerfilesDir = "C:\\Users\\user\\go\\selfadaptive\\temp"                     // macos
+const BatchfilesDir = "C:\\Users\\user\\go\\selfadaptive"                            // macos
 const BatchFileExperiments = "execute-all-experiments.bat"
 
 //const SourcesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\sources"

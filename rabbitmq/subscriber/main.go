@@ -139,6 +139,7 @@ func (c Subscriber) Warmup() {
 
 	fmt.Println("Begin of Warming up...")
 	for i := 0; i < 10000; i++ {
+		//for i := 0; i < 10; i++ {
 		d := <-c.Msgs
 		err := d.Ack(false) // send ack to broker
 		if err != nil {
