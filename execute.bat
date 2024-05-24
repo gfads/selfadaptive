@@ -22,19 +22,19 @@ rem set et=RootTraining
 rem set et=ZieglerTraining
 rem set ct=ErrorSquarePIDFull
 rem set ct=ErrorSquarePIDProportional
-rem set ct=BasicPID
+rem set ct=BasicPI
 rem set ct=GainScheduling
 rem set ct=HPA
-set ct=Fuzzy
+rem set ct=Fuzzy
 rem set ct=IncrementalFormPID
-rem set ct=AsTAR
+set ct=AsTAR
 rem set t=RootLocus
 set t=None
 rem set t=Ziegler
 rem set t=AMIGO
 set b=%et%-%ct%-%t
 rem set f=1 2 3 4 5 6 7 8 9 10
-set f=1
+set f=2
 
 for %%x in (%f%) do (
     set GO111MODULE=on

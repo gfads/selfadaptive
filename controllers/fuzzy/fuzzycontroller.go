@@ -56,9 +56,9 @@ func applyRules(e map[string]float64) shared.OutputX {
 	o.Mx = append(o.Mx, e[shared.EXTREMELYPOSITIVE])
 	o.Out = append(o.Out, getMaxOutput(shared.LARGEINCREASE))
 
-	// Rule 2:  IF error LARGEPOSITIVE THEN output = LARGEINCREASE
+	// Rule 2:  IF error LARGEPOSITIVE THEN output = MEDIUMINCREASE
 	o.Mx = append(o.Mx, e[shared.LARGEPOSITIVE])
-	o.Out = append(o.Out, getMaxOutput(shared.LARGEINCREASE))
+	o.Out = append(o.Out, getMaxOutput(shared.MEDIUMINCREASE))
 
 	// Rule 3:  IF e = SMALLPOSITIVE THEN output = SMALLINCREASE
 	o.Mx = append(o.Mx, e[shared.SMALLPOSITIVE]) // saida = +1 s
@@ -72,9 +72,9 @@ func applyRules(e map[string]float64) shared.OutputX {
 	o.Mx = append(o.Mx, e[shared.SMALLNEGATIVE]) // saida = -1 s
 	o.Out = append(o.Out, getMaxOutput(shared.SMALLDECREASE))
 
-	// Rule 6:  IF e = LARGENEGATIVE THEN output = LARGEINCREASE
+	// Rule 6:  IF e = LARGENEGATIVE THEN output = MEDIUMDECREASE
 	o.Mx = append(o.Mx, e[shared.LARGENEGATIVE])
-	o.Out = append(o.Out, getMaxOutput(shared.LARGEDECREASE))
+	o.Out = append(o.Out, getMaxOutput(shared.MEDIUMDECREASE))
 
 	// Rule 7:  IF e = EXTREMELYNEGATIVE THEN output = LARGEDECREASE
 	o.Mx = append(o.Mx, e[shared.EXTREMELYNEGATIVE])
@@ -99,13 +99,13 @@ func fuzzyInput(x float64, mf string) map[string]float64 {
 		r[shared.EXTREMELYNEGATIVE] = f.Fuzzify(x, -1250, -5000, -10000) // -1000,-750,-500
 	case fuzzification.GAUSSIAN:
 		f := fuzzification.Gaussian{}
-		r[shared.EXTREMELYPOSITIVE] = f.Fuzzify(x, 5000.0, 0.01)
-		r[shared.LARGEPOSITIVE] = f.Fuzzify(x, 1250.0, 0.01)      //500,750,1000
-		r[shared.SMALLPOSITIVE] = f.Fuzzify(x, 625.0, 0.01)       // 0, 500,1000
-		r[shared.ZERO] = f.Fuzzify(x, 0.0, 0.01)                  // -500,0,500
-		r[shared.SMALLNEGATIVE] = f.Fuzzify(x, -625.0, 0.01)      //-1000,-500,0
-		r[shared.LARGENEGATIVE] = f.Fuzzify(x, -1250.0, 0.01)     // -1000,-750,-500
-		r[shared.EXTREMELYNEGATIVE] = f.Fuzzify(x, -5000.0, 0.01) // -1000,-750,-500
+		r[shared.EXTREMELYPOSITIVE] = f.Fuzzify(x, 3000.0, 0.01)
+		r[shared.LARGEPOSITIVE] = f.Fuzzify(x, 1500.0, 0.01)      //500,750,1000
+		r[shared.SMALLPOSITIVE] = f.Fuzzify(x, 500.0, 0.01)       // 0, 500,1000
+		r[shared.ZERO] = f.Fuzzify(x, 0.0, 0.1)                   // -500,0,500
+		r[shared.SMALLNEGATIVE] = f.Fuzzify(x, -500.0, 0.01)      //-1000,-500,0
+		r[shared.LARGENEGATIVE] = f.Fuzzify(x, -1500.0, 0.01)     // -1000,-750,-500
+		r[shared.EXTREMELYNEGATIVE] = f.Fuzzify(x, -3000.0, 0.01) // -1000,-750,-500
 	case fuzzification.PI:
 		f := fuzzification.Pi{}
 		r[shared.EXTREMELYPOSITIVE] = f.Fuzzify(x, 1250, 2500, 5000, 10000)
@@ -139,11 +139,13 @@ func fuzzyOutput(n float64, mf string) map[string]float64 {
 
 	case fuzzification.GAUSSIAN:
 		f := fuzzification.Gaussian{}
-		r[shared.LARGEINCREASE] = f.Fuzzify(n, 2.0, 0.01)
-		r[shared.SMALLINCREASE] = f.Fuzzify(n, 1.0, 0.01)
+		r[shared.LARGEINCREASE] = f.Fuzzify(n, 3.0, 0.01)  // original = 2
+		r[shared.MEDIUMINCREASE] = f.Fuzzify(n, 2.0, 0.01) // original = 2
+		r[shared.SMALLINCREASE] = f.Fuzzify(n, 1.0, 0.01)  // original = 1
 		r[shared.MAINTAIN] = f.Fuzzify(n, 0.0, 0.01)
-		r[shared.SMALLDECREASE] = f.Fuzzify(n, -1.0, 0.01)
-		r[shared.LARGEDECREASE] = f.Fuzzify(n, -2.0, 0.01)
+		r[shared.SMALLDECREASE] = f.Fuzzify(n, -1.0, 0.01)  // original=-1
+		r[shared.MEDIUMDECREASE] = f.Fuzzify(n, -2.0, 0.01) // original=-1
+		r[shared.LARGEDECREASE] = f.Fuzzify(n, -3.0, 0.01)  // original= -2
 	case fuzzification.TRIANGULAR:
 		f := fuzzification.Triangular{}
 		r[shared.LARGEINCREASE] = f.Fuzzify(n, 1.0, 2.0, 3.0)

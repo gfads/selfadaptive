@@ -38,14 +38,14 @@ func (c *Controller) Initialise(p ...float64) {
 func (c *Controller) Update(p ...float64) float64 {
 	u := 0.0
 
-	s := p[0] // goal
+	r := p[0] // goal
 	y := p[1] // plant output
 
-	u = math.Round(c.Info.PC * s / y)
+	u = math.Round(c.Info.PC * r / y)
 
 	//fmt.Printf("s/y=%.4f round(s/y)=%.4f\n", c.Info.PC*(y/s), c.Info.PC*(s/y))
 
-	fmt.Printf("HPA:: Goal=%v y=%.4f PC=%.4f u=%.4f \n", s, y, c.Info.PC, u)
+	//fmt.Printf("HPA:: Goal=%v y=%.4f PC=%.4f u=%.4f \n", s, y, c.Info.PC, u)
 
 	// control law
 	if u > c.Info.Max {

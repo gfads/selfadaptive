@@ -1,17 +1,17 @@
-rem This file has been generated automatically at 2024-05-14 17:39:41.9245535 -0300 -03 m=+0.027799001
+rem This file has been generated automatically at 2024-05-23 14:12:37.9188084 -0300 -03 m=+0.018071001
 @echo off 
 timeout /t 10
 docker stop publisher
 docker rm publisher
 docker stop subscriber
 docker rm subscriber
-set list=Dockerfile-Experiment-Fuzzy-None 
+set list=Dockerfile-Experiment-AsTAR-None 
 
 for %%x in (%list%) do (
 echo %%x 
    copy C:\Users\user\go\selfadaptive\temp\%%x Dockerfile
    docker build --tag subscriber .
-   docker run --rm --name some-subscriber --memory="1g" --cpus="1.0" -v C:\Users\user\go\selfadaptive\rabbitmq\data\middleware-2024:/app/data subscriber
+   docker run --rm --name some-subscriber --memory="1g" --cpus="1.0" -v C:\Users\user\go\selfadaptive\rabbitmq\data\softcom-2024:/app/data subscriber
    del C:\Users\user\go\selfadaptive\temp\%%x 
    echo y| docker volume prune 
    echo y| docker image prune 

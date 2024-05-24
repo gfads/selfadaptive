@@ -37,7 +37,8 @@ const T = 0.1   // original
 //var RandomGoals = []float64{800, 1600, 2400, 3200, 4000, 4800}
 //var RandomGoals = []float64{800, 2400, 1600}
 //var RandomGoals = []float64{800, 2400, 1600, 800, 2400, 1600} // variable final
-var RandomGoals = []float64{800, 1300, 1900, 1400, 2400, 2900, 3400, 800} // fixed final
+//var RandomGoals = []float64{800, 1300, 1900, 1400, 2400, 2900, 3400, 2600} // variable final
+var RandomGoals = []float64{1400, 1400, 1400, 1400, 1400, 1400, 1400, 1400} // fixed final
 
 //var RandomGoals = []float64{1000}
 
@@ -61,21 +62,21 @@ var Kp = map[string]string{
 	BasicP + Ziegler:     "0.00022294", // "-kp=0.00022294", "-ki=0.00000000", "-kd=0.00000000"
 	BasicP + Cohen:       "0.00100321", // "-kp=0.00100321", "-ki=0.00000000", "-kd=0.00000000"
 	BasicP + Amigo:       "0.0",
-	BasicPi + RootLocus:  "0.718169503896682", //-kp=-0.00111867", "-ki=0.00148840", "-kd=0.00000000"
-	BasicPi + Ziegler:    "0.00017245",        // "-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
-	BasicPi + Cohen:      "0.00196709",        // "-kp=0.00196709", "-ki=0.07181427", "-kd=0.00000000"
-	BasicPi + Amigo:      "0.00037871",        // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
-	BasicPid + RootLocus: "-0.00174506",       // -0.00174506", "-ki=0.00423043", "-kd=0.00098382" (15/12/2023)
-	BasicPid + Ziegler:   "0.00026446",        // "-kp=0.00026446", "-ki=0.00132228", "-kd=0.00001322"
-	BasicPid + Cohen:     "0.00083304",        // "-kp=0.00083304", "-ki=0.00788611", "-kd=0.00001063"
-	BasicPid + Amigo:     "0.00053993",        // "-kp=0.00053993", "-ki=0.01136109", "-kd=0.00000675"
+	BasicPi + RootLocus:  "-0.00111867", //-kp=-0.00111867", "-ki=0.00148840", "-kd=0.00000000"
+	BasicPi + Ziegler:    "0.00017245",  // "-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
+	BasicPi + Cohen:      "0.00196709",  // "-kp=0.00196709", "-ki=0.07181427", "-kd=0.00000000"
+	BasicPi + Amigo:      "0.00037871",  // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
+	BasicPid + RootLocus: "-0.00174506", // -0.00174506", "-ki=0.00423043", "-kd=0.00098382" (15/12/2023)
+	BasicPid + Ziegler:   "0.00026446",  // "-kp=0.00026446", "-ki=0.00132228", "-kd=0.00001322"
+	BasicPid + Cohen:     "0.00083304",  // "-kp=0.00083304", "-ki=0.00788611", "-kd=0.00001063"
+	BasicPid + Amigo:     "0.00053993",  // "-kp=0.00053993", "-ki=0.01136109", "-kd=0.00000675"
 }
 var Ki = map[string]string{
 	BasicP + RootLocus:   "0.0",
 	BasicP + Ziegler:     "0.0",
 	BasicP + Cohen:       "0.0",
 	BasicP + Amigo:       "0.0",
-	BasicPi + RootLocus:  "0.000153",
+	BasicPi + RootLocus:  "0.00148840",
 	BasicPi + Ziegler:    "0.00057482", //"-kp=0.00019285", "-ki=0.00064284", "-kd=0.00000000"
 	BasicPi + Cohen:      "0.07181427",
 	BasicPi + Amigo:      "0.01035190", // "-kp=0.00037871", "-ki=0.01035190", "-kd=0.00000000"
@@ -119,7 +120,7 @@ const MaximumNrmse = 0.30
 const WarmupTime = 30 // seconds
 const TrainingAttempts = 30
 
-const SizeOfSameLevel = 30        // used in the experiments
+const SizeOfSameLevel = 50        // used in the experiments
 const SizeOfSameLevelZiegler = 30 // used in the experiments
 //const SizeOfSameLevel = 50 // used in the experiments
 //const SizeOfSameLevel = 100 // used in the experiments
@@ -212,9 +213,9 @@ const ExecutablesDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/example-p
 const DockerDir = "/app/data" // it is mapped into windows dir "C:\Users\user\go\selfadaptive\rabbitmq\data" (see execute-old.bat)
 
 // const DataDir = "/Volumes/GoogleDrive/Meu Drive/go/selfadaptive/rabbitmq/data/" // macos
-const DataDir = "C:\\Users\\user\\go\\selfadaptive\\rabbitmq\\data\\middleware-2024" // macos
-const DockerfilesDir = "C:\\Users\\user\\go\\selfadaptive\\temp"                     // macos
-const BatchfilesDir = "C:\\Users\\user\\go\\selfadaptive"                            // macos
+const DataDir = "C:\\Users\\user\\go\\selfadaptive\\rabbitmq\\data\\softcom-2024" // macos
+const DockerfilesDir = "C:\\Users\\user\\go\\selfadaptive\\temp"                  // macos
+const BatchfilesDir = "C:\\Users\\user\\go\\selfadaptive"                         // macos
 const BatchFileExperiments = "execute-all-experiments.bat"
 
 //const SourcesDir = "C:\\Users\\user\\go\\selfadaptive\\example-plugin\\envrnment\\sources"
@@ -241,9 +242,11 @@ const LARGENEGATIVE = "LN" // Large Negative
 const EXTREMELYNEGATIVE = "EN"
 
 const LARGEINCREASE = "LI"  // Large Positive
+const MEDIUMINCREASE = "MI" // Small Positive
 const SMALLINCREASE = "SI"  // Small Positive
 const MAINTAIN = "MAINTAIN" // Zero
 const SMALLDECREASE = "SD"  // Small Negative
+const MEDIUMDECREASE = "MD" // Small Positive
 const LARGEDECREASE = "LD"  // Large Negative
 
 // Environments security level

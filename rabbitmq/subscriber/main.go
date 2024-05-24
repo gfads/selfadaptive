@@ -138,13 +138,33 @@ func (c Subscriber) RunOpenLoop(startTimer, stopTimer chan bool, p parameters.Ex
 func (c Subscriber) Warmup() {
 
 	fmt.Println("Begin of Warming up...")
-	for i := 0; i < 10000; i++ {
+
+	// configure pc to zero
+	err := c.Ch.Qos(
+		0,    // prefetch count
+		0,    // prefetch size
+		true, // global TODO default is false
+	)
+	if err != nil {
+		shared.ErrorHandler(shared.GetFunction(), "Failed to set QoS")
+	}
+	for i := 0; i < 1000000; i++ {
 		//for i := 0; i < 10; i++ {
 		d := <-c.Msgs
 		err := d.Ack(false) // send ack to broker
 		if err != nil {
 			shared.ErrorHandler(shared.GetFunction(), err.Error())
 		}
+	}
+
+	// return pc back to initial pc
+	err = c.Ch.Qos(
+		c.PC, // prefetch count
+		0,    // prefetch size
+		true, // global TODO default is false
+	)
+	if err != nil {
+		shared.ErrorHandler(shared.GetFunction(), "Failed to set QoS")
 	}
 	fmt.Println("End of Warming up...")
 }
